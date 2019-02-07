@@ -32,17 +32,6 @@ class _MyAppState extends State<MyApp> {
           'https://www.googleapis.com/oauth2/v4/token');
   List<String> _scopes = ['profile'];
 
-  // Azure B2C details
-  // String _clientId = '90c0fe63-bcf2-44d5-8fb7-b8bbc0b29dc6';
-  // String _redirectUrl =
-  //     'com.onmicrosoft.fabrikamb2c.exampleapp://oauth/redirect';
-
-  // AuthorizationServiceConfiguration _authorizationServiceConfiguration =
-  //     AuthorizationServiceConfiguration(
-  //         'https://login.microsoftonline.com/te/fabrikamb2c.onmicrosoft.com/b2c_1_susi/oauth2/v2.0/authorize',
-  //         'https://login.microsoftonline.com/te/fabrikamb2c.onmicrosoft.com/b2c_1_susi/oauth2/v2.0/token');
-  // List<String> _scopes = ['openid', 'profile'];
-
   @override
   void initState() {
     super.initState();

@@ -14,6 +14,8 @@ class AuthorizationTokenRequest extends TokenRequest {
       String discoveryUrl})
       : super(clientId, redirectUrl,
             clientSecret: clientSecret,
+            discoveryUrl: discoveryUrl,
+            issuer: issuer,
             scopes: scopes,
             serviceConfiguration: serviceConfiguration,
             additionalParameters: additionalParameters);

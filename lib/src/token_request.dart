@@ -23,16 +23,10 @@ class TokenRequest {
       this.issuer,
       this.discoveryUrl})
       : assert(
-            (issuer != null &&
-                    discoveryUrl == null &&
-                    serviceConfiguration == null) ||
-                (issuer == null &&
-                    discoveryUrl != null &&
-                    serviceConfiguration == null) ||
-                (issuer == null &&
-                    discoveryUrl == null &&
-                    serviceConfiguration?.authorizationEndpoint != null &&
-                    serviceConfiguration?.tokenEndpoint != null),
+            (issuer != null ||
+                discoveryUrl != null ||
+                (serviceConfiguration?.authorizationEndpoint != null &&
+                    serviceConfiguration?.tokenEndpoint != null)),
             'Either the issuer, discovery URL or service configuration must be provided');
 
   Map<String, dynamic> toMap() {
