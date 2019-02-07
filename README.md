@@ -41,5 +41,5 @@ Go to the `Info.plist` for your iOS app to specify the custom scheme so that the
 		</dict>
 	</array>
 ```
-...
+
 **NOTE**: this library uses AndroidX and there is currently a known issuer with Jetifier that affects the use of Chrome Custom Tabs (see https://issuetracker.google.com/issues/119183822). This means that until a fix for it is released, signing will direct users to the browser as opposed to using Chrome Custom Tabs.
