@@ -1,19 +1,18 @@
 part of flutter_appauth;
 
-/// Details for refreshing a token
-class RefreshRequest extends AuthorizationRequest {
-  final String refreshToken;
+/// Details required for a combined authorization and token exchange request
+class AuthorizationTokenRequest extends TokenRequest {
+  final String loginHint;
 
-  RefreshRequest(String clientId, String redirectUrl, this.refreshToken,
-      {String issuer,
-      String discoveryUrl,
+  AuthorizationTokenRequest(String clientId, String redirectUrl,
+      {this.loginHint,
       String clientSecret,
       List<String> scopes,
       AuthorizationServiceConfiguration serviceConfiguration,
-      Map<String, String> additionalParameters})
+      Map<String, String> additionalParameters,
+      String issuer,
+      String discoveryUrl})
       : super(clientId, redirectUrl,
-            issuer: issuer,
-            discoveryUrl: discoveryUrl,
             clientSecret: clientSecret,
             scopes: scopes,
             serviceConfiguration: serviceConfiguration,
@@ -21,7 +20,7 @@ class RefreshRequest extends AuthorizationRequest {
 
   Map<String, dynamic> toMap() {
     var map = super.toMap();
-    map['refreshToken'] = refreshToken;
+    map['loginHint'] = loginHint;
     return map;
   }
 }

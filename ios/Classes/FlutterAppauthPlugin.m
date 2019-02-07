@@ -1,31 +1,38 @@
 #import "FlutterAppauthPlugin.h"
 #import "AppAuth.h"
 
-@interface RequestParameters : NSObject
-
+@interface TokenRequestParameters : NSObject
 @property(nonatomic, strong) NSString *clientId;
 @property(nonatomic, strong) NSString *clientSecret;
 @property(nonatomic, strong) NSString *issuer;
 @property(nonatomic, strong) NSString *discoveryUrl;
-@property(nonatomic, strong) NSString *loginHint;
 @property(nonatomic, strong) NSString *redirectUrl;
 @property(nonatomic, strong) NSString *refreshToken;
 @property(nonatomic, strong) NSArray *scopes;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
-
 @end
 
-@implementation RequestParameters
+@implementation TokenRequestParameters
+@end
+
+@interface AuthorizationTokenRequestParameters : TokenRequestParameters
+@property(nonatomic, strong) NSString *loginHint;
+@end
+
+@implementation AuthorizationTokenRequestParameters
 @end
 
 @implementation FlutterAppauthPlugin
 
 FlutterMethodChannel* channel;
-NSString *const AUTHORIZE_METHOD = @"authorize";
-NSString *const REFRESH_METHOD = @"refresh";
+NSString *const AUTHORIZE_AND_EXCHANGE_TOKEN_METHOD = @"authorizeAndExchangeToken";
+NSString *const TOKEN_METHOD = @"token";
+NSString *const DISCOVERY_ERROR_CODE = @"discovery_failed";
+NSString *const TOKEN_ERROR_CODE = @"token_failed";
+NSString *const DISCOVERY_ERROR_MESSAGE_FORMAT = @"Error retrieving discovery document: %@";
+NSString *const TOKEN_ERROR_MESSAGE = @"Failed to exchange token";
 
-id<OIDExternalUserAgentSession> currentAuthorizationFlow;
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     channel = [FlutterMethodChannel
@@ -37,23 +44,23 @@ id<OIDExternalUserAgentSession> currentAuthorizationFlow;
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-    if ([AUTHORIZE_METHOD isEqualToString:call.method]) {
-        [self handleAuthorize:[call arguments] result:result];
-    } else if([REFRESH_METHOD isEqualToString:call.method]) {
-        [self handleRefresh:[call arguments] result:result];
+    if ([AUTHORIZE_AND_EXCHANGE_TOKEN_METHOD isEqualToString:call.method]) {
+        [self handleAuthorizeMethodCall:[call arguments] result:result];
+    } else if([TOKEN_METHOD isEqualToString:call.method]) {
+        [self handleTokenMethodCall:[call arguments] result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }
 }
 
--(void)handleAuthorize:(NSDictionary*)arguments result:(FlutterResult)result {
-    RequestParameters *requestParameters = [self processCallArguments:arguments];
+-(void)handleAuthorizeMethodCall:(NSDictionary*)arguments result:(FlutterResult)result {
+    AuthorizationTokenRequestParameters *requestParameters = [self processAuthorizationTokenRequestArguments:arguments];
     if(requestParameters.serviceConfigurationParameters != nil) {
         OIDServiceConfiguration *serviceConfiguration =
         [[OIDServiceConfiguration alloc]
          initWithAuthorizationEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"authorizationEndpoint"]]
          tokenEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"tokenEndpoint"]]];
-        [self performAuthorization:serviceConfiguration requestParameters:requestParameters result:result];
+        [self performAuthorization:serviceConfiguration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters result:result];
     } else if (requestParameters.discoveryUrl) {
         NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
         
@@ -62,13 +69,11 @@ id<OIDExternalUserAgentSession> currentAuthorizationFlow;
                                                                                NSError *_Nullable error) {
                                                                       
                                                                       if (!configuration) {
-                                                                          NSLog(@"Error retrieving discovery document: %@",
-                                                                                [error localizedDescription]);
-                                                                          result(nil);
+                                                                          [self finishWithDiscoveryError:error result:result];
                                                                           return;
                                                                       }
                                                                       
-                                                                      [self performAuthorization:configuration requestParameters:requestParameters result:result];
+                                                                      [self performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters result:result];
                                                                   }];
     } else {
         NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -77,50 +82,53 @@ id<OIDExternalUserAgentSession> currentAuthorizationFlow;
                                                                          NSError *_Nullable error) {
                                                                 
                                                                 if (!configuration) {
-                                                                    NSLog(@"Error retrieving discovery document: %@",
-                                                                          [error localizedDescription]);
-                                                                    result(nil);
+                                                                    [self finishWithDiscoveryError:error result:result];
                                                                     return;
                                                                 }
                                                                 
-                                                                [self performAuthorization:configuration requestParameters:requestParameters result:result];
+                                                                [self performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters result:result];
                                                             }];
     }
     
     
 }
 
-- (void)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration requestParameters:(RequestParameters *)requestParameters result:(FlutterResult)result {
+- (void)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters result:(FlutterResult)result {
     OIDAuthorizationRequest *request =
     [[OIDAuthorizationRequest alloc] initWithConfiguration:serviceConfiguration
-                                                  clientId:requestParameters.clientId
-                                              clientSecret:requestParameters.clientSecret
-                                                    scopes:requestParameters.scopes
-                                               redirectURL:[NSURL URLWithString:requestParameters.redirectUrl]
+                                                  clientId:clientId
+                                              clientSecret:clientSecret
+                                                    scopes:scopes
+                                               redirectURL:[NSURL URLWithString:redirectUrl]
                                               responseType:OIDResponseTypeCode
-                                      additionalParameters:requestParameters.additionalParameters];
+                                      additionalParameters:additionalParameters];
     UIViewController *rootViewController =
     [UIApplication sharedApplication].delegate.window.rootViewController;
-    currentAuthorizationFlow = [OIDAuthState authStateByPresentingAuthorizationRequest:request
-                                                              presentingViewController: rootViewController
-                                                                              callback:^(OIDAuthState *_Nullable authState,
-                                                                                         NSError *_Nullable error) {
-                                                                                  if(authState) {
-                                                                                      result([self processResponses:authState.lastTokenResponse authResponse:authState.lastAuthorizationResponse]);
-                                                                                  } else {
-                                                                                      
-                                                                                  }
-                                                                              }];
+    _currentAuthorizationFlow = [OIDAuthState authStateByPresentingAuthorizationRequest:request
+                                                               presentingViewController: rootViewController
+                                                                               callback:^(OIDAuthState *_Nullable authState,
+                                                                                          NSError *_Nullable error) {
+                                                                                   if(authState) {
+                                                                                       result([self processResponses:authState.lastTokenResponse authResponse:authState.lastAuthorizationResponse]);
+                                                                                   } else {
+                                                                                       
+                                                                                   }
+                                                                               }];
 }
 
--(void)handleRefresh:(NSDictionary*)arguments result:(FlutterResult)result {
-    RequestParameters *requestParameters = [self processCallArguments:arguments];
+- (void)finishWithDiscoveryError:(NSError * _Nullable)error result:(FlutterResult)result {
+    NSString *message = [NSString stringWithFormat:DISCOVERY_ERROR_MESSAGE_FORMAT, [error localizedDescription]];
+    result([FlutterError errorWithCode:DISCOVERY_ERROR_CODE message:message details:nil]);
+}
+
+-(void)handleTokenMethodCall:(NSDictionary*)arguments result:(FlutterResult)result {
+    TokenRequestParameters *requestParameters = [self processAuthorizationTokenRequestArguments:arguments];
     if(requestParameters.serviceConfigurationParameters != nil) {
         OIDServiceConfiguration *serviceConfiguration =
         [[OIDServiceConfiguration alloc]
          initWithAuthorizationEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"authorizationEndpoint"]]
          tokenEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"tokenEndpoint"]]];
-        [self performRefresh:serviceConfiguration requestParameters:requestParameters result:result];
+        [self performTokenRequest:serviceConfiguration requestParameters:requestParameters result:result];
     } else if (requestParameters.discoveryUrl) {
         NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
         
@@ -129,13 +137,11 @@ id<OIDExternalUserAgentSession> currentAuthorizationFlow;
                                                                                NSError *_Nullable error) {
                                                                       
                                                                       if (!configuration) {
-                                                                          NSLog(@"Error retrieving discovery document: %@",
-                                                                                [error localizedDescription]);
-                                                                          result(nil);
+                                                                          [self finishWithDiscoveryError:error result:result];
                                                                           return;
                                                                       }
                                                                       
-                                                                      [self performRefresh:configuration requestParameters:requestParameters result:result];
+                                                                      [self performTokenRequest:configuration requestParameters:requestParameters result:result];
                                                                   }];
     } else {
         NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -144,19 +150,17 @@ id<OIDExternalUserAgentSession> currentAuthorizationFlow;
                                                                          NSError *_Nullable error) {
                                                                 
                                                                 if (!configuration) {
-                                                                    NSLog(@"Error retrieving discovery document: %@",
-                                                                          [error localizedDescription]);
-                                                                    result(nil);
+                                                                    [self finishWithDiscoveryError:error result:result];
                                                                     return;
                                                                 }
                                                                 
-                                                                [self performRefresh:configuration requestParameters:requestParameters result:result];
+                                                                [self performTokenRequest:configuration requestParameters:requestParameters result:result];
                                                             }];
     }
     
 }
 
-- (void)performRefresh:(OIDServiceConfiguration *)serviceConfiguration requestParameters:(RequestParameters *)requestParameters result:(FlutterResult)result {
+- (void)performTokenRequest:(OIDServiceConfiguration *)serviceConfiguration requestParameters:(TokenRequestParameters *)requestParameters result:(FlutterResult)result {
     OIDTokenRequest *tokenRequest =
     [[OIDTokenRequest alloc] initWithConfiguration:serviceConfiguration
                                          grantType:@"refresh_token"
@@ -184,7 +188,7 @@ id<OIDExternalUserAgentSession> currentAuthorizationFlow;
         [processedResponses setValue:tokenResponse.accessToken forKey:@"accessToken"];
     }
     if(tokenResponse.accessTokenExpirationDate) {
-        [processedResponses setValue:[[NSNumber alloc] initWithDouble:[tokenResponse.accessTokenExpirationDate timeIntervalSince1970]] forKey:@"accessTokenExpirationDate"];
+        [processedResponses setValue:[[NSNumber alloc] initWithDouble:[tokenResponse.accessTokenExpirationDate timeIntervalSince1970] * 1000] forKey:@"accessTokenExpirationTime"];
     }
     if(authResponse && authResponse.additionalParameters) {
         [processedResponses setObject:authResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
@@ -205,10 +209,10 @@ id<OIDExternalUserAgentSession> currentAuthorizationFlow;
     return processedResponses;
 }
 
-- (RequestParameters *)processCallArguments:(NSDictionary*)arguments {
-    RequestParameters *requestParameters = [[RequestParameters alloc] init];
+- (AuthorizationTokenRequestParameters *)processAuthorizationTokenRequestArguments:(NSDictionary*)arguments {
+    AuthorizationTokenRequestParameters *requestParameters = [[AuthorizationTokenRequestParameters alloc] init];
     requestParameters.clientId = arguments[@"clientId"];
-    requestParameters.clientSecret = arguments[@"clientSecret"];
+    requestParameters.clientSecret = [arguments objectForKey:@"clientSecret"] != [NSNull null] ? arguments[@"clientSecret"] : nil;
     requestParameters.issuer = arguments[@"issuer"];
     requestParameters.discoveryUrl = arguments[@"discoveryUrl"];
     requestParameters.redirectUrl = arguments[@"redirectUrl"];
@@ -220,14 +224,34 @@ id<OIDExternalUserAgentSession> currentAuthorizationFlow;
     return requestParameters;
 }
 
+- (TokenRequestParameters *)processTokenRequestArguments:(NSDictionary*)arguments {
+    TokenRequestParameters *requestParameters = [[TokenRequestParameters alloc] init];
+    requestParameters.clientId = arguments[@"clientId"];
+    requestParameters.clientSecret = [arguments objectForKey:@"clientSecret"] != [NSNull null] ? arguments[@"clientSecret"] : nil;
+    requestParameters.issuer = arguments[@"issuer"];
+    requestParameters.discoveryUrl = arguments[@"discoveryUrl"];
+    requestParameters.redirectUrl = arguments[@"redirectUrl"];
+    requestParameters.refreshToken = arguments[@"refreshToken"];
+    requestParameters.scopes = [arguments objectForKey:@"scopes"] != [NSNull null] ? (NSArray *) arguments[@"scopes"] : nil;
+    requestParameters.serviceConfigurationParameters = [arguments objectForKey:@"serviceConfiguration"] != [NSNull null] ? (NSDictionary *) arguments[@"serviceConfiguration"] : nil;
+    requestParameters.additionalParameters = [arguments objectForKey:@"additionalParameters"] != [NSNull null] ? (NSDictionary *)arguments[@"additionalParameters"] : nil;
+    return requestParameters;
+}
+
 - (BOOL)application:(UIApplication *)application
             openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-    if ([currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:url]) {
-        currentAuthorizationFlow = nil;
+    if ([_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:url]) {
+        _currentAuthorizationFlow = nil;
         return YES;
     }
     
     return NO;
+}
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+  sourceApplication:(NSString *)sourceApplication
+         annotation:(id)annotation {
+    return [self application:application openURL:url options:@{}];
 }
 @end

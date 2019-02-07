@@ -30,12 +30,17 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
  */
 public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.ActivityResultListener {
 
-    public static final String FAILED_TO_FETCH_CONFIGURATION = "failed to fetch configuration";
-    public static final String FAILED_TO_EXCHANGE_TOKEN = "Failed to exchange token";
-    private static final String AUTHORIZE_METHOD = "authorize";
-    private static final String REFRESH_METHOD = "refresh";
-    private static final String ERROR_AUTHORIZE_FAILED = "authorize_failed";
-    private static final String ERROR_REFRESH_FAILED = "refresh_failed";
+    private static final String AUTHORIZE_AND_EXCHANGE_TOKEN_METHOD = "authorizeAndExchangeToken";
+    private static final String TOKEN_METHOD = "token";
+
+    private static final String DISCOVERY_ERROR_CODE = "discovery_failed";
+    private static final String AUTHORIZE_ERROR_CODE = "authorize_and_exchange_token_failed";
+    private static final String TOKEN_ERROR_CODE = "token_failed";
+
+    private static final String DISCOVERY_ERROR_MESSAGE = "Error retrieving discovery document";
+    private static final String TOKEN_ERROR_MESSAGE = "Failed to exchange token";
+    private static final String AUTHORIZE_ERROR_MESSAGE = "Failed to authorize";
+
     private final Registrar registrar;
     private final int RC_AUTH = 531984;
     private PendingOperation pendingOperation;
@@ -66,13 +71,13 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
     public void onMethodCall(MethodCall call, Result result) {
         Map<String, Object> arguments = call.arguments();
         switch (call.method) {
-            case AUTHORIZE_METHOD:
+            case AUTHORIZE_AND_EXCHANGE_TOKEN_METHOD:
                 checkAndSetPendingOperation(call.method, result);
-                handleAuthorizeMethod(arguments);
+                handleAuthorizeAndExchangeTokenMethodCall(arguments);
                 break;
-            case REFRESH_METHOD:
+            case TOKEN_METHOD:
                 checkAndSetPendingOperation(call.method, result);
-                handleRefreshMethod(arguments);
+                handleTokenMethodCall(arguments);
                 break;
             default:
                 result.notImplemented();
@@ -80,12 +85,26 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
     }
 
     @SuppressWarnings("unchecked")
-    private RequestParameters processCallArguments(Map<String, Object> arguments) {
+    private AuthorizationTokenRequestParameters processAuthorizationTokenRequestArguments(Map<String, Object> arguments) {
         final String clientId = (String) arguments.get("clientId");
         final String issuer = (String) arguments.get("issuer");
         final String discoveryUrl = (String) arguments.get("discoveryUrl");
         final String redirectUrl = (String) arguments.get("redirectUrl");
         final String loginHint = (String) arguments.get("loginHint");
+        clientSecret = (String) arguments.get("clientSecret");
+        final ArrayList<String> scopes = (ArrayList<String>) arguments.get("scopes");
+        Map<String, String> serviceConfigurationParameters = (Map<String, String>) arguments.get("serviceConfiguration");
+        Map<String, String> additionalParameters = (Map<String, String>) arguments.get("additionalParameters");
+        return new AuthorizationTokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, serviceConfigurationParameters, additionalParameters, loginHint);
+    }
+
+    @SuppressWarnings("unchecked")
+    private TokenRequestParameters processTokenRequestArguments(Map<String, Object> arguments) {
+        final String clientId = (String) arguments.get("clientId");
+        final String issuer = (String) arguments.get("issuer");
+        final String discoveryUrl = (String) arguments.get("discoveryUrl");
+        final String redirectUrl = (String) arguments.get("redirectUrl");
+        final String grantType = (String) arguments.get("grantType");
         clientSecret = (String) arguments.get("clientSecret");
         String refreshToken = null;
         if (arguments.containsKey("refreshToken")) {
@@ -94,34 +113,34 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
         final ArrayList<String> scopes = (ArrayList<String>) arguments.get("scopes");
         Map<String, String> serviceConfigurationParameters = (Map<String, String>) arguments.get("serviceConfiguration");
         Map<String, String> additionalParameters = (Map<String, String>) arguments.get("additionalParameters");
-        return new RequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, loginHint, refreshToken, serviceConfigurationParameters, additionalParameters);
+        return new TokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, refreshToken, grantType, serviceConfigurationParameters, additionalParameters);
     }
 
-    private void handleAuthorizeMethod(Map<String, Object> arguments) {
-        final RequestParameters requestParameters = processCallArguments(arguments);
-        if (requestParameters.serviceConfigurationParameters != null) {
-            AuthorizationServiceConfiguration serviceConfiguration = requestParametersToServiceConfiguration(requestParameters);
-            performAuthorization(serviceConfiguration, requestParameters);
+    private void handleAuthorizeAndExchangeTokenMethodCall(Map<String, Object> arguments) {
+        final AuthorizationTokenRequestParameters tokenRequestParameters = processAuthorizationTokenRequestArguments(arguments);
+        if (tokenRequestParameters.serviceConfigurationParameters != null) {
+            AuthorizationServiceConfiguration serviceConfiguration = requestParametersToServiceConfiguration(tokenRequestParameters);
+            performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters);
         } else {
-            if (requestParameters.discoveryUrl != null) {
-                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(requestParameters.discoveryUrl), new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
+            if (tokenRequestParameters.discoveryUrl != null) {
+                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
                     @Override
                     public void onFetchConfigurationCompleted(@Nullable AuthorizationServiceConfiguration serviceConfiguration, @Nullable AuthorizationException ex) {
                         if (ex == null) {
-                            performAuthorization(serviceConfiguration, requestParameters);
+                            performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters);
                         } else {
-                            finishWithError(ERROR_AUTHORIZE_FAILED, FAILED_TO_FETCH_CONFIGURATION);
+                            finishWithDiscoveryError(ex.getLocalizedMessage());
                         }
                     }
                 });
             } else {
-                AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(requestParameters.issuer), new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
+                AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(tokenRequestParameters.issuer), new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
                     @Override
                     public void onFetchConfigurationCompleted(@Nullable AuthorizationServiceConfiguration serviceConfiguration, @Nullable AuthorizationException ex) {
                         if (ex == null) {
-                            performAuthorization(serviceConfiguration, requestParameters);
+                            performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters);
                         } else {
-                            finishWithError(ERROR_AUTHORIZE_FAILED, FAILED_TO_FETCH_CONFIGURATION);
+                            finishWithDiscoveryError(ex.getLocalizedMessage());
 
                         }
                     }
@@ -131,39 +150,39 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
 
     }
 
-    private AuthorizationServiceConfiguration requestParametersToServiceConfiguration(RequestParameters requestParameters) {
-        return new AuthorizationServiceConfiguration(Uri.parse(requestParameters.serviceConfigurationParameters.get("authorizationEndpoint")), Uri.parse(requestParameters.serviceConfigurationParameters.get("tokenEndpoint")));
+    private AuthorizationServiceConfiguration requestParametersToServiceConfiguration(TokenRequestParameters tokenRequestParameters) {
+        return new AuthorizationServiceConfiguration(Uri.parse(tokenRequestParameters.serviceConfigurationParameters.get("authorizationEndpoint")), Uri.parse(tokenRequestParameters.serviceConfigurationParameters.get("tokenEndpoint")));
     }
 
-    private void handleRefreshMethod(Map<String, Object> arguments) {
-        final RequestParameters requestParameters = processCallArguments(arguments);
-        if (requestParameters.serviceConfigurationParameters != null) {
+    private void handleTokenMethodCall(Map<String, Object> arguments) {
+        final TokenRequestParameters tokenRequestParameters = processTokenRequestArguments(arguments);
+        if (tokenRequestParameters.serviceConfigurationParameters != null) {
 
-            AuthorizationServiceConfiguration serviceConfiguration = requestParametersToServiceConfiguration(requestParameters);
-            performRefresh(serviceConfiguration, requestParameters.clientId, requestParameters.redirectUrl, requestParameters.refreshToken, requestParameters.scopes, requestParameters.additionalParameters);
+            AuthorizationServiceConfiguration serviceConfiguration = requestParametersToServiceConfiguration(tokenRequestParameters);
+            performTokenRequest(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.grantType, tokenRequestParameters.refreshToken, tokenRequestParameters.scopes, tokenRequestParameters.additionalParameters);
 
         } else {
-            if (requestParameters.discoveryUrl != null) {
-                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(requestParameters.discoveryUrl), new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
+            if (tokenRequestParameters.discoveryUrl != null) {
+                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
                     @Override
                     public void onFetchConfigurationCompleted(@Nullable AuthorizationServiceConfiguration serviceConfiguration, @Nullable AuthorizationException ex) {
                         if (ex == null) {
-                            performRefresh(serviceConfiguration, requestParameters.clientId, requestParameters.redirectUrl, requestParameters.refreshToken, requestParameters.scopes, requestParameters.additionalParameters);
+                            performTokenRequest(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.grantType, tokenRequestParameters.refreshToken, tokenRequestParameters.scopes, tokenRequestParameters.additionalParameters);
                         } else {
-                            finishWithError(ERROR_REFRESH_FAILED, FAILED_TO_FETCH_CONFIGURATION);
+                            finishWithDiscoveryError(ex.getLocalizedMessage());
                         }
                     }
                 });
 
             } else {
 
-                AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(requestParameters.issuer), new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
+                AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(tokenRequestParameters.issuer), new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
                     @Override
                     public void onFetchConfigurationCompleted(@Nullable AuthorizationServiceConfiguration serviceConfiguration, @Nullable AuthorizationException ex) {
                         if (ex == null) {
-                            performRefresh(serviceConfiguration, requestParameters.clientId, requestParameters.redirectUrl, requestParameters.refreshToken, requestParameters.scopes, requestParameters.additionalParameters);
+                            performTokenRequest(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.grantType, tokenRequestParameters.refreshToken, tokenRequestParameters.scopes, tokenRequestParameters.additionalParameters);
                         } else {
-                            finishWithError(ERROR_REFRESH_FAILED, FAILED_TO_FETCH_CONFIGURATION);
+                            finishWithDiscoveryError(ex.getLocalizedMessage());
                         }
                     }
                 });
@@ -172,23 +191,23 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
     }
 
 
-    private void performAuthorization(AuthorizationServiceConfiguration serviceConfiguration, RequestParameters requestParameters) {
+    private void performAuthorization(AuthorizationServiceConfiguration serviceConfiguration, String clientId, String redirectUrl, ArrayList<String> scopes, String loginHint, Map<String, String> additionalParameters) {
         AuthorizationRequest.Builder authRequestBuilder =
                 new AuthorizationRequest.Builder(
                         serviceConfiguration,
-                        requestParameters.clientId,
+                        clientId,
                         ResponseTypeValues.CODE,
-                        Uri.parse(requestParameters.redirectUrl));
-        if (requestParameters.scopes != null && !requestParameters.scopes.isEmpty()) {
-            authRequestBuilder.setScopes(requestParameters.scopes);
+                        Uri.parse(redirectUrl));
+        if (scopes != null && !scopes.isEmpty()) {
+            authRequestBuilder.setScopes(scopes);
         }
 
-        if (requestParameters.loginHint != null) {
-            authRequestBuilder.setLoginHint(requestParameters.loginHint);
+        if (loginHint != null) {
+            authRequestBuilder.setLoginHint(loginHint);
         }
 
-        if (requestParameters.additionalParameters != null && !requestParameters.additionalParameters.isEmpty()) {
-            authRequestBuilder.setAdditionalParameters(requestParameters.additionalParameters);
+        if (additionalParameters != null && !additionalParameters.isEmpty()) {
+            authRequestBuilder.setAdditionalParameters(additionalParameters);
         }
 
         AuthorizationRequest authRequest = authRequestBuilder.build();
@@ -197,11 +216,14 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
         registrar.activity().startActivityForResult(authIntent, RC_AUTH);
     }
 
-    private void performRefresh(AuthorizationServiceConfiguration serviceConfiguration, String clientId, String redirectUrl, String refreshToken, ArrayList<String> scopes, Map<String, String> additionalParameters) {
+    private void performTokenRequest(AuthorizationServiceConfiguration serviceConfiguration, String clientId, String redirectUrl, String grantType, String refreshToken, ArrayList<String> scopes, Map<String, String> additionalParameters) {
         TokenRequest.Builder builder = new TokenRequest.Builder(serviceConfiguration, clientId)
                 .setRefreshToken(refreshToken)
                 .setRedirectUri(Uri.parse(redirectUrl));
 
+        if (grantType != null) {
+            builder.setGrantType(grantType);
+        }
         if (scopes != null) {
             builder.setScopes(scopes);
         }
@@ -220,7 +242,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                     Map<String, Object> responseMap = tokenResponseToMap(resp, null);
                     finishWithSuccess(responseMap);
                 } else {
-                    finishWithError(ERROR_REFRESH_FAILED, FAILED_TO_EXCHANGE_TOKEN);
+                    finishWithTokenError();
                 }
             }
         };
@@ -232,6 +254,10 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
 
     }
 
+    private void finishWithTokenError() {
+        finishWithError(TOKEN_ERROR_CODE, TOKEN_ERROR_MESSAGE);
+    }
+
 
     private void finishWithSuccess(Object data) {
         pendingOperation.result.success(data);
@@ -241,6 +267,10 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
     private void finishWithError(String errorCode, String errorMessage) {
         pendingOperation.result.error(errorCode, errorMessage, null);
         pendingOperation = null;
+    }
+
+    private void finishWithDiscoveryError(String localizedDescription) {
+        finishWithError(DISCOVERY_ERROR_CODE, DISCOVERY_ERROR_MESSAGE + localizedDescription);
     }
 
 
@@ -262,7 +292,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                             Map<String, Object> responseMap = tokenResponseToMap(resp, authResponse);
                             finishWithSuccess(responseMap);
                         } else {
-                            finishWithError(ERROR_AUTHORIZE_FAILED, FAILED_TO_EXCHANGE_TOKEN);
+                            finishWithTokenError();
                         }
                     }
                 };
@@ -272,7 +302,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                     authService.performTokenRequest(authResponse.createTokenExchangeRequest(), new ClientSecretBasic(clientSecret), tokenResponseCallback);
                 }
             } else {
-                finishWithError(ERROR_AUTHORIZE_FAILED, "Failed to authorize");
+                finishWithError(AUTHORIZE_ERROR_CODE, AUTHORIZE_ERROR_MESSAGE);
 
             }
             return true;
@@ -283,7 +313,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
     private Map<String, Object> tokenResponseToMap(TokenResponse tokenResponse, AuthorizationResponse authorizationResponse) {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("accessToken", tokenResponse.accessToken);
-        responseMap.put("accessTokenExpirationTime", tokenResponse.accessTokenExpirationTime);
+        responseMap.put("accessTokenExpirationTime", tokenResponse.accessTokenExpirationTime != null ? tokenResponse.accessTokenExpirationTime.doubleValue() : null);
         responseMap.put("refreshToken", tokenResponse.refreshToken);
         responseMap.put("idToken", tokenResponse.idToken);
         responseMap.put("tokenType", tokenResponse.tokenType);
@@ -305,27 +335,37 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
         }
     }
 
-    private class RequestParameters {
+
+    private class TokenRequestParameters {
         final String clientId;
         final String issuer;
         final String discoveryUrl;
         final ArrayList<String> scopes;
         final String redirectUrl;
-        final String loginHint;
         final String refreshToken;
+        final String grantType;
         final Map<String, String> serviceConfigurationParameters;
         final Map<String, String> additionalParameters;
 
-        private RequestParameters(String clientId, String issuer, String discoveryUrl, ArrayList<String> scopes, String redirectUrl, String loginHint, String refreshToken, Map<String, String> serviceConfigurationParameters, Map<String, String> additionalParameters) {
+        private TokenRequestParameters(String clientId, String issuer, String discoveryUrl, ArrayList<String> scopes, String redirectUrl, String refreshToken, String grantType, Map<String, String> serviceConfigurationParameters, Map<String, String> additionalParameters) {
             this.clientId = clientId;
             this.issuer = issuer;
             this.discoveryUrl = discoveryUrl;
             this.scopes = scopes;
             this.redirectUrl = redirectUrl;
-            this.loginHint = loginHint;
             this.refreshToken = refreshToken;
+            this.grantType = grantType;
             this.serviceConfigurationParameters = serviceConfigurationParameters;
             this.additionalParameters = additionalParameters;
+        }
+    }
+
+    private class AuthorizationTokenRequestParameters extends TokenRequestParameters {
+        final String loginHint;
+
+        private AuthorizationTokenRequestParameters(String clientId, String issuer, String discoveryUrl, ArrayList<String> scopes, String redirectUrl, Map<String, String> serviceConfigurationParameters, Map<String, String> additionalParameters, String loginHint) {
+            super(clientId, issuer, discoveryUrl, scopes, redirectUrl, null, null, serviceConfigurationParameters, additionalParameters);
+            this.loginHint = loginHint;
         }
     }
 

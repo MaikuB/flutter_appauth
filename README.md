@@ -1,14 +1,9 @@
 # flutter_appauth
 
-A new flutter plugin project.
+A Flutter bridge for AppAuth
 
 ## Getting Started
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.io/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+Please see the example that demonstrates how to sign in with Google auth using the same credentials as the AppAuth code lab by Google. More documentation and details to come soon.
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.io/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+**NOTE**: this library uses AndroidX and there is currently a known issuer with Jetifier that affects the use of Chrome Custom Tabs. This means that until a fix for it is released, signing will direct users to the browser as opposed to using Chrome Custom Tabs.

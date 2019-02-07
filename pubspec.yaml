@@ -1,8 +1,8 @@
 name: flutter_appauth
-description: A new flutter plugin project.
+description: This plugin provides a Flutter bridge for AppAuth
 version: 0.0.1
-author:
-homepage:
+author: Michael Bui <maikub84@gmail.com>
+homepage: https://github.com/MaikuB/flutter_appauth
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"

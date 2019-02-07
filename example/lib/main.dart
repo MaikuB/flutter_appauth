@@ -20,6 +20,8 @@ class _MyAppState extends State<MyApp> {
   TextEditingController _idTokenTextController = TextEditingController();
   TextEditingController _refreshTokenTextController = TextEditingController();
   String _userInfo = '';
+
+  // Google details
   String _clientId =
       '511828570984-fuprh0cm7665emlne3rnf9pk34kkn86s.apps.googleusercontent.com';
   String _redirectUrl = 'com.google.codelabs.appauth:/oauth2callback';
@@ -29,14 +31,26 @@ class _MyAppState extends State<MyApp> {
           'https://accounts.google.com/o/oauth2/v2/auth',
           'https://www.googleapis.com/oauth2/v4/token');
   List<String> _scopes = ['profile'];
+
+  // Azure B2C details
+  // String _clientId = '90c0fe63-bcf2-44d5-8fb7-b8bbc0b29dc6';
+  // String _redirectUrl =
+  //     'com.onmicrosoft.fabrikamb2c.exampleapp://oauth/redirect';
+
+  // AuthorizationServiceConfiguration _authorizationServiceConfiguration =
+  //     AuthorizationServiceConfiguration(
+  //         'https://login.microsoftonline.com/te/fabrikamb2c.onmicrosoft.com/b2c_1_susi/oauth2/v2.0/authorize',
+  //         'https://login.microsoftonline.com/te/fabrikamb2c.onmicrosoft.com/b2c_1_susi/oauth2/v2.0/token');
+  // List<String> _scopes = ['openid', 'profile'];
+
   @override
   void initState() {
     super.initState();
   }
 
   Future _refresh() async {
-    var result = await _appAuth.refresh(RefreshRequest(
-        _clientId, _redirectUrl, _refreshToken,
+    var result = await _appAuth.token(TokenRequest(_clientId, _redirectUrl,
+        refreshToken: _refreshToken,
         serviceConfiguration: _authorizationServiceConfiguration,
         scopes: _scopes));
     _processTokenResponse(result);
@@ -56,8 +70,8 @@ class _MyAppState extends State<MyApp> {
               RaisedButton(
                 child: Text('Sign in'),
                 onPressed: () async {
-                  var result = await _appAuth.authorize(
-                    AuthorizationRequest(
+                  var result = await _appAuth.authorizeAndExchangeToken(
+                    AuthorizationTokenRequest(
                       _clientId,
                       _redirectUrl,
                       serviceConfiguration: _authorizationServiceConfiguration,
@@ -105,11 +119,7 @@ class _MyAppState extends State<MyApp> {
       _idTokenTextController.text = response.idToken;
       _refreshToken = _refreshTokenTextController.text = response.refreshToken;
       _accessTokenExpirationTextController.text =
-          response.accessTokenExpirationTime == null
-              ? null
-              : DateTime.fromMillisecondsSinceEpoch(
-                      response.accessTokenExpirationTime)
-                  .toIso8601String();
+          response.accessTokenExpirationDateTime?.toIso8601String();
     });
   }
 
@@ -119,11 +129,7 @@ class _MyAppState extends State<MyApp> {
       _idTokenTextController.text = response.idToken;
       _refreshToken = _refreshTokenTextController.text = response.refreshToken;
       _accessTokenExpirationTextController.text =
-          response.accessTokenExpirationTime == null
-              ? null
-              : DateTime.fromMillisecondsSinceEpoch(
-                      response.accessTokenExpirationTime)
-                  .toIso8601String();
+          response.accessTokenExpirationDateTime?.toIso8601String();
     });
   }
 

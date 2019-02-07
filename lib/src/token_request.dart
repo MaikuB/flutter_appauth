@@ -1,25 +1,27 @@
 part of flutter_appauth;
 
-/// Details required for an authorization request.
-class AuthorizationRequest {
+/// Details for a token exchange request
+class TokenRequest {
   final String clientId;
-  final String issuer;
-  final String discoveryUrl;
   final String redirectUrl;
   final String clientSecret;
-  final String loginHint;
   final List<String> scopes;
   final AuthorizationServiceConfiguration serviceConfiguration;
   final Map<String, String> additionalParameters;
+  final String refreshToken;
+  final String grantType;
+  final String issuer;
+  final String discoveryUrl;
 
-  AuthorizationRequest(this.clientId, this.redirectUrl,
-      {this.issuer,
-      this.discoveryUrl,
-      this.clientSecret,
+  TokenRequest(this.clientId, this.redirectUrl,
+      {this.clientSecret,
       this.scopes,
       this.serviceConfiguration,
-      this.loginHint,
-      this.additionalParameters})
+      this.additionalParameters,
+      this.refreshToken,
+      this.grantType,
+      this.issuer,
+      this.discoveryUrl})
       : assert(
             (issuer != null &&
                     discoveryUrl == null &&
@@ -40,8 +42,9 @@ class AuthorizationRequest {
       'discoveryUrl': discoveryUrl,
       'redirectUrl': redirectUrl,
       'clientSecret': clientSecret,
+      'refreshToken': refreshToken,
+      'grantType': grantType,
       'scopes': scopes,
-      'loginHint': loginHint,
       'serviceConfiguration': serviceConfiguration?.toMap(),
       'additionalParameters': additionalParameters
     };

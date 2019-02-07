@@ -11,27 +11,34 @@ class FlutterAppAuth {
   static final FlutterAppAuth _instance = new FlutterAppAuth.private(
       const MethodChannel('crossingthestreams.io/flutter_appauth'));
 
-  /// Attempts to issue an authorization request and exchange for a token
-  Future<AuthorizationTokenResponse> authorize(
-      AuthorizationRequest request) async {
-    var result = await _channel.invokeMethod('authorize', request.toMap());
+  /// Convenience method for authorizing and then exchanging a token upon succesful authorization
+  Future<AuthorizationTokenResponse> authorizeAndExchangeToken(
+      AuthorizationTokenRequest request) async {
+    var result = await _channel.invokeMethod(
+        'authorizeAndExchangeToken', request.toMap());
     return AuthorizationTokenResponse(
         result['accessToken'],
         result['refreshToken'],
-        result['accessTokenExpirationTime'],
+        result['accessTokenExpirationTime'] == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(
+                result['accessTokenExpirationTime'].toInt()),
         result['idToken'],
         result['tokenType'],
         result['authorizationAdditionalParameters']?.cast<String, dynamic>(),
         result['tokenAdditionalParameters']?.cast<String, dynamic>());
   }
 
-  /// For refreshing tokens
-  Future<TokenResponse> refresh(RefreshRequest request) async {
-    var result = await _channel.invokeMethod('refresh', request.toMap());
+  /// For exchanging tokens
+  Future<TokenResponse> token(TokenRequest request) async {
+    var result = await _channel.invokeMethod('token', request.toMap());
     return TokenResponse(
         result['accessToken'],
         result['refreshToken'],
-        result['accessTokenExpirationTime'],
+        result['accessTokenExpirationTime'] == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(
+                result['accessTokenExpirationTime'].toInt()),
         result['idToken'],
         result['tokenType'],
         result['tokenAdditionalParameters']?.cast<String, String>());

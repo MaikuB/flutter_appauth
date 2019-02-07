@@ -12,7 +12,7 @@ class AuthorizationServiceConfiguration {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'tokenEndpoint': tokenEndpoint,
-      'authorizationEndpoint': authorizationEndpoint,
+      'authorizationEndpoint': authorizationEndpoint
     };
   }
 }

@@ -384,6 +384,16 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"AppAuth\"",
+					"-l\"flutter_appauth\"",
+					"-framework",
+					"\"Flutter\"",
+					"-framework",
+					"\"SafariServices\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.crossingthestreams.flutterAppauthExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -509,6 +519,16 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"AppAuth\"",
+					"-l\"flutter_appauth\"",
+					"-framework",
+					"\"Flutter\"",
+					"-framework",
+					"\"SafariServices\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.crossingthestreams.flutterAppauthExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -531,6 +551,16 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"AppAuth\"",
+					"-l\"flutter_appauth\"",
+					"-framework",
+					"\"Flutter\"",
+					"-framework",
+					"\"SafariServices\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.crossingthestreams.flutterAppauthExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
