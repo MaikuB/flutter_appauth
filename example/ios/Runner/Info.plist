@@ -9,7 +9,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.google.codelabs.appauth</string>
+				<string>io.identityserver.demo</string>
 			</array>
 		</dict>
 	</array>

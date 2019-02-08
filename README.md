@@ -4,7 +4,7 @@ A Flutter bridge for AppAuth
 
 ## Getting Started
 
-Please see the example that demonstrates how to sign in with Google auth using the same credentials as the AppAuth code lab by Google. Some limited testing has also been done with Azure B2C. More documentation and details to come soon.
+Please see the example that demonstrates how to sign into the IdentityServer4 demo site (https://demo.identityserver.io). Some limited testing has also been done to confirm that it works with Azure B2C and Google. More documentation and details to come soon.
 
 ## Android setup
 

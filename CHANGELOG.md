@@ -1,3 +1,6 @@
+# 0.0.2+1
+* Switch example to connect to test instance of IdentityServer4
+
 # 0.0.2
 * Fix error when either `discoveryUrl` or `issuer` has been passed to the `AuthorizationTokenRequest` constructor
 

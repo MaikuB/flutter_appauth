@@ -41,7 +41,7 @@ android {
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
-                'appAuthRedirectScheme': 'com.google.codelabs.appauth'
+                'appAuthRedirectScheme': 'io.identityserver.demo'
         ]
     }
 

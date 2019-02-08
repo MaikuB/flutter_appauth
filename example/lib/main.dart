@@ -22,15 +22,17 @@ class _MyAppState extends State<MyApp> {
   String _userInfo = '';
 
   // Google details
-  String _clientId =
-      '511828570984-fuprh0cm7665emlne3rnf9pk34kkn86s.apps.googleusercontent.com';
-  String _redirectUrl = 'com.google.codelabs.appauth:/oauth2callback';
-
-  AuthorizationServiceConfiguration _authorizationServiceConfiguration =
-      AuthorizationServiceConfiguration(
-          'https://accounts.google.com/o/oauth2/v2/auth',
-          'https://www.googleapis.com/oauth2/v4/token');
-  List<String> _scopes = ['profile'];
+  String _clientId = 'native.code';
+  String _redirectUrl = 'io.identityserver.demo:/oauthredirect';
+  String _discoveryUrl =
+      'https://demo.identityserver.io/.well-known/openid-configuration';
+  List<String> _scopes = [
+    'openid',
+    'profile',
+    'email',
+    'offline_access',
+    'api'
+  ];
 
   @override
   void initState() {
@@ -40,10 +42,10 @@ class _MyAppState extends State<MyApp> {
   Future _refresh() async {
     var result = await _appAuth.token(TokenRequest(_clientId, _redirectUrl,
         refreshToken: _refreshToken,
-        serviceConfiguration: _authorizationServiceConfiguration,
+        discoveryUrl: _discoveryUrl,
         scopes: _scopes));
     _processTokenResponse(result);
-    await _getUserInfo(result);
+    await _testApi(result);
   }
 
   @override
@@ -63,13 +65,13 @@ class _MyAppState extends State<MyApp> {
                     AuthorizationTokenRequest(
                       _clientId,
                       _redirectUrl,
-                      serviceConfiguration: _authorizationServiceConfiguration,
+                      discoveryUrl: _discoveryUrl,
                       scopes: _scopes,
                     ),
                   );
                   if (result != null) {
                     _processAuthTokenResponse(result);
-                    await _getUserInfo(result);
+                    await _testApi(result);
                   }
                 },
               ),
@@ -93,7 +95,7 @@ class _MyAppState extends State<MyApp> {
               TextField(
                 controller: _refreshTokenTextController,
               ),
-              Text('user info'),
+              Text('test api results'),
               Text(_userInfo),
             ],
           ),
@@ -114,7 +116,7 @@ class _MyAppState extends State<MyApp> {
 
   void _processTokenResponse(TokenResponse response) {
     setState(() {
-      _accessTokenTextController.text = response.accessToken;
+      _accessToken = _accessTokenTextController.text = response.accessToken;
       _idTokenTextController.text = response.idToken;
       _refreshToken = _refreshTokenTextController.text = response.refreshToken;
       _accessTokenExpirationTextController.text =
@@ -122,9 +124,8 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future _getUserInfo(TokenResponse response) async {
-    var httpResponse = await http.get(
-        'https://www.googleapis.com/oauth2/v3/userinfo',
+  Future _testApi(TokenResponse response) async {
+    var httpResponse = await http.get('https://demo.identityserver.io/api/test',
         headers: {'Authorization': 'Bearer $_accessToken'});
     setState(() {
       _userInfo = httpResponse.statusCode == 200 ? httpResponse.body : '';
