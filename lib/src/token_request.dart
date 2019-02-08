@@ -30,6 +30,7 @@ class TokenRequest {
             'Either the issuer, discovery URL or service configuration must be provided');
 
   Map<String, dynamic> toMap() {
+    String inferredGrantType = _inferGrantType();
     return <String, dynamic>{
       'clientId': clientId,
       'issuer': issuer,
@@ -37,10 +38,16 @@ class TokenRequest {
       'redirectUrl': redirectUrl,
       'clientSecret': clientSecret,
       'refreshToken': refreshToken,
-      'grantType': grantType,
+      'grantType': inferredGrantType,
       'scopes': scopes,
       'serviceConfiguration': serviceConfiguration?.toMap(),
       'additionalParameters': additionalParameters
     };
+  }
+
+  String _inferGrantType() {
+    if (refreshToken != null) {
+      return 'refresh_token';
+    }
   }
 }

@@ -34,6 +34,11 @@ class _MyAppState extends State<MyApp> {
     'api'
   ];
 
+  AuthorizationServiceConfiguration _serviceConfiguration =
+      AuthorizationServiceConfiguration(
+          'https://demo.identityserver.io/connect/authorize',
+          'https://demo.identityserver.io/connect/token');
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +66,7 @@ class _MyAppState extends State<MyApp> {
               RaisedButton(
                 child: Text('Sign in'),
                 onPressed: () async {
+                  // use the discovery endpoint to find the configuration
                   var result = await _appAuth.authorizeAndExchangeToken(
                     AuthorizationTokenRequest(
                       _clientId,
@@ -69,6 +75,16 @@ class _MyAppState extends State<MyApp> {
                       scopes: _scopes,
                     ),
                   );
+
+                  // alternatively can explicitly specify the endpoints
+                  // var result = await _appAuth.authorizeAndExchangeToken(
+                  //   AuthorizationTokenRequest(
+                  //     _clientId,
+                  //     _redirectUrl,
+                  //     serviceConfiguration: _serviceConfiguration,
+                  //     scopes: _scopes,
+                  //   ),
+                  // );
                   if (result != null) {
                     _processAuthTokenResponse(result);
                     await _testApi(result);

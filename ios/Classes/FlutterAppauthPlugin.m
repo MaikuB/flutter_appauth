@@ -1,19 +1,51 @@
 #import "FlutterAppauthPlugin.h"
 #import "AppAuth.h"
 
+@interface ArgumentProcessor : NSObject
++ (id _Nullable)processArgumentValue:(NSDictionary *)arguments withKey:(NSString *)key;
+@end
+
+@implementation ArgumentProcessor
+
++ (id _Nullable)processArgumentValue:(NSDictionary *)arguments withKey:(NSString *)key {
+    return [arguments objectForKey:key] != [NSNull null] ? arguments[key] : nil;
+}
+
+@end
+
 @interface TokenRequestParameters : NSObject
 @property(nonatomic, strong) NSString *clientId;
 @property(nonatomic, strong) NSString *clientSecret;
 @property(nonatomic, strong) NSString *issuer;
+@property(nonatomic, strong) NSString *grantType;
 @property(nonatomic, strong) NSString *discoveryUrl;
 @property(nonatomic, strong) NSString *redirectUrl;
 @property(nonatomic, strong) NSString *refreshToken;
 @property(nonatomic, strong) NSArray *scopes;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
+
 @end
 
 @implementation TokenRequestParameters
+- (void)processArguments:(NSDictionary *)arguments {
+    _clientId = [ArgumentProcessor processArgumentValue:arguments withKey:@"clientId"];
+    _clientSecret = [ArgumentProcessor processArgumentValue:arguments withKey:@"clientSecret"];
+    _issuer = [ArgumentProcessor processArgumentValue:arguments withKey:@"issuer"];
+    _discoveryUrl = [ArgumentProcessor processArgumentValue:arguments withKey:@"discoveryUrl"];
+    _redirectUrl = [ArgumentProcessor processArgumentValue:arguments withKey:@"redirectUrl"];
+    _refreshToken = [ArgumentProcessor processArgumentValue:arguments withKey:@"refreshToken"];
+    _grantType = [ArgumentProcessor processArgumentValue:arguments withKey:@"grantType"];
+    _scopes = [ArgumentProcessor processArgumentValue:arguments withKey:@"scopes"];
+    _serviceConfigurationParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"serviceConfiguration"];
+    _additionalParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"additionalParameters"];
+}
+
+- (id)initWithArguments:(NSDictionary *)arguments {
+    [self processArguments:arguments];
+    return self;
+}
+
 @end
 
 @interface AuthorizationTokenRequestParameters : TokenRequestParameters
@@ -21,6 +53,11 @@
 @end
 
 @implementation AuthorizationTokenRequestParameters
+- (id)initWithArguments:(NSDictionary *)arguments {
+    [super processArguments:arguments];
+    _loginHint = [ArgumentProcessor processArgumentValue:arguments withKey:@"loginHint"];
+    return self;
+}
 @end
 
 @implementation FlutterAppauthPlugin
@@ -32,6 +69,7 @@ NSString *const DISCOVERY_ERROR_CODE = @"discovery_failed";
 NSString *const TOKEN_ERROR_CODE = @"token_failed";
 NSString *const DISCOVERY_ERROR_MESSAGE_FORMAT = @"Error retrieving discovery document: %@";
 NSString *const TOKEN_ERROR_MESSAGE = @"Failed to exchange token";
+
 
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
@@ -54,7 +92,7 @@ NSString *const TOKEN_ERROR_MESSAGE = @"Failed to exchange token";
 }
 
 -(void)handleAuthorizeMethodCall:(NSDictionary*)arguments result:(FlutterResult)result {
-    AuthorizationTokenRequestParameters *requestParameters = [self processAuthorizationTokenRequestArguments:arguments];
+    AuthorizationTokenRequestParameters *requestParameters = [[AuthorizationTokenRequestParameters alloc] initWithArguments:arguments];
     if(requestParameters.serviceConfigurationParameters != nil) {
         OIDServiceConfiguration *serviceConfiguration =
         [[OIDServiceConfiguration alloc]
@@ -122,7 +160,7 @@ NSString *const TOKEN_ERROR_MESSAGE = @"Failed to exchange token";
 }
 
 -(void)handleTokenMethodCall:(NSDictionary*)arguments result:(FlutterResult)result {
-    TokenRequestParameters *requestParameters = [self processAuthorizationTokenRequestArguments:arguments];
+    TokenRequestParameters *requestParameters = [[TokenRequestParameters alloc] initWithArguments:arguments];
     if(requestParameters.serviceConfigurationParameters != nil) {
         OIDServiceConfiguration *serviceConfiguration =
         [[OIDServiceConfiguration alloc]
@@ -163,7 +201,7 @@ NSString *const TOKEN_ERROR_MESSAGE = @"Failed to exchange token";
 - (void)performTokenRequest:(OIDServiceConfiguration *)serviceConfiguration requestParameters:(TokenRequestParameters *)requestParameters result:(FlutterResult)result {
     OIDTokenRequest *tokenRequest =
     [[OIDTokenRequest alloc] initWithConfiguration:serviceConfiguration
-                                         grantType:@"refresh_token"
+                                         grantType:requestParameters.grantType
                                  authorizationCode:nil
                                        redirectURL:[NSURL URLWithString:requestParameters.redirectUrl]
                                           clientID:requestParameters.clientId
@@ -209,34 +247,6 @@ NSString *const TOKEN_ERROR_MESSAGE = @"Failed to exchange token";
     return processedResponses;
 }
 
-- (AuthorizationTokenRequestParameters *)processAuthorizationTokenRequestArguments:(NSDictionary*)arguments {
-    AuthorizationTokenRequestParameters *requestParameters = [[AuthorizationTokenRequestParameters alloc] init];
-    requestParameters.clientId = arguments[@"clientId"];
-    requestParameters.clientSecret = [arguments objectForKey:@"clientSecret"] != [NSNull null] ? arguments[@"clientSecret"] : nil;
-    requestParameters.issuer = arguments[@"issuer"];
-    requestParameters.discoveryUrl = arguments[@"discoveryUrl"];
-    requestParameters.redirectUrl = arguments[@"redirectUrl"];
-    requestParameters.loginHint = arguments[@"loginHint"];
-    requestParameters.refreshToken = arguments[@"refreshToken"];
-    requestParameters.scopes = [arguments objectForKey:@"scopes"] != [NSNull null] ? (NSArray *) arguments[@"scopes"] : nil;
-    requestParameters.serviceConfigurationParameters = [arguments objectForKey:@"serviceConfiguration"] != [NSNull null] ? (NSDictionary *) arguments[@"serviceConfiguration"] : nil;
-    requestParameters.additionalParameters = [arguments objectForKey:@"additionalParameters"] != [NSNull null] ? (NSDictionary *)arguments[@"additionalParameters"] : nil;
-    return requestParameters;
-}
-
-- (TokenRequestParameters *)processTokenRequestArguments:(NSDictionary*)arguments {
-    TokenRequestParameters *requestParameters = [[TokenRequestParameters alloc] init];
-    requestParameters.clientId = arguments[@"clientId"];
-    requestParameters.clientSecret = [arguments objectForKey:@"clientSecret"] != [NSNull null] ? arguments[@"clientSecret"] : nil;
-    requestParameters.issuer = arguments[@"issuer"];
-    requestParameters.discoveryUrl = arguments[@"discoveryUrl"];
-    requestParameters.redirectUrl = arguments[@"redirectUrl"];
-    requestParameters.refreshToken = arguments[@"refreshToken"];
-    requestParameters.scopes = [arguments objectForKey:@"scopes"] != [NSNull null] ? (NSArray *) arguments[@"scopes"] : nil;
-    requestParameters.serviceConfigurationParameters = [arguments objectForKey:@"serviceConfiguration"] != [NSNull null] ? (NSDictionary *) arguments[@"serviceConfiguration"] : nil;
-    requestParameters.additionalParameters = [arguments objectForKey:@"additionalParameters"] != [NSNull null] ? (NSDictionary *)arguments[@"additionalParameters"] : nil;
-    return requestParameters;
-}
 
 - (BOOL)application:(UIApplication *)application
             openURL:(NSURL *)url

@@ -1,6 +1,6 @@
 # Flutter AppAuth Plugin
 
-A Flutter bridge for AppAuth
+A Flutter bridge for AppAuth (https://appauth.io) used authenticating and authorizing users. Note that AppAuth also supports the PKCE extension that is required some providers so this plugin should work with them.
 
 ## Getting Started
 
