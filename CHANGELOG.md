@@ -1,3 +1,6 @@
+# 0.0.3+1
+* Fix code around inferring grant type.
+* Update plugin description
 
 # 0.0.3
 * Fix to infer grant type based on what is provided when creating a token request (currently only refresh token is supported);

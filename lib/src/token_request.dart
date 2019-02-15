@@ -49,5 +49,6 @@ class TokenRequest {
     if (refreshToken != null) {
       return 'refresh_token';
     }
+    return null;
   }
 }
