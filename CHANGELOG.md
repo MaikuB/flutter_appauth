@@ -1,3 +1,8 @@
+# 0.0.4
+* **BREAKING CHANGE** renamed `authorizeAndExchangeToken` method to `authorizeAndExchangeCode` to reflect what happens behind the scenes
+* Added an `authorize` method that performs an authorization request to get an authorization code without exchanging it
+* Updated README and sample code to demonstrate the use of the `authorize` method, how to exchange the authorization code for tokens and how to perform an authorization request that will retrieve the disocvery document with an issuer instead of the full discovery endpoint URL.
+
 # 0.0.3+1
 * Fix code around inferring grant type.
 * Update plugin description

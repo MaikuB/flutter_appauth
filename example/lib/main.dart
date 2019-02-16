@@ -10,9 +10,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  bool _isBusy = false;
   FlutterAppAuth _appAuth = FlutterAppAuth();
+  String _codeVerifier;
+  String _authorizationCode;
   String _refreshToken;
   String _accessToken;
+  TextEditingController _authorizationCodeTextController =
+      TextEditingController();
   TextEditingController _accessTokenTextController = TextEditingController();
   TextEditingController _accessTokenExpirationTextController =
       TextEditingController();
@@ -24,6 +29,7 @@ class _MyAppState extends State<MyApp> {
   // Google details
   String _clientId = 'native.code';
   String _redirectUrl = 'io.identityserver.demo:/oauthredirect';
+  String _issuer = 'https://demo.identityserver.io';
   String _discoveryUrl =
       'https://demo.identityserver.io/.well-known/openid-configuration';
   List<String> _scopes = [
@@ -45,9 +51,21 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future _refresh() async {
+    setBusyState();
     var result = await _appAuth.token(TokenRequest(_clientId, _redirectUrl,
         refreshToken: _refreshToken,
         discoveryUrl: _discoveryUrl,
+        scopes: _scopes));
+    _processTokenResponse(result);
+    await _testApi(result);
+  }
+
+  Future _exchangeCode() async {
+    setBusyState();
+    var result = await _appAuth.token(TokenRequest(_clientId, _redirectUrl,
+        authorizationCode: _authorizationCode,
+        discoveryUrl: _discoveryUrl,
+        codeVerifier: _codeVerifier,
         scopes: _scopes));
     _processTokenResponse(result);
     await _testApi(result);
@@ -63,11 +81,16 @@ class _MyAppState extends State<MyApp> {
         body: SingleChildScrollView(
           child: Column(
             children: <Widget>[
+              Visibility(
+                visible: _isBusy,
+                child: LinearProgressIndicator(),
+              ),
               RaisedButton(
-                child: Text('Sign in'),
+                child: Text('Sign in with no code exchange'),
                 onPressed: () async {
+                  setBusyState();
                   // use the discovery endpoint to find the configuration
-                  var result = await _appAuth.authorizeAndExchangeToken(
+                  var result = await _appAuth.authorize(
                     AuthorizationTokenRequest(
                       _clientId,
                       _redirectUrl,
@@ -76,15 +99,38 @@ class _MyAppState extends State<MyApp> {
                     ),
                   );
 
-                  // alternatively can explicitly specify the endpoints
-                  // var result = await _appAuth.authorizeAndExchangeToken(
+                  // or just use to issuer
+                  // var result = await _appAuth.authorize(
                   //   AuthorizationTokenRequest(
                   //     _clientId,
                   //     _redirectUrl,
-                  //     serviceConfiguration: _serviceConfiguration,
+                  //     issuer: _issuer,
                   //     scopes: _scopes,
                   //   ),
                   // );
+                  if (result != null) {
+                    _processAuthResponse(result);
+                  }
+                },
+              ),
+              RaisedButton(
+                child: Text('Exchange code'),
+                onPressed: _authorizationCode != null ? _exchangeCode : null,
+              ),
+              RaisedButton(
+                child: Text('Sign in with auto code exchange'),
+                onPressed: () async {
+                  setBusyState();
+
+                  // show that we can also explicitly specify the endpoints rather than getting from the details from the discovery document
+                  var result = await _appAuth.authorizeAndExchangeCode(
+                    AuthorizationTokenRequest(
+                      _clientId,
+                      _redirectUrl,
+                      serviceConfiguration: _serviceConfiguration,
+                      scopes: _scopes,
+                    ),
+                  );
                   if (result != null) {
                     _processAuthTokenResponse(result);
                     await _testApi(result);
@@ -94,6 +140,10 @@ class _MyAppState extends State<MyApp> {
               RaisedButton(
                 child: Text('Refresh token'),
                 onPressed: _refreshToken != null ? _refresh : null,
+              ),
+              Text('authorization code'),
+              TextField(
+                controller: _authorizationCodeTextController,
               ),
               Text('access token'),
               TextField(
@@ -120,6 +170,12 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  void setBusyState() {
+    setState(() {
+      _isBusy = true;
+    });
+  }
+
   void _processAuthTokenResponse(AuthorizationTokenResponse response) {
     setState(() {
       _accessToken = _accessTokenTextController.text = response.accessToken;
@@ -127,6 +183,16 @@ class _MyAppState extends State<MyApp> {
       _refreshToken = _refreshTokenTextController.text = response.refreshToken;
       _accessTokenExpirationTextController.text =
           response.accessTokenExpirationDateTime?.toIso8601String();
+    });
+  }
+
+  void _processAuthResponse(AuthorizationResponse response) {
+    setState(() {
+      // save the code verifier as it must be used when exchanging the token
+      _codeVerifier = response.codeVerifier;
+      _authorizationCode =
+          _authorizationCodeTextController.text = response.authorizationCode;
+      _isBusy = false;
     });
   }
 
@@ -145,6 +211,7 @@ class _MyAppState extends State<MyApp> {
         headers: {'Authorization': 'Bearer $_accessToken'});
     setState(() {
       _userInfo = httpResponse.statusCode == 200 ? httpResponse.body : '';
+      _isBusy = false;
     });
   }
 }
