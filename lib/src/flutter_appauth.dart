@@ -11,11 +11,11 @@ class FlutterAppAuth {
   static final FlutterAppAuth _instance = new FlutterAppAuth.private(
       const MethodChannel('crossingthestreams.io/flutter_appauth'));
 
-  /// Convenience method for authorizing and then exchanging a token upon succesful authorization
-  Future<AuthorizationTokenResponse> authorizeAndExchangeToken(
+  /// Convenience method for authorizing and then exchanges code
+  Future<AuthorizationTokenResponse> authorizeAndExchangeCode(
       AuthorizationTokenRequest request) async {
     var result = await _channel.invokeMethod(
-        'authorizeAndExchangeToken', request.toMap());
+        'authorizeAndExchangeCode', request.toMap());
     return AuthorizationTokenResponse(
         result['accessToken'],
         result['refreshToken'],
@@ -27,6 +27,15 @@ class FlutterAppAuth {
         result['tokenType'],
         result['authorizationAdditionalParameters']?.cast<String, dynamic>(),
         result['tokenAdditionalParameters']?.cast<String, dynamic>());
+  }
+
+  Future<AuthorizationResponse> authorize(
+      AuthorizationTokenRequest request) async {
+    var result = await _channel.invokeMethod('authorize', request.toMap());
+    return AuthorizationResponse(
+        result['authorizationCode'],
+        result['codeVerifier'],
+        result['authorizationAdditionalParameters']?.cast<String, dynamic>());
   }
 
   /// For exchanging tokens
