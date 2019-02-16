@@ -69,7 +69,7 @@ var result = await appAuth.token(TokenRequest('<client_id>', '<redirect_url>',
         scopes: ['openid','profile', 'email', 'offline_access', 'api']));
 ```
 
-# Refreshing tokens
+### Refreshing tokens
 
 Some providers may return a refresh token that could be used to refresh short-lived access tokens. A request to get a new access token before it expires could be made that would like similar to the following code
 
