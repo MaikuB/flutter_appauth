@@ -16,7 +16,7 @@ The first step is to create an instance of the plugin
 FlutterAppAuth appAuth = FlutterAppAuth();
 ```
 
-Afterwards, you'll reach a point where end-users need to be authorized and authenticated. A convenience method is provided that do and automatically exchange the authorization code. This can be done in a few different ways, one of which is to use the OpenID Connect Discovery
+Afterwards, you'll reach a point where end-users need to be authorized and authenticated. A convenience method is provided that will perform an authorization request and automatically exchange the authorization code. This can be done in a few different ways, one of which is to use the OpenID Connect Discovery
 
 ```
 var result = await appAuth.authorizeAndExchangeCode(
@@ -31,7 +31,7 @@ var result = await appAuth.authorizeAndExchangeCode(
 
 Here the `<client_id>` and `<redirect_url>` should be replaced by the values registered with your identity provider. The `<discovery_url>` would be the URL for the discovery endpoint exposed by your provider that will return a document containing information about the OAuth 2.0 endpoints among other things. This URL is obtained by concatenating the issuer with the path `/.well-known/openid-configuration`. For example, the full URL for the IdentityServer4 demo site is `https://demo.identityserver.io/.well-known/openid-configuration`. As demonstrated in the above sample code, it's also possible specify the `scopes` being requested.
 
-It's possible to perform the above request with just the issuer as well
+Rather than using the full discovery URL, the issuer could be used instead so that the process retrieving the discovery document is skipped
 
 ```
 var result = await appAuth.authorizeAndExchangeCode(
