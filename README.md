@@ -18,7 +18,7 @@ FlutterAppAuth appAuth = FlutterAppAuth();
 
 Afterwards, you'll reach a point where end-users need to be authorized and authenticated. A convenience method is provided that will perform an authorization request and automatically exchange the authorization code. This can be done in a few different ways, one of which is to use the OpenID Connect Discovery
 
-```
+```dart
 var result = await appAuth.authorizeAndExchangeCode(
                     AuthorizationTokenRequest(
                       '<client_id>',
@@ -33,7 +33,7 @@ Here the `<client_id>` and `<redirect_url>` should be replaced by the values reg
 
 Rather than using the full discovery URL, the issuer could be used instead so that the process retrieving the discovery document is skipped
 
-```
+```dart
 var result = await appAuth.authorizeAndExchangeCode(
                     AuthorizationTokenRequest(
                       '<client_id>',
@@ -46,7 +46,7 @@ var result = await appAuth.authorizeAndExchangeCode(
 
 If you already know the authorization and token endpoints, then these could be explicitly specified
 
-```
+```dart
 var result = await appAuth.authorizeAndExchangeCode(
                     AuthorizationTokenRequest(
                       '<client_id>',
@@ -61,7 +61,7 @@ Upon completing the request successfully, the method should return an object (th
 
 If you would prefer to not have the automatic code exchange to happen then can call the `authorize` method instead of the `authorizeAndExchangeCode` method. This will return an instance of the `AuthorizationResponse` class that will contain the code verifier that AppAuth generated (as part of implementing PKCE) when issuing the authorization request, the authorization code and additional parameters should they exist. Both of the code verifier and authorization code would need to be stored so they can then be reused to exchange the code later on e.g.
 
-```
+```dart
 var result = await appAuth.token(TokenRequest('<client_id>', '<redirect_url>',
         authorizationCode: '<authorization_code>',
         discoveryUrl: '<discovery_url>',
@@ -73,7 +73,7 @@ var result = await appAuth.token(TokenRequest('<client_id>', '<redirect_url>',
 
 Some providers may return a refresh token that could be used to refresh short-lived access tokens. A request to get a new access token before it expires could be made that would like similar to the following code
 
-```
+```dart
 var result = await appAuth.token(TokenRequest('<client_id>', '<redirect_url>',
         authorizationCode: '<authorization_code>',
         discoveryUrl: '<discovery_url>',
@@ -103,7 +103,7 @@ android {
 Go to the `Info.plist` for your iOS app to specify the custom scheme so that there should be a section in it that look similar to the following but replace `<your_custom_scheme>` with the desired value
 
 
-```
+```xml
 <key>CFBundleURLTypes</key>
 <array>
     <dict>

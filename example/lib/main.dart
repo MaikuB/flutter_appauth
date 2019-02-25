@@ -26,7 +26,6 @@ class _MyAppState extends State<MyApp> {
   TextEditingController _refreshTokenTextController = TextEditingController();
   String _userInfo = '';
 
-  // Google details
   String _clientId = 'native.code';
   String _redirectUrl = 'io.identityserver.demo:/oauthredirect';
   String _issuer = 'https://demo.identityserver.io';
