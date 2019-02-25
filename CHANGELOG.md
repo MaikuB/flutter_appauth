@@ -1,3 +1,6 @@
+# 0.0.4+1
+* No functional changes in this release. Just remove old comment in the code and changes to format the README more nicely
+
 # 0.0.4
 * **BREAKING CHANGE** renamed `authorizeAndExchangeToken` method to `authorizeAndExchangeCode` to reflect what happens behind the scenes
 * Added an `authorize` method that performs an authorization request to get an authorization code without exchanging it
