@@ -1,3 +1,7 @@
+# 0.1.0
+* **BREAKING CHANGE** Updated lower bound of the Dark SDK constraints from 2.0.0-dev.68.0 to 2.1.0
+* Added more details to the error messages when platform exceptions are raised e.g. when problems occur exchanging the authorization code. Note that there will be differences in the level of details that will be returned on each platform. This is due the differences between the SDKs on each platform
+
 # 0.0.4+1
 * No functional changes in this release. Just remove old comment in the code and changes to format the README more nicely
 

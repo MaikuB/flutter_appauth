@@ -98,7 +98,7 @@ class _MyAppState extends State<MyApp> {
                     ),
                   );
 
-                  // or just use to issuer
+                  // or just use the issuer
                   // var result = await _appAuth.authorize(
                   //   AuthorizationTokenRequest(
                   //     _clientId,

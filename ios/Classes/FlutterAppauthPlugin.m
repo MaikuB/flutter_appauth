@@ -75,8 +75,8 @@ NSString *const AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE = @"authorize_and_exchang
 NSString *const DISCOVERY_ERROR_CODE = @"discovery_failed";
 NSString *const TOKEN_ERROR_CODE = @"token_failed";
 NSString *const DISCOVERY_ERROR_MESSAGE_FORMAT = @"Error retrieving discovery document: %@";
-NSString *const TOKEN_ERROR_MESSAGE_FORMAT = @"Failed to get token %@";
-NSString *const AUTHORIZE_ERROR_MESSAGE = @"Failed to authorize";
+NSString *const TOKEN_ERROR_MESSAGE_FORMAT = @"Failed to get token: %@";
+NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
 
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
@@ -159,7 +159,7 @@ NSString *const AUTHORIZE_ERROR_MESSAGE = @"Failed to authorize";
                                                                                            result([self processResponses:authState.lastTokenResponse authResponse:authState.lastAuthorizationResponse]);
                                                                                            
                                                                                        } else {
-                                                                                           [self finishWithError:AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE message:AUTHORIZE_ERROR_MESSAGE result:result];
+                                                                                           [self finishWithError:AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE message:[self formatMessageWithError:AUTHORIZE_ERROR_MESSAGE_FORMAT error:error] result:result];
                                                                                        }
                                                                                    }];
     } else {
@@ -171,11 +171,16 @@ NSString *const AUTHORIZE_ERROR_MESSAGE = @"Failed to authorize";
                 [processedResponse setObject:authorizationResponse.request.codeVerifier forKey:@"codeVerifier"];
                 result(processedResponse);
             } else {
-                [self finishWithError:AUTHORIZE_ERROR_CODE message:AUTHORIZE_ERROR_MESSAGE result:result];
+                [self finishWithError:AUTHORIZE_ERROR_CODE message:[self formatMessageWithError:AUTHORIZE_ERROR_MESSAGE_FORMAT error:error] result:result];
             }
         }];
         
     }
+}
+
+- (NSString *) formatMessageWithError:(NSString *)messageFormat error:(NSError * _Nullable)error {
+    NSString *formattedMessage = [NSString stringWithFormat:messageFormat, [error localizedDescription]];
+    return formattedMessage;
 }
 
 - (void)finishWithDiscoveryError:(NSError * _Nullable)error result:(FlutterResult)result {

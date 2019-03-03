@@ -44,7 +44,7 @@ var result = await appAuth.authorizeAndExchangeCode(
                   );
 ```
 
-If you already know the authorization and token endpoints, then these could be explicitly specified
+If you already know the authorization and token endpoints, which may be because discovery isn't supported, then these could be explicitly specified
 
 ```dart
 var result = await appAuth.authorizeAndExchangeCode(
