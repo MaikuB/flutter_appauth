@@ -9,7 +9,6 @@ import net.openid.appauth.AuthorizationResponse;
 import net.openid.appauth.AuthorizationService;
 import net.openid.appauth.AuthorizationServiceConfiguration;
 import net.openid.appauth.ClientSecretBasic;
-import net.openid.appauth.CodeVerifierUtil;
 import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenRequest;
 import net.openid.appauth.TokenResponse;
@@ -40,9 +39,9 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
     private static final String AUTHORIZE_ERROR_CODE = "authorize_failed";
     private static final String TOKEN_ERROR_CODE = "token_failed";
 
-    private static final String DISCOVERY_ERROR_MESSAGE = "Error retrieving discovery document";
-    private static final String TOKEN_ERROR_MESSAGE = "Failed to get token";
-    private static final String AUTHORIZE_ERROR_MESSAGE = "Failed to authorize";
+    private static final String DISCOVERY_ERROR_MESSAGE_FORMAT = "Error retrieving discovery document: [error: %s, description: %s]";
+    private static final String TOKEN_ERROR_MESSAGE_FORMAT = "Failed to get token: [error: %s, description: %s]";
+    private static final String AUTHORIZE_ERROR_MESSAGE_FORMAT = "Failed to authorize: [error: %s, description: %s]";
 
     private final Registrar registrar;
     private final int RC_AUTH_EXCHANGE_CODE = 531984;
@@ -123,7 +122,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
             authorizationCode = (String) arguments.get("authorizationCode");
         }
         String codeVerifier = null;
-        if(arguments.containsKey("codeVerifier")) {
+        if (arguments.containsKey("codeVerifier")) {
             codeVerifier = (String) arguments.get("codeVerifier");
         }
         final ArrayList<String> scopes = (ArrayList<String>) arguments.get("scopes");
@@ -144,7 +143,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                     if (ex == null) {
                         performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters, exchangeCode);
                     } else {
-                        finishWithDiscoveryError(ex.getLocalizedMessage());
+                        finishWithDiscoveryError(ex);
                     }
                 }
             };
@@ -176,7 +175,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                         if (ex == null) {
                             performTokenRequest(serviceConfiguration, tokenRequestParameters);
                         } else {
-                            finishWithDiscoveryError(ex.getLocalizedMessage());
+                            finishWithDiscoveryError(ex);
                         }
                     }
                 });
@@ -189,7 +188,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                         if (ex == null) {
                             performTokenRequest(serviceConfiguration, tokenRequestParameters);
                         } else {
-                            finishWithDiscoveryError(ex.getLocalizedMessage());
+                            finishWithDiscoveryError(ex);
                         }
                     }
                 });
@@ -223,7 +222,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
         registrar.activity().startActivityForResult(authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
     }
 
-    private void performTokenRequest(AuthorizationServiceConfiguration serviceConfiguration, TokenRequestParameters tokenRequestParameters)  {
+    private void performTokenRequest(AuthorizationServiceConfiguration serviceConfiguration, TokenRequestParameters tokenRequestParameters) {
         TokenRequest.Builder builder = new TokenRequest.Builder(serviceConfiguration, tokenRequestParameters.clientId)
                 .setRefreshToken(tokenRequestParameters.refreshToken)
                 .setAuthorizationCode(tokenRequestParameters.authorizationCode)
@@ -251,7 +250,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                     Map<String, Object> responseMap = tokenResponseToMap(resp, null);
                     finishWithSuccess(responseMap);
                 } else {
-                    finishWithTokenError();
+                    finishWithTokenError(ex);
                 }
             }
         };
@@ -263,8 +262,8 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
 
     }
 
-    private void finishWithTokenError() {
-        finishWithError(TOKEN_ERROR_CODE, TOKEN_ERROR_MESSAGE);
+    private void finishWithTokenError(AuthorizationException ex) {
+        finishWithError(TOKEN_ERROR_CODE, String.format(TOKEN_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription));
     }
 
 
@@ -278,8 +277,8 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
         pendingOperation = null;
     }
 
-    private void finishWithDiscoveryError(String localizedDescription) {
-        finishWithError(DISCOVERY_ERROR_CODE, DISCOVERY_ERROR_MESSAGE + localizedDescription);
+    private void finishWithDiscoveryError(AuthorizationException ex) {
+        finishWithError(DISCOVERY_ERROR_CODE, String.format(DISCOVERY_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription));
     }
 
 
@@ -308,7 +307,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                         if (resp != null) {
                             finishWithSuccess(tokenResponseToMap(resp, authResponse));
                         } else {
-                            finishWithTokenError();
+                            finishWithError(AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE, String.format(AUTHORIZE_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription));
                         }
                     }
                 };
@@ -321,7 +320,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                 finishWithSuccess(authorizationResponseToMap(authResponse));
             }
         } else {
-            finishWithError(exchangeCode ? AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE : AUTHORIZE_ERROR_CODE, AUTHORIZE_ERROR_MESSAGE);
+            finishWithError(exchangeCode ? AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE : AUTHORIZE_ERROR_CODE, String.format(AUTHORIZE_ERROR_MESSAGE_FORMAT, authException.error, authException.errorDescription));
         }
     }
 
