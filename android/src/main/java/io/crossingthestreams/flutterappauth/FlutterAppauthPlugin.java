@@ -44,8 +44,8 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
     private static final String AUTHORIZE_ERROR_MESSAGE_FORMAT = "Failed to authorize: [error: %s, description: %s]";
 
     private final Registrar registrar;
-    private final int RC_AUTH_EXCHANGE_CODE = 531984;
-    private final int RC_AUTH = 531985;
+    private final int RC_AUTH_EXCHANGE_CODE = 65030;
+    private final int RC_AUTH = 65031;
     private PendingOperation pendingOperation;
     private String clientSecret;
 
