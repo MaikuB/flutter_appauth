@@ -4,7 +4,7 @@
 
 A Flutter bridge for AppAuth (https://appauth.io) used authenticating and authorizing users. Note that AppAuth also supports the PKCE extension that is required some providers so this plugin should work with them.
 
-**NOTE**: this library uses AndroidX and there is currently a known issuer with Jetifier that affects the use of Chrome Custom Tabs (see https://issuetracker.google.com/issues/119183822). This means that until a fix for it is released, signing in will direct users to the browser as opposed to using Chrome Custom Tabs.
+**NOTE**: if Chrome Custom Tabs are not working in your Android app, check to make sure that you have the latest version of this plugin, Android Studio, Gradle distribution and Android Gradle plugin for your app. There was previously a known [issue](https://issuetracker.google.com/issues/119183822) with the Android tooling with AndroidX that should now be resolved since Android Studio 3.4 has been released
 
 
 ## Getting Started
