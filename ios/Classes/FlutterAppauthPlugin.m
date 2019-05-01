@@ -54,12 +54,14 @@
 
 @interface AuthorizationTokenRequestParameters : TokenRequestParameters
 @property(nonatomic, strong) NSString *loginHint;
+@property(nonatomic, strong) NSArray *promptValues;
 @end
 
 @implementation AuthorizationTokenRequestParameters
 - (id)initWithArguments:(NSDictionary *)arguments {
     [super processArguments:arguments];
     _loginHint = [ArgumentProcessor processArgumentValue:arguments withKey:@"loginHint"];
+    _promptValues = [ArgumentProcessor processArgumentValue:arguments withKey:@"promptValues"];
     return self;
 }
 @end
@@ -100,6 +102,12 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
     }
 }
 
+- (void)ensureAdditionalParametersInitialized:(AuthorizationTokenRequestParameters *)requestParameters {
+    if(!requestParameters.additionalParameters) {
+        requestParameters.additionalParameters = [[NSMutableDictionary alloc] init];
+    }
+}
+
 -(void)handleAuthorizeMethodCall:(NSDictionary*)arguments result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode {
     AuthorizationTokenRequestParameters *requestParameters = [[AuthorizationTokenRequestParameters alloc] initWithArguments:arguments];
     if(requestParameters.serviceConfigurationParameters != nil) {
@@ -107,6 +115,14 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
         [[OIDServiceConfiguration alloc]
          initWithAuthorizationEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"authorizationEndpoint"]]
          tokenEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"tokenEndpoint"]]];
+        if(requestParameters.loginHint) {
+            [self ensureAdditionalParametersInitialized:requestParameters];
+            [requestParameters.additionalParameters setValue:requestParameters.loginHint forKey:@"login_hint"];
+        }
+        if(requestParameters.promptValues) {
+            [self ensureAdditionalParametersInitialized:requestParameters];
+            [requestParameters.additionalParameters setValue:[requestParameters.promptValues componentsJoinedByString:@","] forKey:@"prompt"];
+        }
         [self performAuthorization:serviceConfiguration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters result:result exchangeCode:exchangeCode];
     } else if (requestParameters.discoveryUrl) {
         NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
