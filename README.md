@@ -9,7 +9,7 @@ A Flutter bridge for AppAuth (https://appauth.io) used authenticating and author
 
 ## Getting Started
 
-Please see the example that demonstrates how to sign into the IdentityServer4 demo site (https://demo.identityserver.io). It has also been tested with Azure B2C and Google Sign-in. API docs can be found [here](https://pub.dartlang.org/documentation/flutter_appauth/latest/)
+Please see the example that demonstrates how to sign into the IdentityServer4 demo site (https://demo.identityserver.io). It has also been tested with Azure B2C and Google Sign-in. It is suggested that developers check the documentation of the identity provider they are using to see what capabilities it supports e.g. how to logout, what values of the `prompt` parameter it supports etc. API docs can be found [here](https://pub.dartlang.org/documentation/flutter_appauth/latest/)
 
 
 The first step is to create an instance of the plugin
