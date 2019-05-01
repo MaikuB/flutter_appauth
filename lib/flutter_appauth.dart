@@ -13,3 +13,5 @@ part 'src/common_request_details.dart';
 part 'src/token_response.dart';
 part 'src/token_request.dart';
 part 'src/flutter_appauth.dart';
+part 'src/mappable.dart';
+part 'src/authorization_parameters.dart';

@@ -90,12 +90,10 @@ class _MyAppState extends State<MyApp> {
                   setBusyState();
                   // use the discovery endpoint to find the configuration
                   var result = await _appAuth.authorize(
-                    AuthorizationTokenRequest(
-                      _clientId,
-                      _redirectUrl,
-                      discoveryUrl: _discoveryUrl,
-                      scopes: _scopes,
-                    ),
+                    AuthorizationTokenRequest(_clientId, _redirectUrl,
+                        discoveryUrl: _discoveryUrl,
+                        scopes: _scopes,
+                        loginHint: 'bob'),
                   );
 
                   // or just use the issuer
@@ -123,13 +121,19 @@ class _MyAppState extends State<MyApp> {
 
                   // show that we can also explicitly specify the endpoints rather than getting from the details from the discovery document
                   var result = await _appAuth.authorizeAndExchangeCode(
-                    AuthorizationTokenRequest(
-                      _clientId,
-                      _redirectUrl,
-                      serviceConfiguration: _serviceConfiguration,
-                      scopes: _scopes,
-                    ),
+                    AuthorizationTokenRequest(_clientId, _redirectUrl,
+                        serviceConfiguration: _serviceConfiguration,
+                        scopes: _scopes),
                   );
+
+                  // this code block demonstrates passing in values for the prompt parameter. in this case it prompts the user login even if they have already signed in. the list of supported values depends on the identity provider
+                  // var result = await _appAuth.authorizeAndExchangeCode(
+                  //   AuthorizationTokenRequest(_clientId, _redirectUrl,
+                  //       serviceConfiguration: _serviceConfiguration,
+                  //       scopes: _scopes,
+                  //       promptValues: ['login']),
+                  // );
+
                   if (result != null) {
                     _processAuthTokenResponse(result);
                     await _testApi(result);

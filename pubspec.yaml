@@ -1,6 +1,6 @@
 name: flutter_appauth
 description: This plugin provides an abstraction around the Android and iOS AppAuth SDKs so it can be used to communicate with OAuth 2.0 and OpenID Connect providers
-version: 0.2.0
+version: 0.2.1
 author: Michael Bui <maikub84@gmail.com>
 homepage: https://github.com/MaikuB/flutter_appauth
 

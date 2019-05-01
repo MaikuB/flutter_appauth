@@ -1,6 +1,6 @@
 part of flutter_appauth;
 
-class _CommonRequestDetails {
+class _CommonRequestDetails implements _Mappable {
   /// The client id
   String clientId;
 
