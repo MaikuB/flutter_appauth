@@ -1,3 +1,6 @@
+# 0.2.1+1
+* Updated README to add a note suggesting developers to check the documentation of the identity provider they plan to use
+
 # 0.2.1
 * [iOS] Fix issue where `login_hint` OAuth parameter (specified by the `loginHint` field of the `AuthorizationTokenRequest` and `AuthorizationRequest` classes). Example app has also been updated to demonstrate how to specify it
 * Added support for specifying the `prompt` OAuth parameter. This can be specified by populating the `promptValues` field in the either the `AuthorizationTokenRequest` or `AuthorizationRequest` class. Updated example app (note: code is commented out) to demonstrate how to use it
