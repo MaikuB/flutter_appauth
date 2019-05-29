@@ -77,7 +77,6 @@ Some providers may return a refresh token that could be used to refresh short-li
 
 ```dart
 var result = await appAuth.token(TokenRequest('<client_id>', '<redirect_url>',
-        authorizationCode: '<authorization_code>',
         discoveryUrl: '<discovery_url>',
         refreshToken: '<refresh_token>',
         scopes: ['openid','profile', 'email', 'offline_access', 'api']));

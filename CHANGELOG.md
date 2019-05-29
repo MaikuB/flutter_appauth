@@ -1,3 +1,6 @@
+# 0.2.1+2
+* Updated README to fix section on refreshing tokens where `authorizationCode` was shown in code snippet by mistake
+
 # 0.2.1+1
 * Updated README to add a note suggesting developers to check the documentation of the identity provider they plan to use
 
