@@ -1,3 +1,7 @@
+# 0.3.0
+* [iOS] Explicitly set to depend on version 1.0 of the AppAuth iOS SDK
+* Added Cirrus CI configuration
+
 # 0.2.1+2
 * Updated README to fix section on refreshing tokens where `authorizationCode` was shown in code snippet by mistake
 
@@ -11,7 +15,7 @@
 # 0.2.0
 * **BREAKING CHANGE** Updated the Android Gradle plugin to version 3.4.0. Applies to both the library and sample app
 * Updated README with a note for developers to check to see if their development environment on the Android is up to date as this should now be fixed with the release of Android Studio 3.4
-* Updated the Gradle distribution used by the example app to 5.1.1s
+* Updated the Gradle distribution used by the example app to 5.1.1
 
 # 0.1.1
 * Changed the request codes used internally on the Android side to be less than 16 bits. Thanks to the PR from [Dviejopomata](https://github.com/Dviejopomata)
