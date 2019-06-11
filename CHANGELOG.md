@@ -1,3 +1,7 @@
+# 0.3.0
+* Explicitly set to depend on version 1.0 of the AppAuth iOS SDK
+* Added Cirrus CI configuration
+
 # 0.2.1+2
 * Updated README to fix section on refreshing tokens where `authorizationCode` was shown in code snippet by mistake
 
