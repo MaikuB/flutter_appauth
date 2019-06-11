@@ -13,4 +13,7 @@ build_example_ios_task:
     folder: ~/.pub-cache
   build_script:
     - cd example
+    - cd ios
+    - pod install --repo-update
+    - cd ..
     - flutter build ios --no-codesign
