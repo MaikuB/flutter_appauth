@@ -13,4 +13,4 @@ build_example_ios_task:
     folder: ~/.pub-cache
   build_script:
     - cd example
-    - flutter build ios
+    - flutter build ios --no-codesign
