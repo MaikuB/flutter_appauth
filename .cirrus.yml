@@ -1,4 +1,4 @@
-task:
+android_build_task:
   name: Build Android example
   container:
     image: cirrusci/flutter:stable
@@ -8,7 +8,7 @@ task:
     - cd example
     - flutter build apk
 
-task:
+ios_build_task:
   name: Build iOS example
   osx_instance:
     image: mojave-xcode-10.2-flutter
