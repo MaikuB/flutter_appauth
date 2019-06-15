@@ -1,4 +1,5 @@
-build_example_android_task:
+task:
+  name: Build Android example
   container:
     image: cirrusci/flutter:stable
   pub_cache:
@@ -7,7 +8,8 @@ build_example_android_task:
     - cd example
     - flutter build apk
 
-build_example_ios_task:
+task:
+  name: Build iOS example
   osx_instance:
     image: mojave-xcode-10.2-flutter
   pub_cache:
