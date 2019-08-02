@@ -1,3 +1,6 @@
+# 0.3.0+1
+* Update email address in the README
+
 # 0.3.0
 * [iOS] Explicitly set to depend on version 1.0 of the AppAuth iOS SDK
 * Added Cirrus CI configuration
