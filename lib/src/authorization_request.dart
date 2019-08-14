@@ -1,8 +1,10 @@
-part of flutter_appauth;
+import 'authorization_parameters.dart';
+import 'authorization_service_configuration.dart';
+import 'common_request_details.dart';
 
 /// The details of an authorization request to get an authorization code
-class AuthorizationRequest extends _CommonRequestDetails
-    with _AuthorizationParameters {
+class AuthorizationRequest extends CommonRequestDetails
+    with AuthorizationParameters {
   AuthorizationRequest(String clientId, String redirectUrl,
       {String loginHint,
       List<String> scopes,

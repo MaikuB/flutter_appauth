@@ -1,6 +1,6 @@
-part of flutter_appauth;
+import 'mappable.dart';
 
-mixin _AuthorizationParameters on _Mappable {
+mixin AuthorizationParameters on Mappable {
   /// Hint to the Authorization Server about the login identifier the End-User might use to log in
   String loginHint;
 

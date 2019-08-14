@@ -1,4 +1,11 @@
-part of flutter_appauth;
+import 'package:flutter/services.dart';
+import 'package:meta/meta.dart';
+import 'authorization_request.dart';
+import 'authorization_response.dart';
+import 'authorization_token_request.dart';
+import 'authorization_token_response.dart';
+import 'token_request.dart';
+import 'token_response.dart';
 
 class FlutterAppAuth {
   factory FlutterAppAuth() => _instance;
@@ -29,8 +36,7 @@ class FlutterAppAuth {
         result['tokenAdditionalParameters']?.cast<String, dynamic>());
   }
 
-  Future<AuthorizationResponse> authorize(
-      AuthorizationTokenRequest request) async {
+  Future<AuthorizationResponse> authorize(AuthorizationRequest request) async {
     var result = await _channel.invokeMethod('authorize', request.toMap());
     return AuthorizationResponse(
         result['authorizationCode'],

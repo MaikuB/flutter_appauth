@@ -1,5 +1,3 @@
-part of flutter_appauth;
-
 class AuthorizationResponse {
   /// The authorization code
   final String authorizationCode;

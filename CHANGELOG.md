@@ -1,5 +1,11 @@
+# 0.4.0
+* [iOS] Update AppAuth SDK dependency to 1.1
+* Update email address in pubspec.yaml
+* Add `GrantTypes` class as a convenience for other developers to use
+* **BREAKING CHANGE** `authorize` method has been corrected to accept an instance of the `AuthorizationRequest` class as opposed to an instance of the `AuthorizationTokenRequest` class even though a token isn't being requested
+
 # 0.3.0+1
-* Update email address in the README
+* Update email address in pubspec.yaml
 
 # 0.3.0
 * [iOS] Explicitly set to depend on version 1.0 of the AppAuth iOS SDK
