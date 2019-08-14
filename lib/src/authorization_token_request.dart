@@ -1,8 +1,11 @@
-part of flutter_appauth;
+import 'authorization_parameters.dart';
+import 'authorization_service_configuration.dart';
+import 'grant_types.dart';
+import 'token_request.dart';
 
 /// Details required for a combined authorization and code exchange request
 class AuthorizationTokenRequest extends TokenRequest
-    with _AuthorizationParameters {
+    with AuthorizationParameters {
   AuthorizationTokenRequest(String clientId, String redirectUrl,
       {String loginHint,
       String clientSecret,
@@ -17,14 +20,11 @@ class AuthorizationTokenRequest extends TokenRequest
             discoveryUrl: discoveryUrl,
             issuer: issuer,
             scopes: scopes,
+            grantType: GrantType.authorizationCode,
             serviceConfiguration: serviceConfiguration,
             additionalParameters: additionalParameters) {
     this.loginHint = loginHint;
     this.promptValues = promptValues;
-  }
-
-  String _inferGrantType() {
-    return grantType;
   }
 
   Map<String, dynamic> toMap() {

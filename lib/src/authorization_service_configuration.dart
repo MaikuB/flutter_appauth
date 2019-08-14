@@ -1,5 +1,3 @@
-part of flutter_appauth;
-
 class AuthorizationServiceConfiguration {
   final String authorizationEndpoint;
   final String tokenEndpoint;

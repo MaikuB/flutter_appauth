@@ -1,5 +1,3 @@
-part of flutter_appauth;
-
-abstract class _Mappable {
+abstract class Mappable {
   Map<String, dynamic> toMap();
 }

@@ -1,5 +1,3 @@
-part of flutter_appauth;
-
 /// Details from making a successful token exchange
 class TokenResponse {
   final String accessToken;

@@ -1,6 +1,7 @@
-part of flutter_appauth;
+import 'authorization_service_configuration.dart';
+import 'mappable.dart';
 
-class _CommonRequestDetails implements _Mappable {
+class CommonRequestDetails implements Mappable {
   /// The client id
   String clientId;
 

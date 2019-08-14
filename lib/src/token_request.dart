@@ -1,7 +1,9 @@
-part of flutter_appauth;
+import 'authorization_service_configuration.dart';
+import 'common_request_details.dart';
+import 'grant_types.dart';
 
 /// Details for a token exchange request
-class TokenRequest with _CommonRequestDetails {
+class TokenRequest with CommonRequestDetails {
   /// The client secret
   final String clientSecret;
 
@@ -59,10 +61,10 @@ class TokenRequest with _CommonRequestDetails {
       return grantType;
     }
     if (refreshToken != null) {
-      return 'refresh_token';
+      return GrantType.refreshToken;
     }
     if (authorizationCode != null) {
-      return 'authorization_code';
+      return GrantType.authorizationCode;
     }
     throw 'Grant type not specified and cannot be inferred';
   }
