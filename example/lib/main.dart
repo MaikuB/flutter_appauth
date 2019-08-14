@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
-  Future _refresh() async {
+  Future<void> _refresh() async {
     setBusyState();
     var result = await _appAuth.token(TokenRequest(_clientId, _redirectUrl,
         refreshToken: _refreshToken,
@@ -59,7 +59,7 @@ class _MyAppState extends State<MyApp> {
     await _testApi(result);
   }
 
-  Future _exchangeCode() async {
+  Future<void> _exchangeCode() async {
     setBusyState();
     var result = await _appAuth.token(TokenRequest(_clientId, _redirectUrl,
         authorizationCode: _authorizationCode,
@@ -209,7 +209,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future _testApi(TokenResponse response) async {
+  Future<void> _testApi(TokenResponse response) async {
     var httpResponse = await http.get('https://demo.identityserver.io/api/test',
         headers: {'Authorization': 'Bearer $_accessToken'});
     setState(() {

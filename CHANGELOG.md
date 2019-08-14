@@ -1,5 +1,9 @@
+# 0.3.1
+* [iOS] Update AppAuth SDK dependency to 1.1
+* Update email address in pubspec.yaml
+
 # 0.3.0+1
-* Update email address in the README
+* Update email address in pubspec.yaml
 
 # 0.3.0
 * [iOS] Explicitly set to depend on version 1.0 of the AppAuth iOS SDK
