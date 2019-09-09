@@ -7,6 +7,18 @@ A Flutter bridge for AppAuth (https://appauth.io) used authenticating and author
 
 **NOTE**: if Chrome Custom Tabs are not working in your Android app, check to make sure that you have the latest version of this plugin, Android Studio, Gradle distribution and Android Gradle plugin for your app. There was previously a known [issue](https://issuetracker.google.com/issues/119183822) with the Android tooling with AndroidX that should now be resolved since Android Studio 3.4 has been released
 
+You may be able to solve the Chrome Custom Tabs issue by adding AndroidX support to your application. Add these 2 lines to `Android/gradle.properties`:
+
+```
+android.enableJetifier=true
+android.useAndroidX=true
+```
+
+This same result is achieved if you add the  `--androidx` command line switch when creating your project:
+
+```
+$ flutter create --androidx project_name
+```
 
 ## Getting Started
 
