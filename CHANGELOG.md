@@ -1,3 +1,6 @@
+# 0.4.0+1
+* Make it clearer in the readme that AndroidX is required
+
 # 0.4.0
 * [iOS] Update AppAuth SDK dependency to 1.1
 * Update email address in pubspec.yaml
