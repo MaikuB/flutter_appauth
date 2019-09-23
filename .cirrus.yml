@@ -6,7 +6,7 @@ task:
     folder: ~/.pub-cache
   build_script:
     - cd example
-    - flutter build apk
+    - flutter build appbundle
 
 task:
   name: Build iOS example

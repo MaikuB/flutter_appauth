@@ -1,3 +1,6 @@
+# 0.4.2
+* [iOS] Update AppAuth SDK dependency to 1.2 so it works on iOS 13. Thanks to the PR from [Aynur Dinmukhametov](https://github.com/ARDcode)
+
 # 0.4.0+1
 * Make it clearer in the readme that AndroidX is required
 
