@@ -23,6 +23,9 @@ class CommonRequestDetails implements Mappable {
   /// Additional parameters to include in the request
   Map<String, String> additionalParameters;
 
+  /// Whether to require HTTPS endpoints (only supported on Android)
+  bool requireHttps;
+
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'clientId': clientId,
@@ -31,7 +34,8 @@ class CommonRequestDetails implements Mappable {
       'redirectUrl': redirectUrl,
       'scopes': scopes,
       'serviceConfiguration': serviceConfiguration?.toMap(),
-      'additionalParameters': additionalParameters
+      'additionalParameters': additionalParameters,
+      'requireHttps': requireHttps
     };
   }
 }

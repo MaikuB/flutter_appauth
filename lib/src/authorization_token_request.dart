@@ -14,7 +14,8 @@ class AuthorizationTokenRequest extends TokenRequest
       Map<String, String> additionalParameters,
       String issuer,
       String discoveryUrl,
-      List<String> promptValues})
+      List<String> promptValues,
+      bool requireHttps})
       : super(clientId, redirectUrl,
             clientSecret: clientSecret,
             discoveryUrl: discoveryUrl,
@@ -25,6 +26,7 @@ class AuthorizationTokenRequest extends TokenRequest
             additionalParameters: additionalParameters) {
     this.loginHint = loginHint;
     this.promptValues = promptValues;
+    this.requireHttps = requireHttps;
   }
 
   Map<String, dynamic> toMap() {
