@@ -12,7 +12,7 @@ import java.net.URL;
 
 public class InsecureConnectionBuilder implements ConnectionBuilder {
 
-    public static InsecureConnectionBuilder INSTANCE = new InsecureConnectionBuilder();
+    public static final InsecureConnectionBuilder INSTANCE = new InsecureConnectionBuilder();
 
     private InsecureConnectionBuilder() { }
 
