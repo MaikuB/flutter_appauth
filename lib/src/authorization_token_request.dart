@@ -23,10 +23,10 @@ class AuthorizationTokenRequest extends TokenRequest
             scopes: scopes,
             grantType: GrantType.authorizationCode,
             serviceConfiguration: serviceConfiguration,
-            additionalParameters: additionalParameters) {
+            additionalParameters: additionalParameters,
+            allowInsecureConnections: allowInsecureConnections) {
     this.loginHint = loginHint;
     this.promptValues = promptValues;
-    this.allowInsecureConnections = allowInsecureConnections;
   }
 
   Map<String, dynamic> toMap() {
