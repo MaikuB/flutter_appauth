@@ -49,7 +49,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
     private final int RC_AUTH = 65031;
     private PendingOperation pendingOperation;
     private String clientSecret;
-    private Boolean requireHttps;
+    private boolean allowInsecureConnections;
 
     private FlutterAppauthPlugin(Registrar registrar) {
         this.registrar = registrar;
@@ -105,10 +105,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
         final ArrayList<String> promptValues = (ArrayList<String>) arguments.get("promptValues");
         Map<String, String> serviceConfigurationParameters = (Map<String, String>) arguments.get("serviceConfiguration");
         Map<String, String> additionalParameters = (Map<String, String>) arguments.get("additionalParameters");
-        requireHttps = (Boolean) arguments.get("requireHttps");
-        if (requireHttps == null) {
-            requireHttps = true;
-        }
+        allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
         return new AuthorizationTokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, serviceConfigurationParameters, additionalParameters, loginHint, promptValues);
     }
 
@@ -135,10 +132,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
         final ArrayList<String> scopes = (ArrayList<String>) arguments.get("scopes");
         Map<String, String> serviceConfigurationParameters = (Map<String, String>) arguments.get("serviceConfiguration");
         Map<String, String> additionalParameters = (Map<String, String>) arguments.get("additionalParameters");
-        requireHttps = (Boolean) arguments.get("requireHttps");
-        if (requireHttps == null) {
-            requireHttps = true;
-        }
+        allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
         return new TokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, refreshToken, authorizationCode, codeVerifier, grantType, serviceConfigurationParameters, additionalParameters);
     }
 
@@ -232,7 +226,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
         }
 
         AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-        if (!requireHttps) {
+        if (allowInsecureConnections) {
             authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
         }
 
@@ -262,7 +256,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
         }
 
         AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-        if (!requireHttps) {
+        if (allowInsecureConnections) {
             authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
         }
 
@@ -327,7 +321,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
         if (authException == null) {
             if (exchangeCode) {
                 AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-                if (!requireHttps) {
+                if (allowInsecureConnections) {
                     authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
                 }
 

@@ -23,8 +23,8 @@ class CommonRequestDetails implements Mappable {
   /// Additional parameters to include in the request
   Map<String, String> additionalParameters;
 
-  /// Whether to require HTTPS endpoints (only supported on Android)
-  bool requireHttps;
+  /// Whether to allow non-HTTPS endpoints (only applicable on Android)
+  bool allowInsecureConnections;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -35,7 +35,7 @@ class CommonRequestDetails implements Mappable {
       'scopes': scopes,
       'serviceConfiguration': serviceConfiguration?.toMap(),
       'additionalParameters': additionalParameters,
-      'requireHttps': requireHttps
+      'allowInsecureConnections': allowInsecureConnections
     };
   }
 }
