@@ -15,7 +15,7 @@ class AuthorizationTokenRequest extends TokenRequest
       String issuer,
       String discoveryUrl,
       List<String> promptValues,
-      bool allowInsecureConnections: false})
+      bool allowInsecureConnections = false})
       : super(clientId, redirectUrl,
             clientSecret: clientSecret,
             discoveryUrl: discoveryUrl,
@@ -27,10 +27,5 @@ class AuthorizationTokenRequest extends TokenRequest
             allowInsecureConnections: allowInsecureConnections) {
     this.loginHint = loginHint;
     this.promptValues = promptValues;
-  }
-
-  Map<String, dynamic> toMap() {
-    var map = super.toMap();
-    return map;
   }
 }

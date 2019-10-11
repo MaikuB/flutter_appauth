@@ -10,18 +10,18 @@ import 'token_response.dart';
 class FlutterAppAuth {
   factory FlutterAppAuth() => _instance;
 
-  final MethodChannel _channel;
-
   @visibleForTesting
   FlutterAppAuth.private(MethodChannel channel) : _channel = channel;
 
-  static final FlutterAppAuth _instance = new FlutterAppAuth.private(
+  final MethodChannel _channel;
+
+  static final FlutterAppAuth _instance = FlutterAppAuth.private(
       const MethodChannel('crossingthestreams.io/flutter_appauth'));
 
   /// Convenience method for authorizing and then exchanges code
   Future<AuthorizationTokenResponse> authorizeAndExchangeCode(
       AuthorizationTokenRequest request) async {
-    var result = await _channel.invokeMethod(
+    final Map<dynamic, dynamic> result = await _channel.invokeMethod(
         'authorizeAndExchangeCode', request.toMap());
     return AuthorizationTokenResponse(
         result['accessToken'],
@@ -37,7 +37,8 @@ class FlutterAppAuth {
   }
 
   Future<AuthorizationResponse> authorize(AuthorizationRequest request) async {
-    var result = await _channel.invokeMethod('authorize', request.toMap());
+    final Map<dynamic, dynamic> result =
+        await _channel.invokeMethod('authorize', request.toMap());
     return AuthorizationResponse(
         result['authorizationCode'],
         result['codeVerifier'],
@@ -46,7 +47,8 @@ class FlutterAppAuth {
 
   /// For exchanging tokens
   Future<TokenResponse> token(TokenRequest request) async {
-    var result = await _channel.invokeMethod('token', request.toMap());
+    final Map<dynamic, dynamic> result =
+        await _channel.invokeMethod('token', request.toMap());
     return TokenResponse(
         result['accessToken'],
         result['refreshToken'],
