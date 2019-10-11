@@ -12,7 +12,8 @@ class AuthorizationRequest extends CommonRequestDetails
       Map<String, String> additionalParameters,
       String issuer,
       String discoveryUrl,
-      List<String> promptValues}) {
+      List<String> promptValues,
+      bool allowInsecureConnections: false}) {
     this.clientId = clientId;
     this.redirectUrl = redirectUrl;
     this.scopes = scopes;
@@ -22,6 +23,7 @@ class AuthorizationRequest extends CommonRequestDetails
     this.discoveryUrl = discoveryUrl;
     this.loginHint = loginHint;
     this.promptValues = promptValues;
+    this.allowInsecureConnections = allowInsecureConnections;
   }
 
   Map<String, dynamic> toMap() {

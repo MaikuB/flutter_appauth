@@ -29,7 +29,8 @@ class TokenRequest with CommonRequestDetails {
       String issuer,
       String discoveryUrl,
       this.authorizationCode,
-      this.codeVerifier})
+      this.codeVerifier,
+      bool allowInsecureConnections: false})
       : assert(
             (issuer != null ||
                 discoveryUrl != null ||
@@ -43,6 +44,7 @@ class TokenRequest with CommonRequestDetails {
     this.additionalParameters = additionalParameters;
     this.issuer = issuer;
     this.discoveryUrl = discoveryUrl;
+    this.allowInsecureConnections = allowInsecureConnections;
   }
 
   Map<String, dynamic> toMap() {

@@ -14,7 +14,8 @@ class AuthorizationTokenRequest extends TokenRequest
       Map<String, String> additionalParameters,
       String issuer,
       String discoveryUrl,
-      List<String> promptValues})
+      List<String> promptValues,
+      bool allowInsecureConnections: false})
       : super(clientId, redirectUrl,
             clientSecret: clientSecret,
             discoveryUrl: discoveryUrl,
@@ -22,7 +23,8 @@ class AuthorizationTokenRequest extends TokenRequest
             scopes: scopes,
             grantType: GrantType.authorizationCode,
             serviceConfiguration: serviceConfiguration,
-            additionalParameters: additionalParameters) {
+            additionalParameters: additionalParameters,
+            allowInsecureConnections: allowInsecureConnections) {
     this.loginHint = loginHint;
     this.promptValues = promptValues;
   }
