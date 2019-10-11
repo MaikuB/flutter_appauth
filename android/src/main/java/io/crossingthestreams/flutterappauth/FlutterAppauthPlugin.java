@@ -230,10 +230,8 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
             authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
         }
 
-        AppAuthConfiguration authConfig = authConfigBuilder.build();
-        AuthorizationRequest authRequest = authRequestBuilder.build();
-        AuthorizationService authService = new AuthorizationService(registrar.context(), authConfig);
-        Intent authIntent = authService.getAuthorizationRequestIntent(authRequest);
+        AuthorizationService authService = new AuthorizationService(registrar.context(), authConfigBuilder.build());
+        Intent authIntent = authService.getAuthorizationRequestIntent(authRequestBuilder.build());
         registrar.activity().startActivityForResult(authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
     }
 
@@ -260,9 +258,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
             authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
         }
 
-        AppAuthConfiguration authConfig = authConfigBuilder.build();
-        TokenRequest tokenRequest = builder.build();
-        AuthorizationService authService = new AuthorizationService(registrar.context(), authConfig);
+        AuthorizationService authService = new AuthorizationService(registrar.context(), authConfigBuilder.build());
         AuthorizationService.TokenResponseCallback tokenResponseCallback = new AuthorizationService.TokenResponseCallback() {
             @Override
             public void onTokenRequestCompleted(
@@ -275,6 +271,8 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                 }
             }
         };
+
+        TokenRequest tokenRequest = builder.build();
         if (clientSecret == null) {
             authService.performTokenRequest(tokenRequest, tokenResponseCallback);
         } else {
@@ -325,8 +323,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                     authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
                 }
 
-                AppAuthConfiguration authConfig = authConfigBuilder.build();
-                AuthorizationService authService = new AuthorizationService(registrar.context(), authConfig);
+                AuthorizationService authService = new AuthorizationService(registrar.context(), authConfigBuilder.build());
                 AuthorizationService.TokenResponseCallback tokenResponseCallback = new AuthorizationService.TokenResponseCallback() {
                     @Override
                     public void onTokenRequestCompleted(
