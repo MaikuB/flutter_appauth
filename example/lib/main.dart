@@ -132,7 +132,7 @@ class _MyAppState extends State<MyApp> {
                   );
 
                   // this code block demonstrates passing in values for the prompt parameter. in this case it prompts the user login even if they have already signed in. the list of supported values depends on the identity provider
-                  // var result = await _appAuth.authorizeAndExchangeCode(
+                  // final AuthorizationTokenResponse result = await _appAuth.authorizeAndExchangeCode(
                   //   AuthorizationTokenRequest(_clientId, _redirectUrl,
                   //       serviceConfiguration: _serviceConfiguration,
                   //       scopes: _scopes,
