@@ -1,5 +1,5 @@
 import 'authorization_parameters.dart';
-import 'authorization_service_configuration.dart';
+import 'service_configuration.dart';
 import 'common_request_details.dart';
 
 /// The details of an authorization request to get an authorization code
@@ -8,7 +8,7 @@ class AuthorizationRequest extends CommonRequestDetails
   AuthorizationRequest(String clientId, String redirectUrl,
       {String loginHint,
       List<String> scopes,
-      AuthorizationServiceConfiguration serviceConfiguration,
+      ServiceConfiguration serviceConfiguration,
       Map<String, String> additionalParameters,
       String issuer,
       String discoveryUrl,

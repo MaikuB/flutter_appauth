@@ -1,5 +1,7 @@
 #import "FlutterAppauthPlugin.h"
 #import "AppAuth.h"
+#import "OIDExternalUserAgentIOSSafariViewController.h"
+#import "OIDExternalUserAgentIOSEphemeral.h"
 
 @interface ArgumentProcessor : NSObject
 + (id _Nullable)processArgumentValue:(NSDictionary *)arguments withKey:(NSString *)key;
@@ -66,16 +68,39 @@
 }
 @end
 
+@interface EndSessionRequestParameters: NSObject
+@property(nonatomic, strong) NSString *issuer;
+@property(nonatomic, strong) NSString *idTokenHint;
+@property(nonatomic, strong) NSString *redirectUrl;
+@property(nonatomic, strong) NSDictionary *additionalParameters;
+@property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
+@property(nonatomic, strong) NSString *discoveryUrl;
+@end
+
+@implementation EndSessionRequestParameters
+- (id)initWithArguments:(NSDictionary *)arguments {
+    _issuer = [ArgumentProcessor processArgumentValue:arguments withKey:@"issuer"];
+    _idTokenHint = [ArgumentProcessor processArgumentValue:arguments withKey:@"idTokenHint"];
+    _redirectUrl = [ArgumentProcessor processArgumentValue:arguments withKey:@"redirectUrl"];
+    _additionalParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"additionalParameters"];
+    _serviceConfigurationParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"serviceConfiguration"];
+    _discoveryUrl = [ArgumentProcessor processArgumentValue:arguments withKey:@"discoveryUrl"];
+    return self;
+}
+@end
+
 @implementation FlutterAppauthPlugin
 
 FlutterMethodChannel* channel;
 NSString *const AUTHORIZE_METHOD = @"authorize";
 NSString *const AUTHORIZE_AND_EXCHANGE_CODE_METHOD = @"authorizeAndExchangeCode";
 NSString *const TOKEN_METHOD = @"token";
+NSString *const END_SESSION_METHOD = @"endSession";
 NSString *const AUTHORIZE_ERROR_CODE = @"authorize_failed";
 NSString *const AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE = @"authorize_and_exchange_code_failed";
 NSString *const DISCOVERY_ERROR_CODE = @"discovery_failed";
 NSString *const TOKEN_ERROR_CODE = @"token_failed";
+NSString *const END_SESSION_ERROR_CODE = @"end_session_failed";
 NSString *const DISCOVERY_ERROR_MESSAGE_FORMAT = @"Error retrieving discovery document: %@";
 NSString *const TOKEN_ERROR_MESSAGE_FORMAT = @"Failed to get token: %@";
 NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
@@ -97,6 +122,8 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
         [self handleAuthorizeMethodCall:[call arguments] result:result exchangeCode:false];
     } else if([TOKEN_METHOD isEqualToString:call.method]) {
         [self handleTokenMethodCall:[call arguments] result:result];
+    } else if([END_SESSION_METHOD isEqualToString:call.method]) {
+        [self handleLogoutMethodCall:[call arguments] result:result];    
     } else {
         result(FlutterMethodNotImplemented);
     }
@@ -106,6 +133,50 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
     if(!requestParameters.additionalParameters) {
         requestParameters.additionalParameters = [[NSMutableDictionary alloc] init];
     }
+}
+
+-(void)handleLogoutMethodCall:(NSDictionary*)arguments result:(FlutterResult) result {
+
+    EndSessionRequestParameters *requestParameters = [[EndSessionRequestParameters alloc] initWithArguments:arguments];
+    if(requestParameters.serviceConfigurationParameters != nil) {
+        OIDServiceConfiguration *serviceConfiguration =
+        [[OIDServiceConfiguration alloc]
+         initWithAuthorizationEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"authorizationEndpoint"]]
+         tokenEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"tokenEndpoint"]]
+         issuer: nil
+         registrationEndpoint: nil
+         endSessionEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"endSessionEndpoint"]]];
+
+        [self performLogout:serviceConfiguration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters result:result];
+    } else if (requestParameters.discoveryUrl) {
+        NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
+        
+        [OIDAuthorizationService discoverServiceConfigurationForDiscoveryURL:discoveryUrl
+                                                                completion:^(OIDServiceConfiguration *_Nullable configuration,
+                                                                             NSError *_Nullable error) {
+                                                                    
+                                                                    if (!configuration) {
+                                                                        [self finishWithDiscoveryError:error result:result];
+                                                                        return;
+                                                                    }
+                                                                    
+                                                                    [self performLogout:configuration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters result:result];
+                                                                }];
+    } else {
+        NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
+        [OIDAuthorizationService discoverServiceConfigurationForIssuer:issuerUrl
+                                                                completion:^(OIDServiceConfiguration *_Nullable configuration,
+                                                                             NSError *_Nullable error) {
+                                                                            
+                                                                    if (!configuration) {
+                                                                        [self finishWithDiscoveryError:error result:result];
+                                                                        return;
+                                                                    }
+                                                                    
+                                                                    [self performLogout:configuration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters result:result];
+                                                                }];
+    }
+
 }
 
 -(void)handleAuthorizeMethodCall:(NSDictionary*)arguments result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode {
@@ -166,8 +237,26 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
                                       additionalParameters:additionalParameters];
     UIViewController *rootViewController =
     [UIApplication sharedApplication].delegate.window.rootViewController;
+
+    // Will use AppAuth-iOS defaults
+    // OIDExternalUserAgentIOS *externalUserAgent =
+    // [[OIDExternalUserAgentIOS alloc] initWithPresentingViewController:rootViewController];
+
+    // Will use SFSafariViewController for all supported iOS versions
+    OIDExternalUserAgentIOSSafariViewController *externalUserAgent =
+    [[OIDExternalUserAgentIOSSafariViewController alloc] initWithPresentingViewController:rootViewController];
+
+    // Uncomment to test using ASWebAuthenticationSession with prefersEphemeralWebBrowserSession = true
+    // Remarks : SSO will not work in iOS 13. In iOS 12 it will be SSO enbabled and will still ask for user permissions.
+    // Behavior : Will use ASWebAuthenticationSession with prefersEphemeralWebBrowserSession = true only for iOS 13, however it will not display the prompt asking the user for persmissions.
+    // For more infos :  https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio?language=objc
+
+    //OIDExternalUserAgentIOSEphemeral *externalUserAgent =
+    //[[OIDExternalUserAgentIOSEphemeral alloc] initWithPresentingViewController:rootViewController];
+
     if(exchangeCode) {
-        _currentAuthorizationFlow = [OIDAuthState authStateByPresentingAuthorizationRequest:request presentingViewController: rootViewController
+        _currentAuthorizationFlow = [OIDAuthState authStateByPresentingAuthorizationRequest:request externalUserAgent: externalUserAgent
+        //_currentAuthorizationFlow = [OIDAuthState authStateByPresentingAuthorizationRequest:request presentingViewController: rootViewController
                                                                                    callback:^(OIDAuthState *_Nullable authState,
                                                                                               NSError *_Nullable error) {
                                                                                        if(authState) {
@@ -178,7 +267,8 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
                                                                                        }
                                                                                    }];
     } else {
-        _currentAuthorizationFlow = [OIDAuthorizationService presentAuthorizationRequest:request presentingViewController:rootViewController callback:^(OIDAuthorizationResponse *_Nullable authorizationResponse, NSError *_Nullable error) {
+        _currentAuthorizationFlow = [OIDAuthorizationService presentAuthorizationRequest:request externalUserAgent: externalUserAgent{
+        //_currentAuthorizationFlow = [OIDAuthorizationService presentAuthorizationRequest:request presentingViewController:rootViewController callback:^(OIDAuthorizationResponse *_Nullable authorizationResponse, NSError *_Nullable error) {
             if(authorizationResponse) {
                 NSMutableDictionary *processedResponse = [[NSMutableDictionary alloc] init];
                 [processedResponse setObject:authorizationResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
@@ -191,6 +281,46 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
         }];
         
     }
+}
+
+- (void)performLogout:(OIDServiceConfiguration *)serviceConfiguration idTokenHint:(NSString*)idTokenHint postLogoutRedirectURL:(NSString*)postLogoutRedirectURL additionalParameters:(NSDictionary *)additionalParameters result:(FlutterResult)result{
+    OIDEndSessionRequest *request =
+    [[OIDEndSessionRequest alloc] initWithConfiguration:serviceConfiguration
+                                                  idTokenHint:idTokenHint
+                                               postLogoutRedirectURL:[NSURL URLWithString:postLogoutRedirectURL]
+                                      additionalParameters:additionalParameters];
+
+    UIViewController *rootViewController =
+    [UIApplication sharedApplication].delegate.window.rootViewController;     
+
+    // Will use AppAuth-iOS defaults
+    // OIDExternalUserAgentIOS *externalUserAgent =
+    // [[OIDExternalUserAgentIOS alloc] initWithPresentingViewController:rootViewController];
+
+
+    // Will use SFSafariViewController for all supported iOS versions
+    OIDExternalUserAgentIOSSafariViewController *externalUserAgent =
+    [[OIDExternalUserAgentIOSSafariViewController alloc] initWithPresentingViewController:rootViewController];
+
+    
+    // Uncomment to test using ASWebAuthenticationSession with prefersEphemeralWebBrowserSession = true
+    // Remarks : SSO will not work in iOS 13. In iOS 12 it will be SSO enbabled and will still ask for user permissions.
+    // Behavior : Will use ASWebAuthenticationSession with prefersEphemeralWebBrowserSession = true only for iOS 13, however it will not display the prompt asking the user for persmissions.
+    // For more infos :  https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio?language=objc
+
+    //OIDExternalUserAgentIOSEphemeral *externalUserAgent =
+    //[[OIDExternalUserAgentIOSEphemeral alloc] initWithPresentingViewController:rootViewController];
+    
+    _currentAuthorizationFlow = [OIDAuthorizationService presentEndSessionRequest:request externalUserAgent:externalUserAgent callback:^(OIDEndSessionResponse *_Nullable endSessionResponse, NSError *_Nullable error) {
+            if(endSessionResponse) {
+                NSMutableDictionary *processedResponse = [[NSMutableDictionary alloc] init];
+                [processedResponse setObject:endSessionResponse.additionalParameters forKey:@"endSessionAdditionalParameters"];
+                [processedResponse setObject:endSessionResponse.state forKey:@"state"];
+                result(processedResponse);
+            } else {
+                [self finishWithError:END_SESSION_ERROR_CODE message:[self formatMessageWithError:END_SESSION_ERROR_CODE error:error] result:result];
+            }
+        }];                           
 }
 
 - (NSString *) formatMessageWithError:(NSString *)messageFormat error:(NSError * _Nullable)error {

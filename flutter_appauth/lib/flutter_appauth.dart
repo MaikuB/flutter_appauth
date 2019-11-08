@@ -8,4 +8,5 @@ export 'package:flutter_appauth_platform_interface/flutter_appauth_platform_inte
         GrantType,
         TokenRequest,
         TokenResponse;
+export 'src/end_session_response.dart';
 export 'src/flutter_appauth.dart';

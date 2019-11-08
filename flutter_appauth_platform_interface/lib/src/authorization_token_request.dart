@@ -1,5 +1,5 @@
 import 'authorization_parameters.dart';
-import 'authorization_service_configuration.dart';
+import 'service_configuration.dart';
 import 'grant_types.dart';
 import 'token_request.dart';
 
@@ -10,7 +10,7 @@ class AuthorizationTokenRequest extends TokenRequest
       {String loginHint,
       String clientSecret,
       List<String> scopes,
-      AuthorizationServiceConfiguration serviceConfiguration,
+      ServiceConfiguration serviceConfiguration,
       Map<String, String> additionalParameters,
       String issuer,
       String discoveryUrl,
