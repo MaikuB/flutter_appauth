@@ -1,6 +1,6 @@
-# 0.4.3
-* [Android] Bump compile and target SDK versions to 29
-* [Android] Bump Gradle to version 5.4.1 and Gradle plugin to version 3.5.2
+# 0.5.0
+* [Android] **BREAKING CHANGE** Bump compile and target SDK versions to 29
+* [Android] **BREAKING CHANGE** Bump Gradle to version 5.4.1 and Gradle plugin to version 3.5.2
 
 # 0.4.2
 * [iOS] Update AppAuth SDK dependency to 1.2 so it works on iOS 13. Thanks to the PR from [Aynur Dinmukhametov](https://github.com/ARDcode)
