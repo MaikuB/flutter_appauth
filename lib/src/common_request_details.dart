@@ -26,6 +26,7 @@ class CommonRequestDetails implements Mappable {
   /// Whether to allow non-HTTPS endpoints (only applicable on Android)
   bool allowInsecureConnections;
 
+  @override
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'clientId': clientId,

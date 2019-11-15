@@ -1,5 +1,6 @@
 name: flutter_appauth_example
 description: Demonstrates how to use the flutter_appauth plugin.
+version: 1.0.0+1
 publish_to: 'none'
 
 environment:
