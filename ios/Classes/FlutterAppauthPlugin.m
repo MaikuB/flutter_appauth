@@ -110,23 +110,22 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
 
 -(void)handleAuthorizeMethodCall:(NSDictionary*)arguments result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode {
     AuthorizationTokenRequestParameters *requestParameters = [[AuthorizationTokenRequestParameters alloc] initWithArguments:arguments];
+    if(requestParameters.loginHint) {
+        [self ensureAdditionalParametersInitialized:requestParameters];
+        [requestParameters.additionalParameters setValue:requestParameters.loginHint forKey:@"login_hint"];
+    }
+    if(requestParameters.promptValues) {
+        [self ensureAdditionalParametersInitialized:requestParameters];
+        [requestParameters.additionalParameters setValue:[requestParameters.promptValues componentsJoinedByString:@","] forKey:@"prompt"];
+    }
     if(requestParameters.serviceConfigurationParameters != nil) {
         OIDServiceConfiguration *serviceConfiguration =
         [[OIDServiceConfiguration alloc]
          initWithAuthorizationEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"authorizationEndpoint"]]
          tokenEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"tokenEndpoint"]]];
-        if(requestParameters.loginHint) {
-            [self ensureAdditionalParametersInitialized:requestParameters];
-            [requestParameters.additionalParameters setValue:requestParameters.loginHint forKey:@"login_hint"];
-        }
-        if(requestParameters.promptValues) {
-            [self ensureAdditionalParametersInitialized:requestParameters];
-            [requestParameters.additionalParameters setValue:[requestParameters.promptValues componentsJoinedByString:@","] forKey:@"prompt"];
-        }
         [self performAuthorization:serviceConfiguration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters result:result exchangeCode:exchangeCode];
     } else if (requestParameters.discoveryUrl) {
         NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
-        
         [OIDAuthorizationService discoverServiceConfigurationForDiscoveryURL:discoveryUrl
                                                                   completion:^(OIDServiceConfiguration *_Nullable configuration,
                                                                                NSError *_Nullable error) {
