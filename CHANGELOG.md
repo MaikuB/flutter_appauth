@@ -1,3 +1,8 @@
+# 0.6.0
+* [Android] **BREAKING CHANGE** Bump Gradle plugin to 3.5.2
+* [iOS] Fix issue [63](https://github.com/MaikuB/flutter_appauth/issues/63) where `login_hint` and `promptValues` was only passed when using service discovery
+* Update pubspec to match latest version of pub
+
 # 0.5.0
 * [Android] **BREAKING CHANGE** Bump compile and target SDK versions to 29
 * [Android] **BREAKING CHANGE** Bump Gradle plugin to version 3.5.2
@@ -29,7 +34,7 @@
 * Updated README to add a note suggesting developers to check the documentation of the identity provider they plan to use
 
 # 0.2.1
-* [iOS] Fix issue where `login_hint` OAuth parameter (specified by the `loginHint` field of the `AuthorizationTokenRequest` and `AuthorizationRequest` classes). Example app has also been updated to demonstrate how to specify it
+* [iOS] Fix issue with `login_hint` OAuth parameter (specified by the `loginHint` field of the `AuthorizationTokenRequest` and `AuthorizationRequest` classes). Example app has also been updated to demonstrate how to specify it
 * Added support for specifying the `prompt` OAuth parameter. This can be specified by populating the `promptValues` field in the either the `AuthorizationTokenRequest` or `AuthorizationRequest` class. Updated example app (note: code is commented out) to demonstrate how to use it
 
 # 0.2.0
