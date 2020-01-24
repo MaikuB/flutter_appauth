@@ -1,5 +1,8 @@
+# 0.6.0+1
+* Correct changelog entry for 0.6.0 release. Previously reported plugin updated to use Gradle plugin 3.5.2 but should have written 3.5.3
+
 # 0.6.0
-* [Android] **BREAKING CHANGE** Bump Gradle plugin to 3.5.2
+* [Android] **BREAKING CHANGE** Bump Gradle plugin to 3.5.3
 * [iOS] Fix issue [63](https://github.com/MaikuB/flutter_appauth/issues/63) where `login_hint` and `promptValues` was only passed when using service discovery
 * Update pubspec to match latest version of pub
 
