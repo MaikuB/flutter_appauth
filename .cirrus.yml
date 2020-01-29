@@ -11,10 +11,9 @@ task:
 task:
   name: Build iOS example
   osx_instance:
-    image: mojave-flutter
+    image: catalina-flutter
   pub_cache:
     folder: ~/.pub-cache
-  update_pods_script: pod repo update # to fetch all the latest versions
   build_script:
     - cd example
     - flutter build ios --no-codesign
