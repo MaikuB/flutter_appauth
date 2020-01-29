@@ -1,6 +1,5 @@
 # 0.7.0
 * Add minimum version of Flutter (1.12.13+hotfix.5) to address `MissingPluginException` raised issue [66](https://github.com/MaikuB/flutter_appauth/issues/66)
-* Removed maximum Dart SDK version constraint
 * Update pubspec file of example app to reference plugin in the `dependencies` section instead of `dev_dependencies` to avoid confusion
 * Update changelog for 0.6.0 where the minimum Flutter version should have been added
 

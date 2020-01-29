@@ -4,7 +4,7 @@ version: 0.7.0
 homepage: https://github.com/MaikuB/flutter_appauth
 
 environment:
-  sdk: ">=2.1.0"
+  sdk: ">=2.1.0 <3.0.0"
   flutter: ">=1.12.13+hotfix.5"
 
 dependencies:
