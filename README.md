@@ -67,7 +67,7 @@ Upon completing the request successfully, the method should return an object (th
 If you would prefer to not have the automatic code exchange to happen then can call the `authorize` method instead of the `authorizeAndExchangeCode` method. This will return an instance of the `AuthorizationResponse` class that will contain the code verifier that AppAuth generated (as part of implementing PKCE) when issuing the authorization request, the authorization code and additional parameters should they exist. Both of the code verifier and authorization code would need to be stored so they can then be reused to exchange the code later on e.g.
 
 ```dart
-final AuthorizationTokenResponse result = await appAuth.token(TokenRequest('<client_id>', '<redirect_url>',
+final TokenResponse result = await appAuth.token(TokenRequest('<client_id>', '<redirect_url>',
         authorizationCode: '<authorization_code>',
         discoveryUrl: '<discovery_url>',
         codeVerifier: '<code_verifier>',
@@ -79,7 +79,7 @@ final AuthorizationTokenResponse result = await appAuth.token(TokenRequest('<cli
 Some providers may return a refresh token that could be used to refresh short-lived access tokens. A request to get a new access token before it expires could be made that would like similar to the following code
 
 ```dart
-final AuthorizationTokenResponse result = await appAuth.token(TokenRequest('<client_id>', '<redirect_url>',
+final TokenResponse result = await appAuth.token(TokenRequest('<client_id>', '<redirect_url>',
         discoveryUrl: '<discovery_url>',
         refreshToken: '<refresh_token>',
         scopes: ['openid','profile', 'email', 'offline_access', 'api']));
