@@ -1,3 +1,6 @@
+# 0.7.0+1
+* Fix code snippet in readme where the variable for saving the result of the `token()` method should have been of type `TokenResponse` (issue [74](https://github.com/MaikuB/flutter_appauth/issues/74)). Thanks to PR from [Stephen Owens](https://github.com/sowens-csd).
+
 # 0.7.0
 * Add minimum version of Flutter (1.12.13+hotfix.5) to address `MissingPluginException` raised issue [66](https://github.com/MaikuB/flutter_appauth/issues/66)
 * Update pubspec file of example app to reference plugin in the `dependencies` section instead of `dev_dependencies` to avoid confusion
