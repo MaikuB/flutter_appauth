@@ -1,45 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="flutter_appauth.dart" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/lib/flutter_appauth.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="main.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+  <component name="ChangeListManager">
+    <list default="true" id="04547e21-2440-4fcf-8eb1-ecad5e41bbb0" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/io/crossingthestreams/flutterappauth/InsecureConnectionBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/io/crossingthestreams/flutterappauth/InsecureConnectionBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flutter_appauth.iml" beforeDir="false" afterPath="$PROJECT_DIR$/flutter_appauth.iml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ToolWindowManager">
-    <editor active="true" />
-    <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-    </layout>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1">
-    </navigator>
-    <panes>
-      <pane id="ProjectPane">
-        <option name="show-excluded-files" value="false" />
-      </pane>
-    </panes>
+  <component name="ProjectId" id="1XW93DKhKRA7pTMNwqjhl9eBcm1" />
+  <component name="ProjectReloadState">
+    <option name="STATE" value="1" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="abbreviatePackageNames" value="true" />
+    <option name="autoscrollFromSource" value="true" />
+    <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showVisibilityIcons" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="dart.analysis.tool.window.force.activate" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="show.migrate.to.gradle.popup" value="false" />
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="04547e21-2440-4fcf-8eb1-ecad5e41bbb0" name="Default Changelist" comment="" />
+      <created>1581150781921</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1581150781921</updated>
+      <workItem from="1581150784611" duration="54000" />
+      <workItem from="1581150860834" duration="206000" />
+      <workItem from="1581151127143" duration="510000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="440" y="202" key="#Notifications" timestamp="1581150880206">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="440" y="202" key="#Notifications/1680.23.1920.1057/0.23.1680.1027@0.23.1680.1027" timestamp="1581150880206" />
+    <state x="690" y="432" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1581150831843">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="690" y="432" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/1680.23.1920.1057/0.23.1680.1027@0.23.1680.1027" timestamp="1581150831843" />
+    <state x="519" y="369" key="com.intellij.ide.util.TipDialog" timestamp="1581151129129">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="519" y="369" key="com.intellij.ide.util.TipDialog/1680.23.1920.1057/0.23.1680.1027@0.23.1680.1027" timestamp="1581151129129" />
   </component>
 </project>

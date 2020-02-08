@@ -2,6 +2,7 @@ package io.crossingthestreams.flutterappauth;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
 import net.openid.appauth.AppAuthConfiguration;
 import net.openid.appauth.AuthorizationException;
@@ -13,11 +14,16 @@ import net.openid.appauth.ClientSecretBasic;
 import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenRequest;
 import net.openid.appauth.TokenResponse;
+import net.openid.appauth.browser.AnyBrowserMatcher;
+import net.openid.appauth.browser.BrowserMatcher;
+import net.openid.appauth.connectivity.ConnectionBuilder;
+import net.openid.appauth.connectivity.DefaultConnectionBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -31,6 +37,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
  */
 public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.ActivityResultListener {
 
+    private static final String TAG = "FlutterAppauthPlugin";
     private static final String AUTHORIZE_AND_EXCHANGE_CODE_METHOD = "authorizeAndExchangeCode";
     private static final String AUTHORIZE_METHOD = "authorize";
     private static final String TOKEN_METHOD = "token";
@@ -50,16 +57,37 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
     private PendingOperation pendingOperation;
     private String clientSecret;
     private boolean allowInsecureConnections;
+    @NonNull
+    private BrowserMatcher mBrowserMatcher = AnyBrowserMatcher.INSTANCE;
 
     private FlutterAppauthPlugin(Registrar registrar) {
         this.registrar = registrar;
         this.registrar.addActivityResultListener(this);
     }
 
+    public ConnectionBuilder getConnectionBuilder() {
+        Log.d(TAG, "AllowInsecureConnections getConnectionBuilder: " + allowInsecureConnections);
+        if (allowInsecureConnections) {
+            return InsecureConnectionBuilder.INSTANCE;
+        }
+        return DefaultConnectionBuilder.INSTANCE;
+    }
+
+
+
+    private AuthorizationService createAuthorizationService() {
+        Log.d(TAG, "Creating authorization service");
+        AppAuthConfiguration.Builder builder = new AppAuthConfiguration.Builder();
+        builder.setBrowserMatcher(mBrowserMatcher);
+        builder.setConnectionBuilder(getConnectionBuilder());
+
+        return new AuthorizationService(registrar.context(), builder.build());
+    }
     /**
      * Plugin registration.
      */
     public static void registerWith(Registrar registrar) {
+        Log.d(TAG, "Register crossingthestreams.io/flutter_appauth");
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "crossingthestreams.io/flutter_appauth");
         channel.setMethodCallHandler(new FlutterAppauthPlugin(registrar));
     }
@@ -153,7 +181,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                 }
             };
             if (tokenRequestParameters.discoveryUrl != null) {
-                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), callback);
+                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), callback, getConnectionBuilder());
             } else {
                 AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(tokenRequestParameters.issuer), callback);
 
@@ -183,7 +211,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                             finishWithDiscoveryError(ex);
                         }
                     }
-                });
+                }, getConnectionBuilder());
 
             } else {
 
@@ -225,12 +253,9 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
             authRequestBuilder.setAdditionalParameters(additionalParameters);
         }
 
-        AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-        if (allowInsecureConnections) {
-            authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
-        }
 
-        AuthorizationService authService = new AuthorizationService(registrar.context(), authConfigBuilder.build());
+        Log.d(TAG, "call performAuthorization");
+        AuthorizationService authService = createAuthorizationService();
         Intent authIntent = authService.getAuthorizationRequestIntent(authRequestBuilder.build());
         registrar.activity().startActivityForResult(authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
     }
@@ -253,12 +278,9 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
             builder.setAdditionalParameters(tokenRequestParameters.additionalParameters);
         }
 
-        AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-        if (allowInsecureConnections) {
-            authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
-        }
 
-        AuthorizationService authService = new AuthorizationService(registrar.context(), authConfigBuilder.build());
+        Log.d(TAG, "call performTokenRequest");
+        AuthorizationService authService = createAuthorizationService();
         AuthorizationService.TokenResponseCallback tokenResponseCallback = new AuthorizationService.TokenResponseCallback() {
             @Override
             public void onTokenRequestCompleted(
@@ -318,12 +340,9 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
     private void processAuthorizationData(final AuthorizationResponse authResponse, AuthorizationException authException, boolean exchangeCode) {
         if (authException == null) {
             if (exchangeCode) {
-                AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-                if (allowInsecureConnections) {
-                    authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
-                }
 
-                AuthorizationService authService = new AuthorizationService(registrar.context(), authConfigBuilder.build());
+                Log.d(TAG, "call processAuthorizationData");
+                AuthorizationService authService = createAuthorizationService();
                 AuthorizationService.TokenResponseCallback tokenResponseCallback = new AuthorizationService.TokenResponseCallback() {
                     @Override
                     public void onTokenRequestCompleted(
