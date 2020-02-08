@@ -202,8 +202,8 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
     }
 
 
-    private void performAuthorization(AuthorizationServiceConfiguration serviceConfiguration, String clientId, String redirectUrl, ArrayList<String> scopes, String loginHint, Map<String, String> additionalParameters, boolean exchangeCode, ArrayList<String> promptValues) {
-        AuthorizationRequest.Builder authRequestBuilder =
+    private void performAuthorization(AuthorizationServiceConfiguration serviceConfiguration, String clientId, String redirectUrl, ArrayList<String> scopes, String loginHint, Map<String, String> additionalParameters, final boolean exchangeCode, ArrayList<String> promptValues) {
+        final AuthorizationRequest.Builder authRequestBuilder =
                 new AuthorizationRequest.Builder(
                         serviceConfiguration,
                         clientId,
@@ -225,14 +225,21 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
             authRequestBuilder.setAdditionalParameters(additionalParameters);
         }
 
-        AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-        if (allowInsecureConnections) {
-            authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
-        }
+        // Launch the AppAuth on a separate thread so that this one can immediately return
+        // to Flutter, preventing the UI from being locked up.
+        Thread t = new Thread(new Runnable() {
+          public void run() {
+            AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
+            if (allowInsecureConnections) {
+                authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
+            }
 
-        AuthorizationService authService = new AuthorizationService(registrar.context(), authConfigBuilder.build());
-        Intent authIntent = authService.getAuthorizationRequestIntent(authRequestBuilder.build());
-        registrar.activity().startActivityForResult(authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
+            AuthorizationService authService = new AuthorizationService(registrar.context(), authConfigBuilder.build());
+            Intent authIntent = authService.getAuthorizationRequestIntent(authRequestBuilder.build());
+            registrar.activity().startActivityForResult(authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
+          }
+        });
+        t.start();
     }
 
     private void performTokenRequest(AuthorizationServiceConfiguration serviceConfiguration, TokenRequestParameters tokenRequestParameters) {
