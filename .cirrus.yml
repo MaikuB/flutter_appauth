@@ -5,7 +5,7 @@ task:
   pub_cache:
     folder: ~/.pub-cache
   build_script:
-    - cd example
+    - cd flutter_appauth/example
     - flutter build appbundle
 
 task:
@@ -15,5 +15,5 @@ task:
   pub_cache:
     folder: ~/.pub-cache
   build_script:
-    - cd example
+    - cd flutter_appauth/example
     - flutter build ios --no-codesign
