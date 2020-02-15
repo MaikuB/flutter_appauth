@@ -5,7 +5,7 @@ task:
   pub_cache:
     folder: ~/.pub-cache
   build_script:
-    - cd flutter_appauth_interface
+    - cd flutter_appauth_platform_interface
     - flutter test
 task:
   name: Build Android example
