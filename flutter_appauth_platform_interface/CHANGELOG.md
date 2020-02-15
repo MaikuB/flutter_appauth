@@ -1,6 +1,6 @@
 ## [1.0.1]
 
-* Make `instance` property within `FlutterAppAuthPlatform` strongly typed instead of being dynamic
+* Specify the object type for the `instance` property within `FlutterAppAuthPlatform` instead of being dynamic
 
 ## [1.0.0+1]
 
