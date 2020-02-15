@@ -68,14 +68,14 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         registrar.addActivityResultListener(plugin);
     }
 
+    private void setActivity(Activity flutterActivity) {
+        this.mainActivity = flutterActivity;
+    }
+
     private void onAttachedToEngine(Context context, BinaryMessenger binaryMessenger) {
         this.applicationContext = context;
         final MethodChannel channel = new MethodChannel(binaryMessenger, "crossingthestreams.io/flutter_appauth");
         channel.setMethodCallHandler(this);
-    }
-
-    private void setActivity(Activity flutterActivity) {
-        this.mainActivity = flutterActivity;
     }
 
     @Override
