@@ -15,7 +15,7 @@ abstract class FlutterAppAuthPlatform extends PlatformInterface {
   /// The default instance of [FlutterAppAuthPlatform] to use.
   ///
   /// Defaults to [MethodChannelFlutterAppAuth].
-  static get instance => _instance;
+  static FlutterAppAuthPlatform get instance => _instance;
 
   static FlutterAppAuthPlatform _instance = MethodChannelFlutterAppAuth();
 
