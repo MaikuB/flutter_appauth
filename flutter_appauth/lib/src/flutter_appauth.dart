@@ -1,11 +1,6 @@
+import 'package:flutter_appauth_platform_interface/flutter_appauth_platform_interface.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'authorization_request.dart';
-import 'authorization_response.dart';
-import 'authorization_token_request.dart';
-import 'authorization_token_response.dart';
-import 'token_request.dart';
-import 'token_response.dart';
 
 class FlutterAppAuth {
   factory FlutterAppAuth() => _instance;
