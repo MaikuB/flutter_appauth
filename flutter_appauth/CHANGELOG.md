@@ -1,6 +1,7 @@
 ## 0.8.0
 
 * Migrated plugin to use platform interface
+* [Android] Support v2 Android embedding. Example app has been updated accordingly.
 * **BREAKING CHANGE** removed name constructor from `FlutterAppAuth` class that visible for testing
 * **BREAKING CHANGE** when grant type cannot be inferred, this now throws an `ArgumentError` instead of a string containing the error message
 
