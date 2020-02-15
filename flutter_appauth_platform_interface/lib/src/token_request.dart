@@ -70,6 +70,7 @@ class TokenRequest with CommonRequestDetails {
       return GrantType.authorizationCode;
     }
 
-    throw AssertionError('Grant type not specified and cannot be inferred');
+    throw ArgumentError.value(
+        null, 'grantType', 'Grant type not specified and cannot be inferred');
   }
 }

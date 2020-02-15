@@ -77,7 +77,7 @@ void main() {
           () async => await flutterAppAuth.token(TokenRequest(
               'someClientId', 'someRedirectUrl',
               discoveryUrl: 'someDiscoveryUrl')),
-          throwsAssertionError);
+          throwsArgumentError);
     });
     test('infers refresh token grant type', () async {
       await flutterAppAuth.token(TokenRequest('someClientId', 'someRedirectUrl',
