@@ -1,5 +1,7 @@
 package io.crossingthestreams.flutterappauth;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
@@ -19,6 +21,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import androidx.annotation.Nullable;
+
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -29,8 +36,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 /**
  * FlutterAppauthPlugin
  */
-public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.ActivityResultListener {
-
+public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityResultListener, ActivityAware {
     private static final String AUTHORIZE_AND_EXCHANGE_CODE_METHOD = "authorizeAndExchangeCode";
     private static final String AUTHORIZE_METHOD = "authorize";
     private static final String TOKEN_METHOD = "token";
@@ -44,24 +50,63 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
     private static final String TOKEN_ERROR_MESSAGE_FORMAT = "Failed to get token: [error: %s, description: %s]";
     private static final String AUTHORIZE_ERROR_MESSAGE_FORMAT = "Failed to authorize: [error: %s, description: %s]";
 
-    private final Registrar registrar;
     private final int RC_AUTH_EXCHANGE_CODE = 65030;
     private final int RC_AUTH = 65031;
+    private Context applicationContext;
+    private Activity mainActivity;
     private PendingOperation pendingOperation;
     private String clientSecret;
     private boolean allowInsecureConnections;
-
-    private FlutterAppauthPlugin(Registrar registrar) {
-        this.registrar = registrar;
-        this.registrar.addActivityResultListener(this);
-    }
 
     /**
      * Plugin registration.
      */
     public static void registerWith(Registrar registrar) {
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), "crossingthestreams.io/flutter_appauth");
-        channel.setMethodCallHandler(new FlutterAppauthPlugin(registrar));
+        final FlutterAppauthPlugin plugin = new FlutterAppauthPlugin();
+        plugin.setActivity(registrar.activity());
+        plugin.onAttachedToEngine(registrar.context(), registrar.messenger());
+        registrar.addActivityResultListener(plugin);
+    }
+
+    private void setActivity(Activity flutterActivity) {
+        this.mainActivity = flutterActivity;
+    }
+
+    private void onAttachedToEngine(Context context, BinaryMessenger binaryMessenger) {
+        this.applicationContext = context;
+        final MethodChannel channel = new MethodChannel(binaryMessenger, "crossingthestreams.io/flutter_appauth");
+        channel.setMethodCallHandler(this);
+    }
+
+    @Override
+    public void onAttachedToEngine(FlutterPluginBinding binding) {
+        onAttachedToEngine(binding.getApplicationContext(), binding.getBinaryMessenger());
+    }
+
+    @Override
+    public void onDetachedFromEngine(FlutterPluginBinding binding) {
+    }
+
+    @Override
+    public void onAttachedToActivity(ActivityPluginBinding binding) {
+        binding.addActivityResultListener(this);
+        mainActivity = binding.getActivity();
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+        this.mainActivity = null;
+    }
+
+    @Override
+    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
+        binding.addActivityResultListener(this);
+        mainActivity = binding.getActivity();
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+        this.mainActivity = null;
     }
 
     private void checkAndSetPendingOperation(String method, Result result) {
@@ -230,9 +275,9 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
             authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
         }
 
-        AuthorizationService authService = new AuthorizationService(registrar.context(), authConfigBuilder.build());
+        AuthorizationService authService = new AuthorizationService(applicationContext, authConfigBuilder.build());
         Intent authIntent = authService.getAuthorizationRequestIntent(authRequestBuilder.build());
-        registrar.activity().startActivityForResult(authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
+        mainActivity.startActivityForResult(authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
     }
 
     private void performTokenRequest(AuthorizationServiceConfiguration serviceConfiguration, TokenRequestParameters tokenRequestParameters) {
@@ -258,7 +303,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
             authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
         }
 
-        AuthorizationService authService = new AuthorizationService(registrar.context(), authConfigBuilder.build());
+        AuthorizationService authService = new AuthorizationService(applicationContext, authConfigBuilder.build());
         AuthorizationService.TokenResponseCallback tokenResponseCallback = new AuthorizationService.TokenResponseCallback() {
             @Override
             public void onTokenRequestCompleted(
@@ -323,7 +368,7 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
                     authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
                 }
 
-                AuthorizationService authService = new AuthorizationService(registrar.context(), authConfigBuilder.build());
+                AuthorizationService authService = new AuthorizationService(applicationContext, authConfigBuilder.build());
                 AuthorizationService.TokenResponseCallback tokenResponseCallback = new AuthorizationService.TokenResponseCallback() {
                     @Override
                     public void onTokenRequestCompleted(
@@ -370,6 +415,8 @@ public class FlutterAppauthPlugin implements MethodCallHandler, PluginRegistry.A
         responseMap.put("authorizationAdditionalParameters", authResponse.additionalParameters);
         return responseMap;
     }
+
+
 
     private class PendingOperation {
         final String method;
