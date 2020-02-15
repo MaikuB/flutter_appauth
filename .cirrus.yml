@@ -1,4 +1,13 @@
 task:
+  name: Run platform interface tests
+  container:
+    image: cirrusci/flutter:stable
+  pub_cache:
+    folder: ~/.pub-cache
+  build_script:
+    - cd flutter_appauth_interface
+    - flutter test
+task:
   name: Build Android example
   container:
     image: cirrusci/flutter:stable
