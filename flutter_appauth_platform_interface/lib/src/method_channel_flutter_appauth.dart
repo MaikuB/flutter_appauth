@@ -62,6 +62,6 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
                 result['accessTokenExpirationTime'].toInt()),
         result['idToken'],
         result['tokenType'],
-        result['tokenAdditionalParameters']?.cast<String, String>());
+        result['tokenAdditionalParameters']?.cast<String, dynamic>());
   }
 }
