@@ -1,3 +1,7 @@
+## 0.8.1
+
+* Bump dependency on `flutter_appauth_platform_interface` to take in fix for casting error that could apply upon calling `token()` method
+
 ## 0.8.0
 
 * Migrated plugin to use platform interface
