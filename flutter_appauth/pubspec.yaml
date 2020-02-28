@@ -11,7 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_appauth_platform_interface:
-    path: ../flutter_appauth_platform_interface
+    git:
+      url: https://github.com/qhrtech/flutter_appauth.git
+      ref: ACCMO-1027-logout
+      path: flutter_appauth_platform_interface
 
 flutter:
   plugin:
