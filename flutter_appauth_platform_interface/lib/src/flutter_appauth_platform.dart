@@ -48,6 +48,6 @@ abstract class FlutterAppAuthPlatform extends PlatformInterface {
   }
 
   Future<EndSessionResponse> endSession(EndSessionRequest request) async {
-    throw UnimplementedError('token() has not been implemented');
+    throw UnimplementedError('endSession() has not been implemented');
   }
 }
