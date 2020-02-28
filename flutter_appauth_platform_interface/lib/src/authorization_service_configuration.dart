@@ -1,9 +1,9 @@
-class ServiceConfiguration {
+class AuthorizationServiceConfiguration {
   final String authorizationEndpoint;
   final String tokenEndpoint;
   final String endSessionEndpoint;
 
-  ServiceConfiguration(
+  AuthorizationServiceConfiguration(
       this.authorizationEndpoint, this.tokenEndpoint, this.endSessionEndpoint)
       : assert(tokenEndpoint != null && authorizationEndpoint != null,
             'Must specify both the authorization and token endpoints');

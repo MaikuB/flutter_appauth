@@ -15,6 +15,8 @@
  */
 
 #import "OIDExternalUserAgentIOSSafariViewController.h"
+#import "OIDExternalUserAgent.h"
+#import "OIDExternalUserAgentIOS.h"
 
 #import <SafariServices/SafariServices.h>
 

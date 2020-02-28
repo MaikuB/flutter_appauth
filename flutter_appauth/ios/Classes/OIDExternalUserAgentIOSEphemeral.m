@@ -16,7 +16,8 @@
         limitations under the License.
  */
 
-#import "OIDExternalUserAgentIOSEphemeral.h"
+
+#import "OIDExternalUserAgent.h"
 
 #import <SafariServices/SafariServices.h>
 #import <AuthenticationServices/AuthenticationServices.h>
@@ -24,7 +25,7 @@
 #import "OIDErrorUtilities.h"
 #import "OIDExternalUserAgentSession.h"
 #import "OIDExternalUserAgentRequest.h"
-
+#import "OIDExternalUserAgentIOSEphemeral.h"
 NS_ASSUME_NONNULL_BEGIN
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000

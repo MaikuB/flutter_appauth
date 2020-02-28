@@ -1,4 +1,4 @@
-import 'service_configuration.dart';
+import 'authorization_service_configuration.dart';
 import 'mappable.dart';
 
 class CommonRequestDetails implements Mappable {
@@ -18,7 +18,7 @@ class CommonRequestDetails implements Mappable {
   List<String> scopes;
 
   /// The details of the OAuth 2.0 endpoints that can be explicitly when discovery isn't used or not possible
-  ServiceConfiguration serviceConfiguration;
+  AuthorizationServiceConfiguration serviceConfiguration;
 
   /// Additional parameters to include in the request
   Map<String, String> additionalParameters;

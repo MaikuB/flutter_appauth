@@ -1,4 +1,4 @@
-import 'service_configuration.dart';
+import 'authorization_service_configuration.dart';
 
 /// The details of an end_session request to initiate a logout
 class EndSessionRequest {
@@ -15,7 +15,7 @@ class EndSessionRequest {
   String redirectUrl;
 
   // The details of the OAuth 2.0 endpoints that can be explicitly when discovery isn't used or not possible
-  ServiceConfiguration serviceConfiguration;
+  AuthorizationServiceConfiguration serviceConfiguration;
 
   /// Additional parameters to include in the request
   Map<String, String> additionalParameters;

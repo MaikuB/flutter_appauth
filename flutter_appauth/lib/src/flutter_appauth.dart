@@ -1,6 +1,4 @@
 import 'package:flutter_appauth_platform_interface/flutter_appauth_platform_interface.dart';
-import 'end_session_request.dart';
-import 'end_session_response.dart';
 
 class FlutterAppAuth {
   /// Convenience method for authorizing and then exchanges code
@@ -20,11 +18,7 @@ class FlutterAppAuth {
   }
 
   /// For logging out
-  Future<EndSessionResponse> endSession(EndSessionRequest request) async {
-    var result = await _channel.invokeMethod('endSession', request.toMap());
-    return EndSessionResponse(
-      result['state'],
-      result['endSessionAdditionalParameters']?.cast<String, dynamic>(),
-    );
+  Future<EndSessionResponse> endSession(EndSessionRequest request) {
+    return FlutterAppAuthPlatform.instance.endSession(request);
   }
 }

@@ -1,6 +1,6 @@
 #import <Flutter/Flutter.h>
-#import "OIDExternalUserAgentIOSSafariViewController.h"
-#import "OIDExternalUserAgentIOSEphemeral.h"
+//#import "OIDExternalUserAgentIOSSafariViewController.h"
+//#import "OIDExternalUserAgentIOSEphemeral.h"
 
 @protocol OIDExternalUserAgentSession;
 

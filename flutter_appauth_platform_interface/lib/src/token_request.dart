@@ -1,4 +1,4 @@
-import 'service_configuration.dart';
+import 'authorization_service_configuration.dart';
 import 'common_request_details.dart';
 import 'grant_types.dart';
 
@@ -7,7 +7,7 @@ class TokenRequest with CommonRequestDetails {
   TokenRequest(String clientId, String redirectUrl,
       {this.clientSecret,
       List<String> scopes,
-      ServiceConfiguration serviceConfiguration,
+      AuthorizationServiceConfiguration serviceConfiguration,
       Map<String, String> additionalParameters,
       this.refreshToken,
       this.grantType,

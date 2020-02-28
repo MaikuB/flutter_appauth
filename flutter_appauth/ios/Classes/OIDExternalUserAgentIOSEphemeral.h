@@ -18,7 +18,8 @@
 
 #import <UIKit/UIKit.h>
 
-#import "OIDExternalUserAgent.h"
+//#import "OIDExternalUserAgent.h"
+@class OIDExternalUserAgent;
 
 @class SFSafariViewController;
 
@@ -27,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*! @brief An iOS specific external user-agent that uses the best possible user-agent available
         depending on the version of iOS to present the request.
  */
-@interface OIDExternalUserAgentIOSEphemeral : NSObject <OIDExternalUserAgent>
+@interface OIDExternalUserAgentIOSEphemeral : NSObject
 
 - (nullable instancetype)init API_AVAILABLE(ios(11))
     __deprecated_msg("This method will not work on iOS 13, use "
