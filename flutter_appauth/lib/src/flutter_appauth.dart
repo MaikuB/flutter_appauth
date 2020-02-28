@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_appauth_platform_interface/flutter_appauth_platform_interface.dart';
 
 class FlutterAppAuth {
@@ -19,6 +21,10 @@ class FlutterAppAuth {
 
   /// For logging out
   Future<EndSessionResponse> endSession(EndSessionRequest request) {
-    return FlutterAppAuthPlatform.instance.endSession(request);
+    if (Platform.isIOS) {
+      return FlutterAppAuthPlatform.instance.endSession(request);
+    } else {
+      throw UnsupportedError('End session only supported on iOS.');
+    }
   }
 }
