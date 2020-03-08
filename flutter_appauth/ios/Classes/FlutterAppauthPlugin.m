@@ -55,6 +55,7 @@
 @interface AuthorizationTokenRequestParameters : TokenRequestParameters
 @property(nonatomic, strong) NSString *loginHint;
 @property(nonatomic, strong) NSArray *promptValues;
+@property(nonatomic, strong) NSString *state;
 @end
 
 @implementation AuthorizationTokenRequestParameters
@@ -62,6 +63,7 @@
     [super processArguments:arguments];
     _loginHint = [ArgumentProcessor processArgumentValue:arguments withKey:@"loginHint"];
     _promptValues = [ArgumentProcessor processArgumentValue:arguments withKey:@"promptValues"];
+    _state = [ArgumentProcessor processArgumentValue:arguments withKey:@"state"];
     return self;
 }
 @end
@@ -117,6 +119,10 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
     if(requestParameters.promptValues) {
         [self ensureAdditionalParametersInitialized:requestParameters];
         [requestParameters.additionalParameters setValue:[requestParameters.promptValues componentsJoinedByString:@","] forKey:@"prompt"];
+    }
+    if(requestParameters.state) {
+        [self ensureAdditionalParametersInitialized:requestParameters];
+        [requestParameters.additionalParameters setValue:requestParameters.state forKey:@"state"];
     }
     if(requestParameters.serviceConfigurationParameters != nil) {
         OIDServiceConfiguration *serviceConfiguration =
