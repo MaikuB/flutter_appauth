@@ -13,6 +13,7 @@ class AuthorizationRequest extends CommonRequestDetails
       String issuer,
       String discoveryUrl,
       List<String> promptValues,
+      String state,
       bool allowInsecureConnections = false}) {
     this.clientId = clientId;
     this.redirectUrl = redirectUrl;
@@ -23,6 +24,7 @@ class AuthorizationRequest extends CommonRequestDetails
     this.discoveryUrl = discoveryUrl;
     this.loginHint = loginHint;
     this.promptValues = promptValues;
+    this.state = state;
     this.allowInsecureConnections = allowInsecureConnections;
   }
 }
