@@ -152,7 +152,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         Map<String, String> serviceConfigurationParameters = (Map<String, String>) arguments.get("serviceConfiguration");
         Map<String, String> additionalParameters = (Map<String, String>) arguments.get("additionalParameters");
         allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
-        return new AuthorizationTokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, serviceConfigurationParameters, additionalParameters, loginHint, state, promptValues);
+        return new AuthorizationTokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, serviceConfigurationParameters, additionalParameters, loginHint, promptValues, state);
     }
 
     @SuppressWarnings("unchecked")
