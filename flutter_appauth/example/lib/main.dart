@@ -51,29 +51,6 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
-  Future<void> _refresh() async {
-    setBusyState();
-    final TokenResponse result = await _appAuth.token(TokenRequest(
-        _clientId, _redirectUrl,
-        refreshToken: _refreshToken,
-        discoveryUrl: _discoveryUrl,
-        scopes: _scopes));
-    _processTokenResponse(result);
-    await _testApi(result);
-  }
-
-  Future<void> _exchangeCode() async {
-    setBusyState();
-    final TokenResponse result = await _appAuth.token(TokenRequest(
-        _clientId, _redirectUrl,
-        authorizationCode: _authorizationCode,
-        discoveryUrl: _discoveryUrl,
-        codeVerifier: _codeVerifier,
-        scopes: _scopes));
-    _processTokenResponse(result);
-    await _testApi(result);
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -90,29 +67,7 @@ class _MyAppState extends State<MyApp> {
               ),
               RaisedButton(
                 child: const Text('Sign in with no code exchange'),
-                onPressed: () async {
-                  setBusyState();
-                  // use the discovery endpoint to find the configuration
-                  final AuthorizationResponse result = await _appAuth.authorize(
-                    AuthorizationRequest(_clientId, _redirectUrl,
-                        discoveryUrl: _discoveryUrl,
-                        scopes: _scopes,
-                        loginHint: 'bob'),
-                  );
-
-                  // or just use the issuer
-                  // var result = await _appAuth.authorize(
-                  //   AuthorizationRequest(
-                  //     _clientId,
-                  //     _redirectUrl,
-                  //     issuer: _issuer,
-                  //     scopes: _scopes,
-                  //   ),
-                  // );
-                  if (result != null) {
-                    _processAuthResponse(result);
-                  }
-                },
+                onPressed: _signInWithNoCodeExchange,
               ),
               RaisedButton(
                 child: const Text('Exchange code'),
@@ -120,30 +75,7 @@ class _MyAppState extends State<MyApp> {
               ),
               RaisedButton(
                 child: const Text('Sign in with auto code exchange'),
-                onPressed: () async {
-                  setBusyState();
-
-                  // show that we can also explicitly specify the endpoints rather than getting from the details from the discovery document
-                  final AuthorizationTokenResponse result =
-                      await _appAuth.authorizeAndExchangeCode(
-                    AuthorizationTokenRequest(_clientId, _redirectUrl,
-                        serviceConfiguration: _serviceConfiguration,
-                        scopes: _scopes),
-                  );
-
-                  // this code block demonstrates passing in values for the prompt parameter. in this case it prompts the user login even if they have already signed in. the list of supported values depends on the identity provider
-                  // final AuthorizationTokenResponse result = await _appAuth.authorizeAndExchangeCode(
-                  //   AuthorizationTokenRequest(_clientId, _redirectUrl,
-                  //       serviceConfiguration: _serviceConfiguration,
-                  //       scopes: _scopes,
-                  //       promptValues: ['login']),
-                  // );
-
-                  if (result != null) {
-                    _processAuthTokenResponse(result);
-                    await _testApi(result);
-                  }
-                },
+                onPressed: _signInWithAutoCodeExchange,
               ),
               RaisedButton(
                 child: const Text('Refresh token'),
@@ -178,7 +110,98 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void setBusyState() {
+  Future<void> _refresh() async {
+    try {
+      _setBusyState();
+      final TokenResponse result = await _appAuth.token(TokenRequest(
+          _clientId, _redirectUrl,
+          refreshToken: _refreshToken,
+          discoveryUrl: _discoveryUrl,
+          scopes: _scopes));
+      _processTokenResponse(result);
+      await _testApi(result);
+    } catch (_) {
+      _clearBusyState();
+    }
+  }
+
+  Future<void> _exchangeCode() async {
+    try {
+      _setBusyState();
+      final TokenResponse result = await _appAuth.token(TokenRequest(
+          _clientId, _redirectUrl,
+          authorizationCode: _authorizationCode,
+          discoveryUrl: _discoveryUrl,
+          codeVerifier: _codeVerifier,
+          scopes: _scopes));
+      _processTokenResponse(result);
+      await _testApi(result);
+    } catch (_) {
+      _clearBusyState();
+    }
+  }
+
+  Future<void> _signInWithNoCodeExchange() async {
+    try {
+      _setBusyState();
+      // use the discovery endpoint to find the configuration
+      final AuthorizationResponse result = await _appAuth.authorize(
+        AuthorizationRequest(_clientId, _redirectUrl,
+            discoveryUrl: _discoveryUrl, scopes: _scopes, loginHint: 'bob'),
+      );
+
+      // or just use the issuer
+      // var result = await _appAuth.authorize(
+      //   AuthorizationRequest(
+      //     _clientId,
+      //     _redirectUrl,
+      //     issuer: _issuer,
+      //     scopes: _scopes,
+      //   ),
+      // );
+      if (result != null) {
+        _processAuthResponse(result);
+      }
+    } catch (_) {
+      _clearBusyState();
+    }
+  }
+
+  Future<void> _signInWithAutoCodeExchange() async {
+    try {
+      _setBusyState();
+
+      // show that we can also explicitly specify the endpoints rather than getting from the details from the discovery document
+      final AuthorizationTokenResponse result =
+          await _appAuth.authorizeAndExchangeCode(
+        AuthorizationTokenRequest(_clientId, _redirectUrl,
+            serviceConfiguration: _serviceConfiguration, scopes: _scopes),
+      );
+
+      // this code block demonstrates passing in values for the prompt parameter. in this case it prompts the user login even if they have already signed in. the list of supported values depends on the identity provider
+      // final AuthorizationTokenResponse result = await _appAuth.authorizeAndExchangeCode(
+      //   AuthorizationTokenRequest(_clientId, _redirectUrl,
+      //       serviceConfiguration: _serviceConfiguration,
+      //       scopes: _scopes,
+      //       promptValues: ['login']),
+      // );
+
+      if (result != null) {
+        _processAuthTokenResponse(result);
+        await _testApi(result);
+      }
+    } catch (_) {
+      _clearBusyState();
+    }
+  }
+
+  void _clearBusyState() {
+    setState(() {
+      _isBusy = false;
+    });
+  }
+
+  void _setBusyState() {
     setState(() {
       _isBusy = true;
     });

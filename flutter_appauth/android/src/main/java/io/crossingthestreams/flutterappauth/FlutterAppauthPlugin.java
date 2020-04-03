@@ -122,16 +122,28 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         Map<String, Object> arguments = call.arguments();
         switch (call.method) {
             case AUTHORIZE_AND_EXCHANGE_CODE_METHOD:
-                checkAndSetPendingOperation(call.method, result);
-                handleAuthorizeMethodCall(arguments, true);
+                try {
+                    checkAndSetPendingOperation(call.method, result);
+                    handleAuthorizeMethodCall(arguments, true);
+                } catch(Exception ex) {
+                    finishWithError(AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE, ex.getLocalizedMessage());
+                }
                 break;
             case AUTHORIZE_METHOD:
-                checkAndSetPendingOperation(call.method, result);
-                handleAuthorizeMethodCall(arguments, false);
+                try {
+                    checkAndSetPendingOperation(call.method, result);
+                    handleAuthorizeMethodCall(arguments, false);
+                } catch(Exception ex) {
+                    finishWithError(AUTHORIZE_ERROR_CODE, ex.getLocalizedMessage());
+                }
                 break;
             case TOKEN_METHOD:
-                checkAndSetPendingOperation(call.method, result);
-                handleTokenMethodCall(arguments);
+                try {
+                    checkAndSetPendingOperation(call.method, result);
+                    handleTokenMethodCall(arguments);
+                } catch(Exception ex) {
+                    finishWithError(TOKEN_ERROR_CODE, ex.getLocalizedMessage());
+                }
                 break;
             default:
                 result.notImplemented();
