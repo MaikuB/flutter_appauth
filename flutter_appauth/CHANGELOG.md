@@ -1,3 +1,7 @@
+## 0.8.2
+
+* [Android] Fixed issue [98](https://github.com/MaikuB/flutter_appauth/issues/98) where certain exceptions on Android could prevent the plugin from being able to perform more operations
+
 ## 0.8.1
 
 * Bump dependency on `flutter_appauth_platform_interface` to take in fix for casting error that could apply upon calling `token()` method
