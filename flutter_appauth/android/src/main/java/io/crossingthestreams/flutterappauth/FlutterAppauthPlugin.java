@@ -344,13 +344,17 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
 
     private void finishWithSuccess(Object data) {
-        pendingOperation.result.success(data);
-        pendingOperation = null;
+        if (pendingOperation != null) {
+            pendingOperation.result.success(data);
+            pendingOperation = null;
+        }
     }
 
     private void finishWithError(String errorCode, String errorMessage) {
-        pendingOperation.result.error(errorCode, errorMessage, null);
-        pendingOperation = null;
+        if (pendingOperation != null) {
+            pendingOperation.result.error(errorCode, errorMessage, null);
+            pendingOperation = null;
+        }
     }
 
     private void finishWithDiscoveryError(AuthorizationException ex) {
