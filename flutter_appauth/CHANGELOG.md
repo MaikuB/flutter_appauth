@@ -1,3 +1,7 @@
+## 0.8.3
+
+* [Android] Fixed an issue where a `NullPointerException` could occur when too many operations are started at one time. Thanks to the PR from [Josh Burton](https://github.com/athornz)
+
 ## 0.8.2
 
 * [Android] Fixed issue [98](https://github.com/MaikuB/flutter_appauth/issues/98) where certain exceptions on Android could prevent the plugin from being able to perform more operations
