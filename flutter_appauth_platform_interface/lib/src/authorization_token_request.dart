@@ -15,7 +15,8 @@ class AuthorizationTokenRequest extends TokenRequest
       String issuer,
       String discoveryUrl,
       List<String> promptValues,
-      bool allowInsecureConnections = false})
+      bool allowInsecureConnections = false,
+      bool preferEphemeralSession = false})
       : super(clientId, redirectUrl,
             clientSecret: clientSecret,
             discoveryUrl: discoveryUrl,
@@ -24,7 +25,8 @@ class AuthorizationTokenRequest extends TokenRequest
             grantType: GrantType.authorizationCode,
             serviceConfiguration: serviceConfiguration,
             additionalParameters: additionalParameters,
-            allowInsecureConnections: allowInsecureConnections) {
+            allowInsecureConnections: allowInsecureConnections,
+            preferEphemeralSession: preferEphemeralSession) {
     this.loginHint = loginHint;
     this.promptValues = promptValues;
   }

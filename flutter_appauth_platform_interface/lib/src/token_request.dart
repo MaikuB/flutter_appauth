@@ -15,7 +15,8 @@ class TokenRequest with CommonRequestDetails {
       String discoveryUrl,
       this.authorizationCode,
       this.codeVerifier,
-      bool allowInsecureConnections = false})
+      bool allowInsecureConnections = false,
+      bool preferEphemeralSession = false})
       : assert(
             issuer != null ||
                 discoveryUrl != null ||
@@ -30,6 +31,7 @@ class TokenRequest with CommonRequestDetails {
     this.issuer = issuer;
     this.discoveryUrl = discoveryUrl;
     this.allowInsecureConnections = allowInsecureConnections;
+    this.preferEphemeralSession = preferEphemeralSession;
   }
 
   /// The client secret

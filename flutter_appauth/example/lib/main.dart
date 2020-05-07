@@ -175,7 +175,9 @@ class _MyAppState extends State<MyApp> {
       final AuthorizationTokenResponse result =
           await _appAuth.authorizeAndExchangeCode(
         AuthorizationTokenRequest(_clientId, _redirectUrl,
-            serviceConfiguration: _serviceConfiguration, scopes: _scopes),
+            serviceConfiguration: _serviceConfiguration,
+            scopes: _scopes,
+            preferEphemeralSession: true),
       );
 
       // this code block demonstrates passing in values for the prompt parameter. in this case it prompts the user login even if they have already signed in. the list of supported values depends on the identity provider
