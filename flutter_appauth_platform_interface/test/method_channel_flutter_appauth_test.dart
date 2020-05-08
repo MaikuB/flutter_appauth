@@ -37,6 +37,7 @@ void main() {
           'serviceConfiguration': null,
           'additionalParameters': null,
           'allowInsecureConnections': false,
+          'preferEphemeralSession': false,
           'promptValues': null,
         })
       ],
@@ -60,6 +61,7 @@ void main() {
           'serviceConfiguration': null,
           'additionalParameters': null,
           'allowInsecureConnections': false,
+          'preferEphemeralSession': false,
           'promptValues': null,
           'clientSecret': null,
           'refreshToken': null,
