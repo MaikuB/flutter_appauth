@@ -1,7 +1,4 @@
-/*! @file OIDExternalUserAgentIOS.h
-    @brief AppAuth iOS SDK
-    @copyright
-        Copyright 2016 Google Inc. All Rights Reserved.
+/*! @file OIDExternalUserAgentIOSNoSSO.h
     @copydetails
         Licensed under the Apache License, Version 2.0 (the "License");
         you may not use this file except in compliance with the License.
@@ -23,8 +20,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*! @brief An iOS specific external user-agent that uses the best possible user-agent available
-        depending on the version of iOS to present the request.
+/*! @brief OIDExternalUserAgentIOSNoSSO is a custom user agent based off of the default user agent in the AppAuth iOS SDK found here:
+            https://github.com/openid/AppAuth-iOS/blob/master/Source/iOS/OIDExternalUserAgentIOS.h
+            Ths user agent allows setting `prefersEphemeralSession` flag on iOS 13 to avoid cookies being shared across the device.
  */
 API_UNAVAILABLE(macCatalyst)
 @interface OIDExternalUserAgentIOSNoSSO : NSObject<OIDExternalUserAgent>

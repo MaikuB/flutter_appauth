@@ -45,7 +45,7 @@
     _scopes = [ArgumentProcessor processArgumentValue:arguments withKey:@"scopes"];
     _serviceConfigurationParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"serviceConfiguration"];
     _additionalParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"additionalParameters"];
-    _preferEphemeralSession = [ArgumentProcessor processArgumentValue:arguments withKey:@"preferEphemeralSession"];
+    _preferEphemeralSession = [[ArgumentProcessor processArgumentValue:arguments withKey:@"preferEphemeralSession"] isEqual:@YES];
 }
 
 - (id)initWithArguments:(NSDictionary *)arguments {
@@ -158,7 +158,7 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
     
 }
 
-- (void)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferEphemeralSession:(BOOL)preferEphemeral result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode{
+- (void)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferEphemeralSession:(BOOL)preferEphemeralSession result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode{
     OIDAuthorizationRequest *request =
     [[OIDAuthorizationRequest alloc] initWithConfiguration:serviceConfiguration
                                                   clientId:clientId
@@ -170,15 +170,7 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
     UIViewController *rootViewController =
     [UIApplication sharedApplication].delegate.window.rootViewController;
     if(exchangeCode) {
-
-        NSObject<OIDExternalUserAgent> *agent = NULL;
-        if (preferEphemeral) {
-            agent = [[OIDExternalUserAgentIOSNoSSO alloc]
-                initWithPresentingViewController:rootViewController];
-        } else {
-            agent = [[OIDExternalUserAgentIOS alloc]
-                initWithPresentingViewController:rootViewController];
-        }
+        NSObject<OIDExternalUserAgent> *agent = [self userAgentWithEphemeralSession:preferEphemeralSession inRootViewController:rootViewController];
         _currentAuthorizationFlow = [OIDAuthState authStateByPresentingAuthorizationRequest:request externalUserAgent:agent callback:^(OIDAuthState *_Nullable authState,
                    NSError *_Nullable error) {
             if(authState) {
@@ -189,14 +181,7 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
             }
         }];
     } else {
-        NSObject<OIDExternalUserAgent> *agent = NULL;
-        if (preferEphemeral) {
-            agent = [[OIDExternalUserAgentIOSNoSSO alloc]
-                initWithPresentingViewController:rootViewController];
-        } else {
-            agent = [[OIDExternalUserAgentIOS alloc]
-                initWithPresentingViewController:rootViewController];
-        }
+        NSObject<OIDExternalUserAgent> *agent = [self userAgentWithEphemeralSession:preferEphemeralSession inRootViewController:rootViewController];
         _currentAuthorizationFlow = [OIDAuthorizationService presentAuthorizationRequest:request externalUserAgent:agent callback:^(OIDAuthorizationResponse *_Nullable authorizationResponse, NSError *_Nullable error) {
             if(authorizationResponse) {
                 NSMutableDictionary *processedResponse = [[NSMutableDictionary alloc] init];
@@ -209,6 +194,15 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
             }
         }];
     }
+}
+
+- (NSObject<OIDExternalUserAgent> *)userAgentWithEphemeralSession:(BOOL)preferEphemeralSession inRootViewController:(UIViewController *)rootViewController {
+    if (preferEphemeralSession) {
+        return [[OIDExternalUserAgentIOSNoSSO alloc]
+                initWithPresentingViewController:rootViewController];
+    }
+    return [[OIDExternalUserAgentIOS alloc]
+            initWithPresentingViewController:rootViewController];
 }
 
 - (NSString *) formatMessageWithError:(NSString *)messageFormat error:(NSError * _Nullable)error {

@@ -1,19 +1,7 @@
-/*! @file OIDExternalUserAgentIOS.m
-    @brief AppAuth iOS SDK
-    @copyright
-        Copyright 2016 Google Inc. All Rights Reserved.
-    @copydetails
-        Licensed under the Apache License, Version 2.0 (the "License");
-        you may not use this file except in compliance with the License.
-        You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-        Unless required by applicable law or agreed to in writing, software
-        distributed under the License is distributed on an "AS IS" BASIS,
-        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-        See the License for the specific language governing permissions and
-        limitations under the License.
+/*! @file OIDExternalUserAgentIOSNoSSO.m
+    @brief OIDExternalUserAgentIOSNoSSO is a custom user agent based off of the default user agent in the AppAuth iOS SDK found here:
+           https://github.com/openid/AppAuth-iOS/blob/master/Source/iOS/OIDExternalUserAgentIOS.h
+           This user agent allows setting `prefersEphemeralSession` flag on iOS 13 to avoid cookies being shared across the device.
  */
 
 #import "OIDExternalUserAgentIOSNoSSO.h"
@@ -116,7 +104,7 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
       _webAuthenticationVC = authenticationVC;
         if (@available(iOS 13.0, *)) {
-            authenticationVC.prefersEphemeralWebBrowserSession = @YES;
+            authenticationVC.prefersEphemeralWebBrowserSession = YES;
         }
       openedUserAgent = [authenticationVC start];
     }

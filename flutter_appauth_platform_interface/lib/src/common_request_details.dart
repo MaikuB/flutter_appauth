@@ -27,6 +27,8 @@ class CommonRequestDetails implements Mappable {
   bool allowInsecureConnections;
 
   /// Whether to use an ephemeral session and not share the cookies across the OS
+  ///
+  /// iOS only
   bool preferEphemeralSession;
 
   @override
