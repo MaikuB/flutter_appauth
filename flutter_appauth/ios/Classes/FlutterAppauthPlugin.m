@@ -170,7 +170,8 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
     UIViewController *rootViewController =
     [UIApplication sharedApplication].delegate.window.rootViewController;
     if(exchangeCode) {
-        NSObject<OIDExternalUserAgent> *agent = [self userAgentWithEphemeralSession:preferEphemeralSession inRootViewController:rootViewController];
+        NSObject<OIDExternalUserAgent> *agent = [self userAgentWithViewController:rootViewController useEphemeralSession:preferEphemeralSession];
+        
         _currentAuthorizationFlow = [OIDAuthState authStateByPresentingAuthorizationRequest:request externalUserAgent:agent callback:^(OIDAuthState *_Nullable authState,
                    NSError *_Nullable error) {
             if(authState) {
@@ -181,7 +182,7 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
             }
         }];
     } else {
-        NSObject<OIDExternalUserAgent> *agent = [self userAgentWithEphemeralSession:preferEphemeralSession inRootViewController:rootViewController];
+        NSObject<OIDExternalUserAgent> *agent = [self userAgentWithViewController:rootViewController useEphemeralSession:preferEphemeralSession];
         _currentAuthorizationFlow = [OIDAuthorizationService presentAuthorizationRequest:request externalUserAgent:agent callback:^(OIDAuthorizationResponse *_Nullable authorizationResponse, NSError *_Nullable error) {
             if(authorizationResponse) {
                 NSMutableDictionary *processedResponse = [[NSMutableDictionary alloc] init];
@@ -196,8 +197,8 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
     }
 }
 
-- (NSObject<OIDExternalUserAgent> *)userAgentWithEphemeralSession:(BOOL)preferEphemeralSession inRootViewController:(UIViewController *)rootViewController {
-    if (preferEphemeralSession) {
+- (NSObject<OIDExternalUserAgent> *)userAgentWithViewController:(UIViewController *)rootViewController useEphemeralSession:(BOOL)useEphemeralSession {
+    if (useEphemeralSession) {
         return [[OIDExternalUserAgentIOSNoSSO alloc]
                 initWithPresentingViewController:rootViewController];
     }

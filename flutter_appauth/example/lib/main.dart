@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_appauth/flutter_appauth.dart';
@@ -77,7 +78,7 @@ class _MyAppState extends State<MyApp> {
                 child: const Text('Sign in with auto code exchange'),
                 onPressed: () => _signInWithAutoCodeExchange(),
               ),
-              if (Theme.of(context).platform == TargetPlatform.iOS)
+              if (Platform.isIOS)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: RaisedButton(

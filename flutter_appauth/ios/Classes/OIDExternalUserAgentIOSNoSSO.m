@@ -1,6 +1,6 @@
 /*! @file OIDExternalUserAgentIOSNoSSO.m
-    @brief OIDExternalUserAgentIOSNoSSO is a custom user agent based off of the default user agent in the AppAuth iOS SDK found here:
-           https://github.com/openid/AppAuth-iOS/blob/master/Source/iOS/OIDExternalUserAgentIOS.h
+    @brief OIDExternalUserAgentIOSNoSSO is a custom user agent based on the default user agent in the AppAuth iOS SDK found here:
+           https://github.com/openid/AppAuth-iOS/blob/master/Source/iOS/OIDExternalUserAgentIOS.m
            This user agent allows setting `prefersEphemeralSession` flag on iOS 13 to avoid cookies being shared across the device.
  */
 
