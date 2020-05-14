@@ -181,9 +181,12 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
         _currentAuthorizationFlow = [OIDAuthorizationService presentAuthorizationRequest:request presentingViewController:rootViewController callback:^(OIDAuthorizationResponse *_Nullable authorizationResponse, NSError *_Nullable error) {
             if(authorizationResponse) {
                 NSMutableDictionary *processedResponse = [[NSMutableDictionary alloc] init];
-                [processedResponse setObject:authorizationResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
-                [processedResponse setObject:authorizationResponse.authorizationCode forKey:@"authorizationCode"];
-                [processedResponse setObject:authorizationResponse.request.codeVerifier forKey:@"codeVerifier"];
+                if(authorizationResponse.additionalParameters)
+                    [processedResponse setObject:authorizationResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
+                if(authorizationResponse.authorizationCode)
+                    [processedResponse setObject:authorizationResponse.authorizationCode forKey:@"authorizationCode"];
+                if(authorizationResponse.request.codeVerifier)
+                    [processedResponse setObject:authorizationResponse.request.codeVerifier forKey:@"codeVerifier"];
                 result(processedResponse);
             } else {
                 [self finishWithError:AUTHORIZE_ERROR_CODE message:[self formatMessageWithError:AUTHORIZE_ERROR_MESSAGE_FORMAT error:error] result:result];
