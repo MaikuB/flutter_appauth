@@ -26,11 +26,6 @@ class CommonRequestDetails implements Mappable {
   /// Whether to allow non-HTTPS endpoints (only applicable on Android)
   bool allowInsecureConnections;
 
-  /// Whether to use an ephemeral session and not share the cookies across the OS
-  ///
-  /// iOS only
-  bool preferEphemeralSession;
-
   @override
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -42,7 +37,6 @@ class CommonRequestDetails implements Mappable {
       'serviceConfiguration': serviceConfiguration?.toMap(),
       'additionalParameters': additionalParameters,
       'allowInsecureConnections': allowInsecureConnections,
-      'preferEphemeralSession': preferEphemeralSession,
     };
   }
 }
