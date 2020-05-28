@@ -1,7 +1,7 @@
 ## [2.0.0]
 
 * **Breaking change** the `toMap` methods of all classes have been removed from the public API surface
-* Added `preferEphemeralSession` property to the `AuthorizationRequest` and `AuthorizationTokenRequest`
+* Added `preferEphemeralSession` to `AuthorizationRequest` and `AuthorizationTokenRequest` classes. Thanks to the PR from [Matthew Smith](https://github.com/matthewtsmith).
 
 ## [1.0.2]
 

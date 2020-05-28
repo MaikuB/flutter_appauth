@@ -7,6 +7,6 @@ mixin AuthorizationParameters {
 
   /// Whether to use an ephemeral session that prevents cookies and other browser data being shared with the user's normal browser session.
   ///
-  /// Only applies to iOS versions 13 and above.
+  /// This property is only applicable to iOS versions 13 and above.
   bool preferEphemeralSession;
 }

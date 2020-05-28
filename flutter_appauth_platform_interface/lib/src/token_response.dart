@@ -1,12 +1,13 @@
-/// Details from making a successful token exchange
+/// Details from making a successful token exchange.
 class TokenResponse {
   TokenResponse(
-      this.accessToken,
-      this.refreshToken,
-      this.accessTokenExpirationDateTime,
-      this.idToken,
-      this.tokenType,
-      this.tokenAdditionalParameters);
+    this.accessToken,
+    this.refreshToken,
+    this.accessTokenExpirationDateTime,
+    this.idToken,
+    this.tokenType,
+    this.tokenAdditionalParameters,
+  );
 
   /// The access token returned by the authorization server.
   final String accessToken;
@@ -27,6 +28,6 @@ class TokenResponse {
   /// The type of token returned by the authorization server.
   final String tokenType;
 
-  /// Contains additional parameters returned by the authorization server.
+  /// Contains additional parameters returned by the authorization server from making the token request.
   final Map<String, dynamic> tokenAdditionalParameters;
 }
