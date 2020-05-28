@@ -1,3 +1,10 @@
+## 0.9.0
+
+* Bumped dependency on `flutter_appauth_platform_interface`
+* [iOS] The `preferEphemeralSession` property has been added to the `AuthorizationRequest` and `AuthorizationTokenRequest` classes. This enables authorization requests to be done a in private session that won't share cookies and other data with the user's regular browser. This property only works when run on iOS versions 13 and above
+* **BREAKING CHANGE** bumping the `flutter_appauth_platform_interface` dependency includes the removal of the `toMap` method from all classes. These methods were used internally by plugin and thus have been removed
+* **BREAKING CHANGE** Bumped Gradle plugin to 3.6.3
+
 ## 0.8.3
 
 * [Android] Fixed an issue where a `NullPointerException` could occur when too many operations are started at one time. Thanks to the PR from [Josh Burton](https://github.com/athornz)
