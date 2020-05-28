@@ -1,6 +1,9 @@
 class AuthorizationResponse {
-  AuthorizationResponse(this.authorizationCode, this.codeVerifier,
-      this.authorizationAdditionalParameters);
+  AuthorizationResponse(
+    this.authorizationCode,
+    this.codeVerifier,
+    this.authorizationAdditionalParameters,
+  );
 
   /// The authorization code.
   final String authorizationCode;

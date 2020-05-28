@@ -1,12 +1,13 @@
 /// Details from making a successful token exchange
 class TokenResponse {
   TokenResponse(
-      this.accessToken,
-      this.refreshToken,
-      this.accessTokenExpirationDateTime,
-      this.idToken,
-      this.tokenType,
-      this.tokenAdditionalParameters);
+    this.accessToken,
+    this.refreshToken,
+    this.accessTokenExpirationDateTime,
+    this.idToken,
+    this.tokenType,
+    this.tokenAdditionalParameters,
+  );
 
   /// The access token returned by the authorization server.
   final String accessToken;
