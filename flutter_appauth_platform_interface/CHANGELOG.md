@@ -1,6 +1,6 @@
 ## [1.0.3]
 
-* Added `preferEphemeralSession` to `AuthorizationRequest` and `AuthorizationTokenRequest` classes. Thanks to PR from [Matthew Smith](https://github.com/matthewtsmith).
+* Added `preferEphemeralSession` to `AuthorizationRequest` and `AuthorizationTokenRequest` classes. Thanks to the PR from [Matthew Smith](https://github.com/matthewtsmith).
 
 ## [1.0.2]
 
