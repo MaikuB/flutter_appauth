@@ -28,6 +28,6 @@ class TokenResponse {
   /// The type of token returned by the authorization server.
   final String tokenType;
 
-  /// Contains additional parameters returned by the authorization server.
+  /// Contains additional parameters returned by the authorization server from making the token request.
   final Map<String, dynamic> tokenAdditionalParameters;
 }

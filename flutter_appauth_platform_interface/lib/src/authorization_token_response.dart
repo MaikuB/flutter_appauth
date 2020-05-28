@@ -13,5 +13,6 @@ class AuthorizationTokenResponse extends TokenResponse {
   ) : super(accessToken, refreshToken, accessTokenExpirationDateTime, idToken,
             tokenType, tokenAdditionalParameters);
 
+  /// Contains additional parameters returned by the authorization server from making the authorization request.
   final Map<String, dynamic> authorizationAdditionalParameters;
 }
