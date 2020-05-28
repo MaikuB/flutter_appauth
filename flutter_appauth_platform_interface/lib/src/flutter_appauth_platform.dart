@@ -28,19 +28,19 @@ abstract class FlutterAppAuthPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  /// Convenience method for authorizing and then exchanges the authorization grant code
+  /// Convenience method for authorizing and then exchanges the authorization grant code.
   Future<AuthorizationTokenResponse> authorizeAndExchangeCode(
       AuthorizationTokenRequest request) {
     throw UnimplementedError(
         'authorizeAndExchangeCode() has not been implemented');
   }
 
-  /// Sends an authorization request
+  /// Sends an authorization request.
   Future<AuthorizationResponse> authorize(AuthorizationRequest request) {
     throw UnimplementedError('authorize() has not been implemented');
   }
 
-  /// For exchanging tokens
+  /// For exchanging tokens.
   Future<TokenResponse> token(TokenRequest request) {
     throw UnimplementedError('token() has not been implemented');
   }

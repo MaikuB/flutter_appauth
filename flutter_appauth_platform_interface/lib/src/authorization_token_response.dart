@@ -1,6 +1,6 @@
 import 'token_response.dart';
 
-/// The details from making a successful combined authorization and token exchange request
+/// The details from making a successful combined authorization and token exchange request.
 class AuthorizationTokenResponse extends TokenResponse {
   AuthorizationTokenResponse(
       String accessToken,

@@ -2,7 +2,7 @@ import 'authorization_parameters.dart';
 import 'authorization_service_configuration.dart';
 import 'common_request_details.dart';
 
-/// The details of an authorization request to get an authorization code
+/// The details of an authorization request to get an authorization code.
 class AuthorizationRequest extends CommonRequestDetails
     with AuthorizationParameters {
   AuthorizationRequest(String clientId, String redirectUrl,
