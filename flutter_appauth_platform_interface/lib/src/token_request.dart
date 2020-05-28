@@ -2,7 +2,7 @@ import 'authorization_service_configuration.dart';
 import 'common_request_details.dart';
 import 'grant_types.dart';
 
-/// Details for a token exchange request
+/// Details for a token exchange request.
 class TokenRequest with CommonRequestDetails {
   TokenRequest(
     String clientId,
@@ -34,16 +34,18 @@ class TokenRequest with CommonRequestDetails {
     this.allowInsecureConnections = allowInsecureConnections;
   }
 
-  /// The client secret
+  /// The client secret.
   final String clientSecret;
 
-  /// The refresh token
+  /// The refresh token.
   final String refreshToken;
 
-  /// The grant type. This would be inferred if it hasn't been set based on if a refresh token or authorization code has been specified
+  /// The grant type.
+  ///
+  /// If this is not specified then it will be inferred based on if [refreshToken] or [authorizationCode] has been specified.
   final String grantType;
 
-  /// The authorization code
+  /// The authorization code.
   final String authorizationCode;
 
   /// The code verifier to be sent with the authorization code. This should match the code verifier used when performing the authorization request
