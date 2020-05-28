@@ -4,14 +4,13 @@ version: 0.8.4
 homepage: https://github.com/MaikuB/flutter_appauth/tree/master/flutter_appauth
 
 environment:
-  sdk: ">=2.6.0 <3.0.0"
+  sdk: ">=2.1.0 <3.0.0"
   flutter: ">=1.12.13+hotfix.5"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_appauth_platform_interface:
-    path: ../flutter_appauth_platform_interface
+  flutter_appauth_platform_interface: ^1.0.3
 
 flutter:
   plugin:

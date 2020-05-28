@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_appauth/flutter_appauth.dart';
@@ -158,20 +158,20 @@ class _MyAppState extends State<MyApp> {
     try {
       _setBusyState();
       // use the discovery endpoint to find the configuration
-      // final AuthorizationResponse result = await _appAuth.authorize(
-      //   AuthorizationRequest(_clientId, _redirectUrl,
-      //       discoveryUrl: _discoveryUrl, scopes: _scopes, loginHint: 'bob'),
-      // );
+      final AuthorizationResponse result = await _appAuth.authorize(
+        AuthorizationRequest(_clientId, _redirectUrl,
+            discoveryUrl: _discoveryUrl, scopes: _scopes, loginHint: 'bob'),
+      );
 
       // or just use the issuer
-      final AuthorizationResponse result = await _appAuth.authorize(
-        AuthorizationRequest(
-          _clientId,
-          _redirectUrl,
-          issuer: _issuer,
-          scopes: _scopes,
-        ),
-      );
+      // var result = await _appAuth.authorize(
+      //   AuthorizationRequest(
+      //     _clientId,
+      //     _redirectUrl,
+      //     issuer: _issuer,
+      //     scopes: _scopes,
+      //   ),
+      // );
       if (result != null) {
         _processAuthResponse(result);
       }
@@ -198,7 +198,7 @@ class _MyAppState extends State<MyApp> {
       );
 
       // this code block demonstrates passing in values for the prompt parameter. in this case it prompts the user login even if they have already signed in. the list of supported values depends on the identity provider
-      // var result = await _appAuth.authorizeAndExchangeCode(
+      // final AuthorizationTokenResponse result = await _appAuth.authorizeAndExchangeCode(
       //   AuthorizationTokenRequest(_clientId, _redirectUrl,
       //       serviceConfiguration: _serviceConfiguration,
       //       scopes: _scopes,
