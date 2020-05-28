@@ -1,7 +1,6 @@
 import 'authorization_service_configuration.dart';
-import 'mappable.dart';
 
-class CommonRequestDetails implements Mappable {
+class CommonRequestDetails {
   /// The client id.
   String clientId;
 
@@ -27,18 +26,4 @@ class CommonRequestDetails implements Mappable {
   ///
   /// This property is only applicable to Android.
   bool allowInsecureConnections;
-
-  @override
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'clientId': clientId,
-      'issuer': issuer,
-      'discoveryUrl': discoveryUrl,
-      'redirectUrl': redirectUrl,
-      'scopes': scopes,
-      'serviceConfiguration': serviceConfiguration?.toMap(),
-      'additionalParameters': additionalParameters,
-      'allowInsecureConnections': allowInsecureConnections,
-    };
-  }
 }

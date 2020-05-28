@@ -1,6 +1,4 @@
-import 'mappable.dart';
-
-mixin AuthorizationParameters on Mappable {
+mixin AuthorizationParameters {
   /// Hint to the Authorization Server about the login identifier the End-User might use to log in.
   String loginHint;
 
@@ -11,13 +9,4 @@ mixin AuthorizationParameters on Mappable {
   ///
   /// This property is only applicable to iOS versions 13 and above.
   bool preferEphemeralSession;
-
-  @override
-  Map<String, dynamic> toMap() {
-    final Map<String, dynamic> map = super.toMap();
-    map['loginHint'] = loginHint;
-    map['promptValues'] = promptValues;
-    map['preferEphemeralSession'] = preferEphemeralSession;
-    return map;
-  }
 }

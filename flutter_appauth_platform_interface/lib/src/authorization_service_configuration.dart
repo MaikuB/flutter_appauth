@@ -8,11 +8,4 @@ class AuthorizationServiceConfiguration {
   final String authorizationEndpoint;
 
   final String tokenEndpoint;
-
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'tokenEndpoint': tokenEndpoint,
-      'authorizationEndpoint': authorizationEndpoint
-    };
-  }
 }

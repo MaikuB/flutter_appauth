@@ -1,4 +1,4 @@
-/// Details from making a successful token exchange
+/// Details from making a successful token exchange.
 class TokenResponse {
   TokenResponse(
     this.accessToken,

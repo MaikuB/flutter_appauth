@@ -5,6 +5,7 @@ import 'authorization_response.dart';
 import 'authorization_token_request.dart';
 import 'authorization_token_response.dart';
 import 'flutter_appauth_platform.dart';
+import 'method_channel_mappers.dart';
 import 'token_request.dart';
 import 'token_response.dart';
 
