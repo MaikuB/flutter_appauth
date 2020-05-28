@@ -1,4 +1,4 @@
-import 'dart:io' show Platform;
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_appauth/flutter_appauth.dart';
@@ -158,20 +158,20 @@ class _MyAppState extends State<MyApp> {
     try {
       _setBusyState();
       // use the discovery endpoint to find the configuration
-      final AuthorizationResponse result = await _appAuth.authorize(
-        AuthorizationRequest(_clientId, _redirectUrl,
-            discoveryUrl: _discoveryUrl, scopes: _scopes, loginHint: 'bob'),
-      );
+      // final AuthorizationResponse result = await _appAuth.authorize(
+      //   AuthorizationRequest(_clientId, _redirectUrl,
+      //       discoveryUrl: _discoveryUrl, scopes: _scopes, loginHint: 'bob'),
+      // );
 
       // or just use the issuer
-      // var result = await _appAuth.authorize(
-      //   AuthorizationRequest(
-      //     _clientId,
-      //     _redirectUrl,
-      //     issuer: _issuer,
-      //     scopes: _scopes,
-      //   ),
-      // );
+      final AuthorizationResponse result = await _appAuth.authorize(
+        AuthorizationRequest(
+          _clientId,
+          _redirectUrl,
+          issuer: _issuer,
+          scopes: _scopes,
+        ),
+      );
       if (result != null) {
         _processAuthResponse(result);
       }
