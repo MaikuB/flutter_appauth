@@ -1,3 +1,4 @@
+/// Contains the response from making an authorization request.
 class AuthorizationResponse {
   AuthorizationResponse(
     this.authorizationCode,
