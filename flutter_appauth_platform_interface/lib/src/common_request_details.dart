@@ -25,7 +25,7 @@ class CommonRequestDetails implements Mappable {
 
   /// Whether to allow non-HTTPS endpoints.
   ///
-  /// Only applies to Android.
+  /// This property is only applicable to Android.
   bool allowInsecureConnections;
 
   @override
