@@ -4,19 +4,21 @@ import 'grant_types.dart';
 
 /// Details for a token exchange request
 class TokenRequest with CommonRequestDetails {
-  TokenRequest(String clientId, String redirectUrl,
-      {this.clientSecret,
-      List<String> scopes,
-      AuthorizationServiceConfiguration serviceConfiguration,
-      Map<String, String> additionalParameters,
-      this.refreshToken,
-      this.grantType,
-      String issuer,
-      String discoveryUrl,
-      this.authorizationCode,
-      this.codeVerifier,
-      bool allowInsecureConnections = false})
-      : assert(
+  TokenRequest(
+    String clientId,
+    String redirectUrl, {
+    this.clientSecret,
+    List<String> scopes,
+    AuthorizationServiceConfiguration serviceConfiguration,
+    Map<String, String> additionalParameters,
+    this.refreshToken,
+    this.grantType,
+    String issuer,
+    String discoveryUrl,
+    this.authorizationCode,
+    this.codeVerifier,
+    bool allowInsecureConnections = false,
+  }) : assert(
             issuer != null ||
                 discoveryUrl != null ||
                 (serviceConfiguration?.authorizationEndpoint != null &&

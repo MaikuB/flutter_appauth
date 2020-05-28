@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_appauth/flutter_appauth.dart';
@@ -75,8 +76,20 @@ class _MyAppState extends State<MyApp> {
               ),
               RaisedButton(
                 child: const Text('Sign in with auto code exchange'),
-                onPressed: _signInWithAutoCodeExchange,
+                onPressed: () => _signInWithAutoCodeExchange(),
               ),
+              if (Platform.isIOS)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: RaisedButton(
+                    child: const Text(
+                      'Sign in with auto code exchange using ephemeral session (iOS only)',
+                      textAlign: TextAlign.center,
+                    ),
+                    onPressed: () => _signInWithAutoCodeExchange(
+                        preferEphemeralSession: true),
+                  ),
+                ),
               RaisedButton(
                 child: const Text('Refresh token'),
                 onPressed: _refreshToken != null ? _refresh : null,
@@ -167,15 +180,21 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  Future<void> _signInWithAutoCodeExchange() async {
+  Future<void> _signInWithAutoCodeExchange(
+      {bool preferEphemeralSession = false}) async {
     try {
       _setBusyState();
 
       // show that we can also explicitly specify the endpoints rather than getting from the details from the discovery document
       final AuthorizationTokenResponse result =
           await _appAuth.authorizeAndExchangeCode(
-        AuthorizationTokenRequest(_clientId, _redirectUrl,
-            serviceConfiguration: _serviceConfiguration, scopes: _scopes),
+        AuthorizationTokenRequest(
+          _clientId,
+          _redirectUrl,
+          serviceConfiguration: _serviceConfiguration,
+          scopes: _scopes,
+          preferEphemeralSession: preferEphemeralSession,
+        ),
       );
 
       // this code block demonstrates passing in values for the prompt parameter. in this case it prompts the user login even if they have already signed in. the list of supported values depends on the identity provider

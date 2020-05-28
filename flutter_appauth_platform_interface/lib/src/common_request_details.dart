@@ -36,7 +36,7 @@ class CommonRequestDetails implements Mappable {
       'scopes': scopes,
       'serviceConfiguration': serviceConfiguration?.toMap(),
       'additionalParameters': additionalParameters,
-      'allowInsecureConnections': allowInsecureConnections
+      'allowInsecureConnections': allowInsecureConnections,
     };
   }
 }
