@@ -1,3 +1,7 @@
+## 0.9.1
+
+* [iOS] Update AppAuth SDK dependency to 1.3.1
+
 ## 0.9.0
 
 * Bumped dependency on `flutter_appauth_platform_interface`
