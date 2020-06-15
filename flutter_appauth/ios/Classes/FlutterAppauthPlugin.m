@@ -197,7 +197,7 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
     }
 }
 
-- (NSObject<OIDExternalUserAgent> *)userAgentWithViewController:(UIViewController *)rootViewController useEphemeralSession:(BOOL)useEphemeralSession {
+- (id<OIDExternalUserAgent>)userAgentWithViewController:(UIViewController *)rootViewController useEphemeralSession:(BOOL)useEphemeralSession {
     if (useEphemeralSession) {
         return [[OIDExternalUserAgentIOSNoSSO alloc]
                 initWithPresentingViewController:rootViewController];

@@ -1,3 +1,7 @@
+## 0.9.1+1
+
+* Fixes warnings picked up in Xcode raised in issue [123](https://github.com/MaikuB/flutter_appauth/issues/123)
+
 ## 0.9.1
 
 * [iOS] Update AppAuth SDK dependency to 1.3.1
