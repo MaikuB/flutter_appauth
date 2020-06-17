@@ -1,6 +1,6 @@
 ## 0.9.2
 
-* [iOS] Fixes release build issue  about including a non-modular header that came about from release 0.9.1+1
+* [iOS] Fixes release build issue about including a non-modular header that came about from release 0.9.1+1. If you experienced issues with 0.9.1+1 (in my experience only occurs if your iOS app uses Swift), please update to 0.9.2
 
 ## 0.9.1+1
 
