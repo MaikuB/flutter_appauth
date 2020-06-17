@@ -1,7 +1,6 @@
 #import "FlutterAppauthPlugin.h"
-#import "AppAuth.h"
-
 #import "OIDExternalUserAgentIOSNoSSO.h"
+
 @interface ArgumentProcessor : NSObject
 + (id _Nullable)processArgumentValue:(NSDictionary *)arguments withKey:(NSString *)key;
 @end
