@@ -1,6 +1,5 @@
 #import <Flutter/Flutter.h>
-
-@protocol OIDExternalUserAgentSession;
+#import <AppAuth/AppAuth.h>
 
 @interface FlutterAppauthPlugin : NSObject<FlutterPlugin>
 

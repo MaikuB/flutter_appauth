@@ -9,9 +9,6 @@
 #import <SafariServices/SafariServices.h>
 #import <AuthenticationServices/AuthenticationServices.h>
 
-#import "OIDErrorUtilities.h"
-#import "OIDExternalUserAgentSession.h"
-#import "OIDExternalUserAgentRequest.h"
 
 #if !TARGET_OS_MACCATALYST
 
