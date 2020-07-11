@@ -1,27 +1,14 @@
 task:
-  name: Analyze code
-  alias: analyze
-  container:
-    image: cirrusci/flutter:stable
-  analyze_script: flutter analyze
-
-task:
   name: Run platform interface tests
-  alias: platform_interface_tests
-  depends_on: analyze
   container:
     image: cirrusci/flutter:stable
   pub_cache:
     folder: ~/.pub-cache
-  test_script:
+  build_script:
     - cd flutter_appauth_platform_interface
     - flutter test
 task:
   name: Build Android example
-  alias: build_android_example
-  depends_on:
-    - analyze
-    - platform_interface_tests
   container:
     image: cirrusci/flutter:stable
   pub_cache:
@@ -32,10 +19,6 @@ task:
 
 task:
   name: Build iOS example
-  alias: build_ios_example
-  depends_on:
-    - analyze
-    - platform_interface_tests
   osx_instance:
     image: catalina-flutter
   pub_cache:
