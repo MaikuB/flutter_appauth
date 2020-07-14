@@ -1,6 +1,10 @@
+## 0.9.2+2
+
+* Updated example app to use a new client id that works with the demo IdentityServer instance
+
 ## 0.9.2+1
 
-* Updated readme to add a link to Auth0 blog post and mention that the value assigned to `appAuthRedirectScheme` within the Android application's `build.gradle` file should be all in lowercase.
+* Updated readme to add a link to Auth0 blog post and mention that the value assigned to `appAuthRedirectScheme` within the Android application's `build.gradle` file should be all in lowercase
 
 ## 0.9.2
 
