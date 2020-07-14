@@ -29,7 +29,8 @@ class _MyAppState extends State<MyApp> {
       TextEditingController();
   String _userInfo = '';
 
-  final String _clientId = 'native.code';
+  // For a list of client IDs, go to https://demo.identityserver.io
+  final String _clientId = 'interactive.public';
   final String _redirectUrl = 'io.identityserver.demo:/oauthredirect';
   final String _issuer = 'https://demo.identityserver.io';
   final String _discoveryUrl =
