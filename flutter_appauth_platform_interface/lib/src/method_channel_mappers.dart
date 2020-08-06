@@ -3,6 +3,7 @@ import 'authorization_request.dart';
 import 'authorization_service_configuration.dart';
 import 'authorization_token_request.dart';
 import 'common_request_details.dart';
+import 'end_session_request.dart';
 import 'grant_types.dart';
 import 'token_request.dart';
 
@@ -20,7 +21,16 @@ Map<String, Object> _convertCommonRequestDetailsToMap(
   };
 }
 
-extension AuthorizationRequestParameters on AuthorizationRequest {
+extension EndSessionRequestMapper on EndSessionRequest {
+  Map<String, Object> toMap() {
+    return <String, Object>{
+      'idTokenHint': idTokenHint,
+      'postLogoutRedirectUrl': postLogoutRedirectUrl,
+    };
+  }
+}
+
+extension AuthorizationRequestMapper on AuthorizationRequest {
   Map<String, Object> toMap() {
     return _convertAuthorizationParametersToMap(this)
       ..addAll(_convertCommonRequestDetailsToMap(this));

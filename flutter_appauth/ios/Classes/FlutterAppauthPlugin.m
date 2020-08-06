@@ -74,6 +74,7 @@ FlutterMethodChannel* channel;
 NSString *const AUTHORIZE_METHOD = @"authorize";
 NSString *const AUTHORIZE_AND_EXCHANGE_CODE_METHOD = @"authorizeAndExchangeCode";
 NSString *const TOKEN_METHOD = @"token";
+NSString *const END_SESSION_METHOD = @"endSession";
 NSString *const AUTHORIZE_ERROR_CODE = @"authorize_failed";
 NSString *const AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE = @"authorize_and_exchange_code_failed";
 NSString *const DISCOVERY_ERROR_CODE = @"discovery_failed";
@@ -99,6 +100,8 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
         [self handleAuthorizeMethodCall:[call arguments] result:result exchangeCode:false];
     } else if([TOKEN_METHOD isEqualToString:call.method]) {
         [self handleTokenMethodCall:[call arguments] result:result];
+    } else if([END_SESSION_METHOD isEqualToString:call.method]) {
+        [self handleEndSessionMethodCall:[call arguments] result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }
@@ -169,9 +172,8 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
     UIViewController *rootViewController =
     [UIApplication sharedApplication].delegate.window.rootViewController;
     if(exchangeCode) {
-        NSObject<OIDExternalUserAgent> *agent = [self userAgentWithViewController:rootViewController useEphemeralSession:preferEphemeralSession];
-        
-        _currentAuthorizationFlow = [OIDAuthState authStateByPresentingAuthorizationRequest:request externalUserAgent:agent callback:^(OIDAuthState *_Nullable authState,
+        _externalUserAgent = [self userAgentWithViewController:rootViewController useEphemeralSession:preferEphemeralSession];
+        _currentAuthorizationFlow = [OIDAuthState authStateByPresentingAuthorizationRequest:request externalUserAgent:_externalUserAgent callback:^(OIDAuthState *_Nullable authState,
                    NSError *_Nullable error) {
             if(authState) {
                 result([self processResponses:authState.lastTokenResponse authResponse:authState.lastAuthorizationResponse]);
@@ -181,8 +183,8 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
             }
         }];
     } else {
-        NSObject<OIDExternalUserAgent> *agent = [self userAgentWithViewController:rootViewController useEphemeralSession:preferEphemeralSession];
-        _currentAuthorizationFlow = [OIDAuthorizationService presentAuthorizationRequest:request externalUserAgent:agent callback:^(OIDAuthorizationResponse *_Nullable authorizationResponse, NSError *_Nullable error) {
+        _externalUserAgent = [self userAgentWithViewController:rootViewController useEphemeralSession:preferEphemeralSession];
+        _currentAuthorizationFlow = [OIDAuthorizationService presentAuthorizationRequest:request externalUserAgent:_externalUserAgent callback:^(OIDAuthorizationResponse *_Nullable authorizationResponse, NSError *_Nullable error) {
             if(authorizationResponse) {
                 NSMutableDictionary *processedResponse = [[NSMutableDictionary alloc] init];
                 [processedResponse setObject:authorizationResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
@@ -257,6 +259,16 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
                                                             }];
     }
     
+}
+
+
+-(void)handleEndSessionMethodCall:(NSDictionary*)arguments result:(FlutterResult)result {
+    OIDServiceConfiguration *serviceConfiguration = [[OIDServiceConfiguration alloc] initWithAuthorizationEndpoint:[NSURL URLWithString:@"https://demo.identityserver.io/connect/authorize"] tokenEndpoint:[NSURL URLWithString:@"https://demo.identityserver.io/connect/token"] issuer:nil registrationEndpoint:nil endSessionEndpoint:[NSURL URLWithString:@"https://demo.identityserver.io/connect/endsession"]];
+    OIDEndSessionRequest *endSessionRequest = [[OIDEndSessionRequest alloc] initWithConfiguration:serviceConfiguration idTokenHint:arguments[@"idTokenHint"] postLogoutRedirectURL:[NSURL URLWithString:arguments[@"postLogoutRedirectUrl"]] additionalParameters:nil];
+    [OIDAuthorizationService presentEndSessionRequest:endSessionRequest externalUserAgent:_externalUserAgent callback:^(OIDEndSessionResponse * _Nullable endSessionResponse, NSError * _Nullable error) {
+        NSLog(@"%@", [error localizedDescription]);
+        result(nil);
+    }];
 }
 
 - (void)performTokenRequest:(OIDServiceConfiguration *)serviceConfiguration requestParameters:(TokenRequestParameters *)requestParameters result:(FlutterResult)result {

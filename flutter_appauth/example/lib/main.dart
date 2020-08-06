@@ -17,6 +17,7 @@ class _MyAppState extends State<MyApp> {
   String _authorizationCode;
   String _refreshToken;
   String _accessToken;
+  String _idToken;
   final TextEditingController _authorizationCodeTextController =
       TextEditingController();
   final TextEditingController _accessTokenTextController =
@@ -94,6 +95,15 @@ class _MyAppState extends State<MyApp> {
               RaisedButton(
                 child: const Text('Refresh token'),
                 onPressed: _refreshToken != null ? _refresh : null,
+              ),
+              RaisedButton(
+                child: const Text('End session'),
+                onPressed: _idToken != null
+                    ? () async {
+                        _appAuth.endSession(
+                            EndSessionRequest(_idToken, _redirectUrl));
+                      }
+                    : null,
               ),
               const Text('authorization code'),
               TextField(
@@ -230,7 +240,7 @@ class _MyAppState extends State<MyApp> {
   void _processAuthTokenResponse(AuthorizationTokenResponse response) {
     setState(() {
       _accessToken = _accessTokenTextController.text = response.accessToken;
-      _idTokenTextController.text = response.idToken;
+      _idToken = _idTokenTextController.text = response.idToken;
       _refreshToken = _refreshTokenTextController.text = response.refreshToken;
       _accessTokenExpirationTextController.text =
           response.accessTokenExpirationDateTime?.toIso8601String();
@@ -250,7 +260,7 @@ class _MyAppState extends State<MyApp> {
   void _processTokenResponse(TokenResponse response) {
     setState(() {
       _accessToken = _accessTokenTextController.text = response.accessToken;
-      _idTokenTextController.text = response.idToken;
+      _idToken = _idTokenTextController.text = response.idToken;
       _refreshToken = _refreshTokenTextController.text = response.refreshToken;
       _accessTokenExpirationTextController.text =
           response.accessTokenExpirationDateTime?.toIso8601String();
