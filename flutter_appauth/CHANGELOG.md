@@ -1,3 +1,7 @@
+## 0.9.2+3
+
+* [Android] fix performance issue where an authorisation request could cause the UI to momentarily hang due to AppAuth trying to warm up the browser
+
 ## 0.9.2+2
 
 * Updated example app to use a new client id that works with the demo IdentityServer instance
