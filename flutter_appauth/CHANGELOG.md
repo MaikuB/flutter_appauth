@@ -1,6 +1,6 @@
 ## 0.9.2+3
 
-* [Android] fix performance issue where an authorisation request could cause the UI to momentarily hang due to AppAuth trying to warm up the browser
+* [Android] fix issue [79](https://github.com/MaikuB/flutter_appauth/issues/79) where an authorisation request could cause the UI to momentarily hang due to AppAuth trying to warm up the browser
 
 ## 0.9.2+2
 
