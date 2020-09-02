@@ -16,6 +16,8 @@ import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenRequest;
 import net.openid.appauth.TokenResponse;
 
+import net.openid.appauth.connectivity.DefaultConnectionBuilder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
