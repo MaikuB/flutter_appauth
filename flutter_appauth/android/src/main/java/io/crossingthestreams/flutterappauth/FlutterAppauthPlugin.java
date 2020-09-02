@@ -234,10 +234,9 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                 }
             };
             if (tokenRequestParameters.discoveryUrl != null) {
-                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), callback);
+                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), callback, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
             } else {
-                AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(tokenRequestParameters.issuer), callback);
-
+                AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(tokenRequestParameters.issuer), callback, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
             }
         }
 
@@ -264,7 +263,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                             finishWithDiscoveryError(ex);
                         }
                     }
-                });
+                }, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
 
             } else {
 
@@ -277,7 +276,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                             finishWithDiscoveryError(ex);
                         }
                     }
-                });
+                }, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
             }
         }
     }
