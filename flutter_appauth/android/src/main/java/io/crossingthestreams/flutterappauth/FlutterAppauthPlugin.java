@@ -16,6 +16,8 @@ import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenRequest;
 import net.openid.appauth.TokenResponse;
 
+import net.openid.appauth.connectivity.DefaultConnectionBuilder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -234,10 +236,9 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                 }
             };
             if (tokenRequestParameters.discoveryUrl != null) {
-                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), callback);
+                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), callback, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
             } else {
                 AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(tokenRequestParameters.issuer), callback);
-
             }
         }
 
@@ -264,7 +265,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                             finishWithDiscoveryError(ex);
                         }
                     }
-                });
+                }, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
 
             } else {
 
