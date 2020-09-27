@@ -1,3 +1,9 @@
+## 0.9.2+5
+
+* Updated the Android setup section in the readme to include information for apps targeting Android 11 (API 30) or newer
+* [Android] bumped compile SDK version for the plugin to 30
+* Updated example app to use compile and target SDK version 30
+
 ## 0.9.2+4
 
 * [Android] fix issue [131](https://github.com/MaikuB/flutter_appauth/issues/131) where setting the `allowInsecureConnections` flag to true whilst doing an authorisation or token request didn't behave as expected. Thanks to the PR from [Hongxu Xu](https://github.com/xuhongxu96)
