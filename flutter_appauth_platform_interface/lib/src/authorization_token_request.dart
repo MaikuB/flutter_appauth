@@ -2,6 +2,7 @@ import 'authorization_parameters.dart';
 import 'authorization_service_configuration.dart';
 import 'grant_types.dart';
 import 'token_request.dart';
+import 'connection_type.dart';
 
 /// Details required for a combined authorization and code exchange request
 class AuthorizationTokenRequest extends TokenRequest
@@ -17,7 +18,7 @@ class AuthorizationTokenRequest extends TokenRequest
     String issuer,
     String discoveryUrl,
     List<String> promptValues,
-    bool allowInsecureConnections = false,
+    ConnectionType connectionType = ConnectionType.secure,
     bool preferEphemeralSession = false,
   }) : super(
           clientId,
@@ -29,7 +30,7 @@ class AuthorizationTokenRequest extends TokenRequest
           grantType: GrantType.authorizationCode,
           serviceConfiguration: serviceConfiguration,
           additionalParameters: additionalParameters,
-          allowInsecureConnections: allowInsecureConnections,
+          connectionType: connectionType,
         ) {
     this.loginHint = loginHint;
     this.promptValues = promptValues;

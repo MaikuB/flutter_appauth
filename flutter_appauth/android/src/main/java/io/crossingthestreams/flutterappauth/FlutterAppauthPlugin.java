@@ -16,6 +16,7 @@ import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenRequest;
 import net.openid.appauth.TokenResponse;
 
+import net.openid.appauth.connectivity.ConnectionBuilder;
 import net.openid.appauth.connectivity.DefaultConnectionBuilder;
 
 import java.util.ArrayList;
@@ -59,9 +60,10 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private Activity mainActivity;
     private PendingOperation pendingOperation;
     private String clientSecret;
-    private boolean allowInsecureConnections;
+    private ConnectionType connectionType;
     private AuthorizationService defaultAuthorizationService;
     private AuthorizationService insecureAuthorizationService;
+    private AuthorizationService untrustedAuthorizationService;
 
     /**
      * Plugin registration.
@@ -89,9 +91,15 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private void onAttachedToEngine(Context context, BinaryMessenger binaryMessenger) {
         this.applicationContext = context;
         defaultAuthorizationService = new AuthorizationService(this.applicationContext);
-        AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-        authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
-        insecureAuthorizationService = new AuthorizationService(applicationContext, authConfigBuilder.build());
+
+        AppAuthConfiguration.Builder insecureAuthConfigBuilder = new AppAuthConfiguration.Builder();
+        insecureAuthConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
+        insecureAuthorizationService = new AuthorizationService(applicationContext, insecureAuthConfigBuilder.build());
+
+        AppAuthConfiguration.Builder untrustedAuthConfigBuilder = new AppAuthConfiguration.Builder();
+        untrustedAuthConfigBuilder.setConnectionBuilder(UntrustedSSLCertificateConnectionBuilder.INSTANCE);
+        untrustedAuthorizationService = new AuthorizationService(applicationContext, untrustedAuthConfigBuilder.build());
+
         final MethodChannel channel = new MethodChannel(binaryMessenger, "crossingthestreams.io/flutter_appauth");
         channel.setMethodCallHandler(this);
     }
@@ -131,8 +139,10 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private void disposeAuthorizationServices() {
         defaultAuthorizationService.dispose();
         insecureAuthorizationService.dispose();
+        untrustedAuthorizationService.dispose();
         defaultAuthorizationService = null;
         insecureAuthorizationService = null;
+        untrustedAuthorizationService = null;
     }
 
     private void checkAndSetPendingOperation(String method, Result result) {
@@ -149,6 +159,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         switch (call.method) {
             case AUTHORIZE_AND_EXCHANGE_CODE_METHOD:
                 try {
+                    System.out.println(arguments);
                     checkAndSetPendingOperation(call.method, result);
                     handleAuthorizeMethodCall(arguments, true);
                 } catch(Exception ex) {
@@ -188,7 +199,8 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         final ArrayList<String> promptValues = (ArrayList<String>) arguments.get("promptValues");
         Map<String, String> serviceConfigurationParameters = (Map<String, String>) arguments.get("serviceConfiguration");
         Map<String, String> additionalParameters = (Map<String, String>) arguments.get("additionalParameters");
-        allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
+        int connectionTypeIndex = (int) arguments.get("connectionType");
+        connectionType = ConnectionType.values()[connectionTypeIndex];
         return new AuthorizationTokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, serviceConfigurationParameters, additionalParameters, loginHint, promptValues);
     }
 
@@ -215,7 +227,8 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         final ArrayList<String> scopes = (ArrayList<String>) arguments.get("scopes");
         Map<String, String> serviceConfigurationParameters = (Map<String, String>) arguments.get("serviceConfiguration");
         Map<String, String> additionalParameters = (Map<String, String>) arguments.get("additionalParameters");
-        allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
+        int connectionTypeIndex = (int) arguments.get("connectionType");
+        connectionType = ConnectionType.values()[connectionTypeIndex];
         return new TokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, refreshToken, authorizationCode, codeVerifier, grantType, serviceConfigurationParameters, additionalParameters);
     }
 
@@ -236,12 +249,11 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                 }
             };
             if (tokenRequestParameters.discoveryUrl != null) {
-                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), callback, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
+                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), callback, selectConnectionBuilder(connectionType));
             } else {
                 AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(tokenRequestParameters.issuer), callback);
             }
         }
-
     }
 
     private AuthorizationServiceConfiguration requestParametersToServiceConfiguration(TokenRequestParameters tokenRequestParameters) {
@@ -265,10 +277,8 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                             finishWithDiscoveryError(ex);
                         }
                     }
-                }, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
-
+                }, selectConnectionBuilder(connectionType));
             } else {
-
                 AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(tokenRequestParameters.issuer), new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
                     @Override
                     public void onFetchConfigurationCompleted(@Nullable AuthorizationServiceConfiguration serviceConfiguration, @Nullable AuthorizationException ex) {
@@ -282,7 +292,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             }
         }
     }
-
 
     private void performAuthorization(AuthorizationServiceConfiguration serviceConfiguration, String clientId, String redirectUrl, ArrayList<String> scopes, String loginHint, Map<String, String> additionalParameters, boolean exchangeCode, ArrayList<String> promptValues) {
         AuthorizationRequest.Builder authRequestBuilder =
@@ -308,7 +317,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         }
 
 
-        AuthorizationService authorizationService = allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
+        AuthorizationService authorizationService = selectAuthorizationService(connectionType);
         Intent authIntent = authorizationService.getAuthorizationRequestIntent(authRequestBuilder.build());
         mainActivity.startActivityForResult(authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
     }
@@ -346,7 +355,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         };
 
         TokenRequest tokenRequest = builder.build();
-        AuthorizationService authorizationService = allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
+        AuthorizationService authorizationService = selectAuthorizationService(connectionType);
         if (clientSecret == null) {
             authorizationService.performTokenRequest(tokenRequest, tokenResponseCallback);
         } else {
@@ -358,7 +367,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private void finishWithTokenError(AuthorizationException ex) {
         finishWithError(TOKEN_ERROR_CODE, String.format(TOKEN_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription));
     }
-
 
     private void finishWithSuccess(Object data) {
         if (pendingOperation != null) {
@@ -378,7 +386,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         finishWithError(DISCOVERY_ERROR_CODE, String.format(DISCOVERY_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription));
     }
 
-
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (pendingOperation == null) {
@@ -397,9 +404,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         if (authException == null) {
             if (exchangeCode) {
                 AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-                if (allowInsecureConnections) {
-                    authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
-                }
+                authConfigBuilder.setConnectionBuilder(selectConnectionBuilder(connectionType));
 
                 AuthorizationService authService = new AuthorizationService(applicationContext, authConfigBuilder.build());
                 AuthorizationService.TokenResponseCallback tokenResponseCallback = new AuthorizationService.TokenResponseCallback() {
@@ -459,7 +464,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         }
     }
 
-
     private class TokenRequestParameters {
         final String clientId;
         final String issuer;
@@ -499,5 +503,23 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         }
     }
 
-}
+    private AuthorizationService selectAuthorizationService(ConnectionType connectionType) {
+        if (connectionType == ConnectionType.INSECURE) {
+            return insecureAuthorizationService;
+        } else if (connectionType == ConnectionType.UNTRUSTED) {
+            return untrustedAuthorizationService;
+        } else {
+            return defaultAuthorizationService;
+        }
+    }
 
+    private ConnectionBuilder selectConnectionBuilder(ConnectionType connectionType) {
+        if (connectionType == ConnectionType.INSECURE) {
+            return InsecureConnectionBuilder.INSTANCE;
+        } else if (connectionType == ConnectionType.UNTRUSTED) {
+            return UntrustedSSLCertificateConnectionBuilder.INSTANCE;
+        } else {
+            return DefaultConnectionBuilder.INSTANCE;
+        }
+    }
+}
