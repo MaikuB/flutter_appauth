@@ -381,6 +381,9 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (intent == null) {
+            return false;
+        }        
         if (pendingOperation == null) {
             return false;
         }
