@@ -293,7 +293,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                         clientId,
                         ResponseTypeValues.CODE,
                         Uri.parse(redirectUrl));
-        if (scopes != null && !scopes.isEmpty()) {     
+        if (scopes != null && !scopes.isEmpty()) {
             authRequestBuilder.setScopes(scopes);
         }
 
@@ -506,3 +506,4 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     }
 
 }
+
