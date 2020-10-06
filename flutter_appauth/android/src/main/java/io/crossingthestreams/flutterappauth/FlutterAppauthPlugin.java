@@ -159,7 +159,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         switch (call.method) {
             case AUTHORIZE_AND_EXCHANGE_CODE_METHOD:
                 try {
-                    System.out.println(arguments);
                     checkAndSetPendingOperation(call.method, result);
                     handleAuthorizeMethodCall(arguments, true);
                 } catch(Exception ex) {
