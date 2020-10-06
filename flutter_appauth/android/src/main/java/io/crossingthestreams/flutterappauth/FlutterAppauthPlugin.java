@@ -48,10 +48,12 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private static final String AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE = "authorize_and_exchange_code_failed";
     private static final String AUTHORIZE_ERROR_CODE = "authorize_failed";
     private static final String TOKEN_ERROR_CODE = "token_failed";
+    private static final String NULL_INTENT_ERROR_CODE = "null_intent";
 
     private static final String DISCOVERY_ERROR_MESSAGE_FORMAT = "Error retrieving discovery document: [error: %s, description: %s]";
     private static final String TOKEN_ERROR_MESSAGE_FORMAT = "Failed to get token: [error: %s, description: %s]";
     private static final String AUTHORIZE_ERROR_MESSAGE_FORMAT = "Failed to authorize: [error: %s, description: %s]";
+    private static final String NULL_INTENT_ERROR_FORMAT = "Failed to authorize: Null intent received";
 
     private final int RC_AUTH_EXCHANGE_CODE = 65030;
     private final int RC_AUTH = 65031;
@@ -291,7 +293,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                         clientId,
                         ResponseTypeValues.CODE,
                         Uri.parse(redirectUrl));
-        if (scopes != null && !scopes.isEmpty()) {
+        if (scopes != null && !scopes.isEmpty()) {     
             authRequestBuilder.setScopes(scopes);
         }
 
@@ -382,6 +384,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (intent == null) {
+            finishWithError(NULL_INTENT_ERROR_CODE, NULL_INTENT_ERROR_FORMAT);
             return false;
         }        
         if (pendingOperation == null) {
@@ -503,4 +506,3 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     }
 
 }
-
