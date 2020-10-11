@@ -383,17 +383,17 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (intent == null) {
-            finishWithError(NULL_INTENT_ERROR_CODE, NULL_INTENT_ERROR_FORMAT);
-            return false;
-        }        
         if (pendingOperation == null) {
             return false;
         }
         if (requestCode == RC_AUTH_EXCHANGE_CODE || requestCode == RC_AUTH) {
-            final AuthorizationResponse authResponse = AuthorizationResponse.fromIntent(intent);
-            AuthorizationException ex = AuthorizationException.fromIntent(intent);
-            processAuthorizationData(authResponse, ex, requestCode == RC_AUTH_EXCHANGE_CODE);
+            if (intent == null) {
+                finishWithError(NULL_INTENT_ERROR_CODE, NULL_INTENT_ERROR_FORMAT);
+            } else {
+                final AuthorizationResponse authResponse = AuthorizationResponse.fromIntent(intent);
+                AuthorizationException ex = AuthorizationException.fromIntent(intent);
+                processAuthorizationData(authResponse, ex, requestCode == RC_AUTH_EXCHANGE_CODE);
+            }
             return true;
         }
         return false;
