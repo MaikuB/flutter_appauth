@@ -1,3 +1,7 @@
+## 0.9.2+6
+
+* [Android] community has reported that there seem to be instances where the plugin encounters a null intent on some devices upon processing a authorisation request. This resulted in a crash before but will now throw a `PlatformException`. Thanks to the PR from [Leon Havenga](https://github.com/li0nza)
+
 ## 0.9.2+5
 
 * Updated the Android setup section in the readme to include information for apps targeting Android 11 (API 30) or newer
