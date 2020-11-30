@@ -5,14 +5,14 @@
 
 A Flutter bridge for AppAuth (https://appauth.io) used authenticating and authorizing users. Note that AppAuth also supports the PKCE extension that is required some providers so this plugin should work with them.
 
-Provider tutorials:
-
-* [Auth0](https://auth0.com/blog/get-started-with-flutter-authentication/)
-* [FusionAuth](https://fusionauth.io/blog/2020/11/23/securing-flutter-oauth/)
-
 **IMPORTANT NOTES**:
 - This plugin requires apps to be using AndroidX. The Flutter tooling supports creating apps with AndroidX support but requires passing the `androidx` flag. Details on AndroidX compatibility and migration can be found [here](https://flutter.dev/docs/development/packages-and-plugins/androidx-compatibility)
 - If Chrome Custom Tabs are not working in your Android app, check to make sure that you have the latest version of this plugin, Android Studio, Gradle distribution and Android Gradle plugin for your app. There was previously a known [issue](https://issuetracker.google.com/issues/119183822) with the Android tooling with AndroidX that should now be resolved since Android Studio 3.4 has been released
+
+## Tutorials from identity providers
+
+* [Auth0](https://auth0.com/blog/get-started-with-flutter-authentication/)
+* [FusionAuth](https://fusionauth.io/blog/2020/11/23/securing-flutter-oauth/)
 
 
 ## Getting Started
