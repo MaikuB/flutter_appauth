@@ -1,5 +1,6 @@
 import 'authorization_service_configuration.dart';
 import 'common_request_details.dart';
+import 'connection_type.dart';
 
 /// Details for a token exchange request.
 class TokenRequest with CommonRequestDetails {
@@ -16,7 +17,7 @@ class TokenRequest with CommonRequestDetails {
     String discoveryUrl,
     this.authorizationCode,
     this.codeVerifier,
-    bool allowInsecureConnections = false,
+    ConnectionType connectionType = ConnectionType.secure,
   }) : assert(
             issuer != null ||
                 discoveryUrl != null ||
@@ -30,7 +31,7 @@ class TokenRequest with CommonRequestDetails {
     this.additionalParameters = additionalParameters;
     this.issuer = issuer;
     this.discoveryUrl = discoveryUrl;
-    this.allowInsecureConnections = allowInsecureConnections;
+    this.connectionType = connectionType.index;
   }
 
   /// The client secret.

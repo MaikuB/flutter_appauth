@@ -16,7 +16,7 @@ Map<String, Object> _convertCommonRequestDetailsToMap(
     'scopes': commonRequestDetails.scopes,
     'serviceConfiguration': commonRequestDetails.serviceConfiguration?.toMap(),
     'additionalParameters': commonRequestDetails.additionalParameters,
-    'allowInsecureConnections': commonRequestDetails.allowInsecureConnections,
+    'connectionType': commonRequestDetails.connectionType,
   };
 }
 

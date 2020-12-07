@@ -22,8 +22,10 @@ class CommonRequestDetails {
   /// Additional parameters to include in the request.
   Map<String, String> additionalParameters;
 
-  /// Whether to allow non-HTTPS endpoints.
+  /// The connection type of the connection. Use ConnectionType.secure for HTTPS, ConnectionType.insecure for HTTP
+  /// or ConnectionType.untrusted for HTTPS with untrusted certificates (for example, when using self-signed
+  /// certificates for dev purposes)
   ///
   /// This property is only applicable to Android.
-  bool allowInsecureConnections;
+  int connectionType;
 }

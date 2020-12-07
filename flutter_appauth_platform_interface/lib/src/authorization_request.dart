@@ -1,6 +1,7 @@
 import 'authorization_parameters.dart';
 import 'authorization_service_configuration.dart';
 import 'common_request_details.dart';
+import 'connection_type.dart';
 
 /// The details of an authorization request to get an authorization code.
 class AuthorizationRequest extends CommonRequestDetails
@@ -15,7 +16,7 @@ class AuthorizationRequest extends CommonRequestDetails
     String issuer,
     String discoveryUrl,
     List<String> promptValues,
-    bool allowInsecureConnections = false,
+    ConnectionType connectionType = ConnectionType.secure,
     bool preferEphemeralSession = false,
   }) {
     this.clientId = clientId;
@@ -27,7 +28,7 @@ class AuthorizationRequest extends CommonRequestDetails
     this.discoveryUrl = discoveryUrl;
     this.loginHint = loginHint;
     this.promptValues = promptValues;
-    this.allowInsecureConnections = allowInsecureConnections;
+    this.connectionType = connectionType.index;
     this.preferEphemeralSession = preferEphemeralSession;
   }
 }
