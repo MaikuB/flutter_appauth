@@ -7,13 +7,13 @@ class TokenRequest with CommonRequestDetails {
     String clientId,
     String redirectUrl, {
     this.clientSecret,
-    List<String> scopes,
-    AuthorizationServiceConfiguration serviceConfiguration,
-    Map<String, String> additionalParameters,
+    List<String>? scopes,
+    AuthorizationServiceConfiguration? serviceConfiguration,
+    Map<String, String>? additionalParameters,
     this.refreshToken,
     this.grantType,
-    String issuer,
-    String discoveryUrl,
+    String? issuer,
+    String? discoveryUrl,
     this.authorizationCode,
     this.codeVerifier,
     bool allowInsecureConnections = false,
@@ -34,19 +34,19 @@ class TokenRequest with CommonRequestDetails {
   }
 
   /// The client secret.
-  final String clientSecret;
+  final String? clientSecret;
 
   /// The refresh token.
-  final String refreshToken;
+  final String? refreshToken;
 
   /// The grant type.
   ///
   /// If this is not specified then it will be inferred based on if [refreshToken] or [authorizationCode] has been specified.
-  final String grantType;
+  final String? grantType;
 
   /// The authorization code.
-  final String authorizationCode;
+  final String? authorizationCode;
 
   /// The code verifier to be sent with the authorization code. This should match the code verifier used when performing the authorization request
-  final String codeVerifier;
+  final String? codeVerifier;
 }
