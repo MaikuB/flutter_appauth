@@ -44,7 +44,7 @@ class _MyAppState extends State<MyApp> {
   ];
 
   final AuthorizationServiceConfiguration _serviceConfiguration =
-      AuthorizationServiceConfiguration(
+      const AuthorizationServiceConfiguration(
           'https://demo.identityserver.io/connect/authorize',
           'https://demo.identityserver.io/connect/token');
 
@@ -67,22 +67,22 @@ class _MyAppState extends State<MyApp> {
                 visible: _isBusy,
                 child: const LinearProgressIndicator(),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: const Text('Sign in with no code exchange'),
                 onPressed: _signInWithNoCodeExchange,
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: const Text('Exchange code'),
                 onPressed: _authorizationCode != null ? _exchangeCode : null,
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: const Text('Sign in with auto code exchange'),
                 onPressed: () => _signInWithAutoCodeExchange(),
               ),
               if (Platform.isIOS)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: RaisedButton(
+                  child: ElevatedButton(
                     child: const Text(
                       'Sign in with auto code exchange using ephemeral session (iOS only)',
                       textAlign: TextAlign.center,
@@ -91,7 +91,7 @@ class _MyAppState extends State<MyApp> {
                         preferEphemeralSession: true),
                   ),
                 ),
-              RaisedButton(
+              ElevatedButton(
                 child: const Text('Refresh token'),
                 onPressed: _refreshToken != null ? _refresh : null,
               ),
