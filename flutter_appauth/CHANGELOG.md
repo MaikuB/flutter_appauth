@@ -1,3 +1,7 @@
+## 1.0.0-nullsafety.0
+
+* Migrated to null safety
+
 ## 0.9.2+6
 
 * [Android] community has reported that there seem to be instances where the plugin encounters a null intent on some devices upon processing a authorisation request. This resulted in a crash before but will now throw a `PlatformException`. Thanks to the PR from [Leon Havenga](https://github.com/li0nza)
