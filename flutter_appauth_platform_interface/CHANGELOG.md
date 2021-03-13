@@ -1,3 +1,7 @@
+## [3.0.0-nullsafety.3]
+
+* Updated `plugin_platform_interface` version requirement
+
 ## [3.0.0-nullsafety.2]
 
 * `clientId` and `redirectUrl` are now non-nullable
