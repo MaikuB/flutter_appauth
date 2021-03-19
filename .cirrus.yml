@@ -1,7 +1,7 @@
 task:
   name: Run platform interface tests
   container:
-    image: cirrusci/flutter:beta
+    image: cirrusci/flutter:stable
   pub_cache:
     folder: ~/.pub-cache
   build_script:
@@ -10,7 +10,7 @@ task:
 task:
   name: Build Android example
   container:
-    image: cirrusci/flutter:beta
+    image: cirrusci/flutter:stable
   pub_cache:
     folder: ~/.pub-cache
   build_script:
@@ -24,7 +24,5 @@ task:
   pub_cache:
     folder: ~/.pub-cache
   build_script:
-    - flutter channel beta
-    - flutter upgrade
     - cd flutter_appauth/example
     - flutter build ios --no-codesign
