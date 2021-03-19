@@ -1,16 +1,4 @@
-## [3.0.0-nullsafety.3]
-
-* Updated `plugin_platform_interface` version requirement
-
-## [3.0.0-nullsafety.2]
-
-* `clientId` and `redirectUrl` are now non-nullable
-
-## [3.0.0-nullsafety.1]
-
-* Updated constraints for `plugin_platform_interface` dependency
-
-## [3.0.0-nullsafety.0]
+## [3.0.0]
 
 * Migrated to null safety
 * `AuthorizationServiceConfiguration` and `AuthorizationResponse` now have `const` constructors
