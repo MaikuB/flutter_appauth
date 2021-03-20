@@ -10,24 +10,24 @@ class TokenResponse {
   );
 
   /// The access token returned by the authorization server.
-  final String accessToken;
+  final String? accessToken;
 
   /// The refresh token returned by the authorization server.
-  final String refreshToken;
+  final String? refreshToken;
 
   /// Indicates when [accessToken] will expire.
   ///
   /// To ensure applications have continue to use valid access tokens, they
   /// will generally use the refresh token to get a new access token
   /// before it expires.
-  final DateTime accessTokenExpirationDateTime;
+  final DateTime? accessTokenExpirationDateTime;
 
   /// The id token returned by the authorization server.
-  final String idToken;
+  final String? idToken;
 
   /// The type of token returned by the authorization server.
-  final String tokenType;
+  final String? tokenType;
 
   /// Contains additional parameters returned by the authorization server from making the token request.
-  final Map<String, dynamic> tokenAdditionalParameters;
+  final Map<String, dynamic>? tokenAdditionalParameters;
 }
