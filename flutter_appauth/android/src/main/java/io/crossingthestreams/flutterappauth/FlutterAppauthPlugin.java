@@ -16,6 +16,8 @@ import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenRequest;
 import net.openid.appauth.TokenResponse;
 
+import net.openid.appauth.connectivity.DefaultConnectionBuilder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +34,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.flutter.view.FlutterNativeView;
 
 /**
  * FlutterAppauthPlugin
@@ -45,10 +48,12 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private static final String AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE = "authorize_and_exchange_code_failed";
     private static final String AUTHORIZE_ERROR_CODE = "authorize_failed";
     private static final String TOKEN_ERROR_CODE = "token_failed";
+    private static final String NULL_INTENT_ERROR_CODE = "null_intent";
 
     private static final String DISCOVERY_ERROR_MESSAGE_FORMAT = "Error retrieving discovery document: [error: %s, description: %s]";
     private static final String TOKEN_ERROR_MESSAGE_FORMAT = "Failed to get token: [error: %s, description: %s]";
     private static final String AUTHORIZE_ERROR_MESSAGE_FORMAT = "Failed to authorize: [error: %s, description: %s]";
+    private static final String NULL_INTENT_ERROR_FORMAT = "Failed to authorize: Null intent received";
 
     private final int RC_AUTH_EXCHANGE_CODE = 65030;
     private final int RC_AUTH = 65031;
@@ -57,6 +62,8 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private PendingOperation pendingOperation;
     private String clientSecret;
     private boolean allowInsecureConnections;
+    private AuthorizationService defaultAuthorizationService;
+    private AuthorizationService insecureAuthorizationService;
 
     /**
      * Plugin registration.
@@ -66,7 +73,16 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         plugin.setActivity(registrar.activity());
         plugin.onAttachedToEngine(registrar.context(), registrar.messenger());
         registrar.addActivityResultListener(plugin);
+        registrar.addViewDestroyListener(
+                new PluginRegistry.ViewDestroyListener() {
+                    @Override
+                    public boolean onViewDestroy(FlutterNativeView view) {
+                        plugin.disposeAuthorizationServices();
+                        return false;
+                    }
+                });
     }
+
 
     private void setActivity(Activity flutterActivity) {
         this.mainActivity = flutterActivity;
@@ -74,6 +90,10 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
     private void onAttachedToEngine(Context context, BinaryMessenger binaryMessenger) {
         this.applicationContext = context;
+        defaultAuthorizationService = new AuthorizationService(this.applicationContext);
+        AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
+        authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
+        insecureAuthorizationService = new AuthorizationService(applicationContext, authConfigBuilder.build());
         final MethodChannel channel = new MethodChannel(binaryMessenger, "crossingthestreams.io/flutter_appauth");
         channel.setMethodCallHandler(this);
     }
@@ -85,6 +105,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
     @Override
     public void onDetachedFromEngine(FlutterPluginBinding binding) {
+        disposeAuthorizationServices();
     }
 
     @Override
@@ -107,6 +128,13 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     @Override
     public void onDetachedFromActivity() {
         this.mainActivity = null;
+    }
+
+    private void disposeAuthorizationServices() {
+        defaultAuthorizationService.dispose();
+        insecureAuthorizationService.dispose();
+        defaultAuthorizationService = null;
+        insecureAuthorizationService = null;
     }
 
     private void checkAndSetPendingOperation(String method, Result result) {
@@ -210,10 +238,9 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                 }
             };
             if (tokenRequestParameters.discoveryUrl != null) {
-                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), callback);
+                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), callback, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
             } else {
                 AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(tokenRequestParameters.issuer), callback);
-
             }
         }
 
@@ -240,7 +267,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                             finishWithDiscoveryError(ex);
                         }
                     }
-                });
+                }, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
 
             } else {
 
@@ -282,13 +309,9 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             authRequestBuilder.setAdditionalParameters(additionalParameters);
         }
 
-        AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-        if (allowInsecureConnections) {
-            authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
-        }
 
-        AuthorizationService authService = new AuthorizationService(applicationContext, authConfigBuilder.build());
-        Intent authIntent = authService.getAuthorizationRequestIntent(authRequestBuilder.build());
+        AuthorizationService authorizationService = allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
+        Intent authIntent = authorizationService.getAuthorizationRequestIntent(authRequestBuilder.build());
         mainActivity.startActivityForResult(authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
     }
 
@@ -310,12 +333,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             builder.setAdditionalParameters(tokenRequestParameters.additionalParameters);
         }
 
-        AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-        if (allowInsecureConnections) {
-            authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
-        }
 
-        AuthorizationService authService = new AuthorizationService(applicationContext, authConfigBuilder.build());
         AuthorizationService.TokenResponseCallback tokenResponseCallback = new AuthorizationService.TokenResponseCallback() {
             @Override
             public void onTokenRequestCompleted(
@@ -330,10 +348,11 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         };
 
         TokenRequest tokenRequest = builder.build();
+        AuthorizationService authorizationService = allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
         if (clientSecret == null) {
-            authService.performTokenRequest(tokenRequest, tokenResponseCallback);
+            authorizationService.performTokenRequest(tokenRequest, tokenResponseCallback);
         } else {
-            authService.performTokenRequest(tokenRequest, new ClientSecretBasic(clientSecret), tokenResponseCallback);
+            authorizationService.performTokenRequest(tokenRequest, new ClientSecretBasic(clientSecret), tokenResponseCallback);
         }
 
     }
@@ -368,9 +387,13 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             return false;
         }
         if (requestCode == RC_AUTH_EXCHANGE_CODE || requestCode == RC_AUTH) {
-            final AuthorizationResponse authResponse = AuthorizationResponse.fromIntent(intent);
-            AuthorizationException ex = AuthorizationException.fromIntent(intent);
-            processAuthorizationData(authResponse, ex, requestCode == RC_AUTH_EXCHANGE_CODE);
+            if (intent == null) {
+                finishWithError(NULL_INTENT_ERROR_CODE, NULL_INTENT_ERROR_FORMAT);
+            } else {
+                final AuthorizationResponse authResponse = AuthorizationResponse.fromIntent(intent);
+                AuthorizationException ex = AuthorizationException.fromIntent(intent);
+                processAuthorizationData(authResponse, ex, requestCode == RC_AUTH_EXCHANGE_CODE);
+            }
             return true;
         }
         return false;
@@ -431,8 +454,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         responseMap.put("authorizationAdditionalParameters", authResponse.additionalParameters);
         return responseMap;
     }
-
-
 
     private class PendingOperation {
         final String method;

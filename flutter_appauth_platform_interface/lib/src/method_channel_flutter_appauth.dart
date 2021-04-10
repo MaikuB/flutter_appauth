@@ -15,8 +15,8 @@ const MethodChannel _channel =
 
 class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
   @override
-  Future<AuthorizationResponse> authorize(AuthorizationRequest request) async {
-    final Map<dynamic, dynamic> result =
+  Future<AuthorizationResponse?> authorize(AuthorizationRequest request) async {
+    final Map<dynamic, dynamic>? result =
         await _channel.invokeMethod('authorize', request.toMap());
     if (result == null) {
       return null;
@@ -28,9 +28,9 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
   }
 
   @override
-  Future<AuthorizationTokenResponse> authorizeAndExchangeCode(
+  Future<AuthorizationTokenResponse?> authorizeAndExchangeCode(
       AuthorizationTokenRequest request) async {
-    final Map<dynamic, dynamic> result = await _channel.invokeMethod(
+    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
         'authorizeAndExchangeCode', request.toMap());
     if (result == null) {
       return null;
@@ -49,8 +49,8 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
   }
 
   @override
-  Future<TokenResponse> token(TokenRequest request) async {
-    final Map<dynamic, dynamic> result =
+  Future<TokenResponse?> token(TokenRequest request) async {
+    final Map<dynamic, dynamic>? result =
         await _channel.invokeMethod('token', request.toMap());
     if (result == null) {
       return null;

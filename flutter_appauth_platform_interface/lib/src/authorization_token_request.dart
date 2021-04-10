@@ -9,14 +9,14 @@ class AuthorizationTokenRequest extends TokenRequest
   AuthorizationTokenRequest(
     String clientId,
     String redirectUrl, {
-    String loginHint,
-    String clientSecret,
-    List<String> scopes,
-    AuthorizationServiceConfiguration serviceConfiguration,
-    Map<String, String> additionalParameters,
-    String issuer,
-    String discoveryUrl,
-    List<String> promptValues,
+    String? loginHint,
+    String? clientSecret,
+    List<String>? scopes,
+    AuthorizationServiceConfiguration? serviceConfiguration,
+    Map<String, String>? additionalParameters,
+    String? issuer,
+    String? discoveryUrl,
+    List<String>? promptValues,
     bool allowInsecureConnections = false,
     bool preferEphemeralSession = false,
   }) : super(

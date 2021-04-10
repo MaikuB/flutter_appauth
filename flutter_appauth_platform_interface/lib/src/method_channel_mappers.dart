@@ -7,9 +7,9 @@ import 'end_session_request.dart';
 import 'grant_types.dart';
 import 'token_request.dart';
 
-Map<String, Object> _convertCommonRequestDetailsToMap(
+Map<String, Object?> _convertCommonRequestDetailsToMap(
     CommonRequestDetails commonRequestDetails) {
-  return <String, Object>{
+  return <String, Object?>{
     'clientId': commonRequestDetails.clientId,
     'issuer': commonRequestDetails.issuer,
     'discoveryUrl': commonRequestDetails.discoveryUrl,
@@ -32,6 +32,8 @@ extension EndSessionRequestMapper on EndSessionRequest {
 
 extension AuthorizationRequestMapper on AuthorizationRequest {
   Map<String, Object> toMap() {
+extension AuthorizationRequestParameters on AuthorizationRequest {
+  Map<String, Object?> toMap() {
     return _convertAuthorizationParametersToMap(this)
       ..addAll(_convertCommonRequestDetailsToMap(this));
   }
@@ -48,20 +50,20 @@ extension AuthorizationServiceConfigurationMapper
 }
 
 extension TokenRequestMapper on TokenRequest {
-  Map<String, Object> toMap() {
+  Map<String, Object?> toMap() {
     return _convertTokenRequestToMap(this);
   }
 }
 
 extension AuthorizationTokenRequestMapper on AuthorizationTokenRequest {
-  Map<String, Object> toMap() {
+  Map<String, Object?> toMap() {
     return _convertTokenRequestToMap(this)
       ..addAll(_convertAuthorizationParametersToMap(this));
   }
 }
 
-Map<String, Object> _convertTokenRequestToMap(TokenRequest tokenRequest) {
-  return <String, Object>{
+Map<String, Object?> _convertTokenRequestToMap(TokenRequest tokenRequest) {
+  return <String, Object?>{
     'clientSecret': tokenRequest.clientSecret,
     'refreshToken': tokenRequest.refreshToken,
     'authorizationCode': tokenRequest.authorizationCode,
@@ -70,7 +72,7 @@ Map<String, Object> _convertTokenRequestToMap(TokenRequest tokenRequest) {
   }..addAll(_convertCommonRequestDetailsToMap(tokenRequest));
 }
 
-String _inferGrantType(TokenRequest tokenRequest) {
+String? _inferGrantType(TokenRequest tokenRequest) {
   if (tokenRequest.grantType != null) {
     return tokenRequest.grantType;
   }
@@ -85,9 +87,9 @@ String _inferGrantType(TokenRequest tokenRequest) {
       null, 'grantType', 'Grant type not specified and cannot be inferred');
 }
 
-Map<String, Object> _convertAuthorizationParametersToMap(
+Map<String, Object?> _convertAuthorizationParametersToMap(
     AuthorizationParameters authorizationParameters) {
-  return <String, Object>{
+  return <String, Object?>{
     'loginHint': authorizationParameters.loginHint,
     'promptValues': authorizationParameters.promptValues,
     'preferEphemeralSession': authorizationParameters.preferEphemeralSession,
