@@ -102,7 +102,7 @@ class _MyAppState extends State<MyApp> {
                 onPressed: _idToken != null
                     ? () async {
                         _appAuth.endSession(
-                            EndSessionRequest(_idToken, _redirectUrl));
+                            EndSessionRequest(_idToken!, _redirectUrl));
                       }
                     : null,
               ),
@@ -240,9 +240,9 @@ class _MyAppState extends State<MyApp> {
 
   void _processAuthTokenResponse(AuthorizationTokenResponse response) {
     setState(() {
-      _accessToken = _accessTokenTextController.text = response.accessToken;
-      _idToken = _idTokenTextController.text = response.idToken;
-      _refreshToken = _refreshTokenTextController.text = response.refreshToken;
+      _accessToken = _accessTokenTextController.text = response.accessToken!;
+      _idToken = _idTokenTextController.text = response.idToken!;
+      _refreshToken = _refreshTokenTextController.text = response.refreshToken!;
       _accessTokenExpirationTextController.text =
           response.accessTokenExpirationDateTime!.toIso8601String();
     });
@@ -260,9 +260,9 @@ class _MyAppState extends State<MyApp> {
 
   void _processTokenResponse(TokenResponse? response) {
     setState(() {
-      _accessToken = _accessTokenTextController.text = response.accessToken;
-      _idToken = _idTokenTextController.text = response.idToken;
-      _refreshToken = _refreshTokenTextController.text = response.refreshToken;
+      _accessToken = _accessTokenTextController.text = response!.accessToken!;
+      _idToken = _idTokenTextController.text = response.idToken!;
+      _refreshToken = _refreshTokenTextController.text = response.refreshToken!;
       _accessTokenExpirationTextController.text =
           response.accessTokenExpirationDateTime!.toIso8601String();
     });

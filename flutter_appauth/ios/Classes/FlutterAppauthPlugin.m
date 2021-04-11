@@ -264,7 +264,16 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
 
 -(void)handleEndSessionMethodCall:(NSDictionary*)arguments result:(FlutterResult)result {
     OIDServiceConfiguration *serviceConfiguration = [[OIDServiceConfiguration alloc] initWithAuthorizationEndpoint:[NSURL URLWithString:@"https://demo.identityserver.io/connect/authorize"] tokenEndpoint:[NSURL URLWithString:@"https://demo.identityserver.io/connect/token"] issuer:nil registrationEndpoint:nil endSessionEndpoint:[NSURL URLWithString:@"https://demo.identityserver.io/connect/endsession"]];
+    
+
     OIDEndSessionRequest *endSessionRequest = [[OIDEndSessionRequest alloc] initWithConfiguration:serviceConfiguration idTokenHint:arguments[@"idTokenHint"] postLogoutRedirectURL:[NSURL URLWithString:arguments[@"postLogoutRedirectUrl"]] additionalParameters:nil];
+
+    if(!_externalUserAgent) {
+        UIViewController *rootViewController =
+        [UIApplication sharedApplication].delegate.window.rootViewController;
+        _externalUserAgent = [self userAgentWithViewController:rootViewController useEphemeralSession:false];
+    }
+    
     [OIDAuthorizationService presentEndSessionRequest:endSessionRequest externalUserAgent:_externalUserAgent callback:^(OIDEndSessionResponse * _Nullable endSessionResponse, NSError * _Nullable error) {
         NSLog(@"%@", [error localizedDescription]);
         result(nil);

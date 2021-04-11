@@ -30,8 +30,6 @@ extension EndSessionRequestMapper on EndSessionRequest {
   }
 }
 
-extension AuthorizationRequestMapper on AuthorizationRequest {
-  Map<String, Object> toMap() {
 extension AuthorizationRequestParameters on AuthorizationRequest {
   Map<String, Object?> toMap() {
     return _convertAuthorizationParametersToMap(this)
