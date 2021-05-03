@@ -7,6 +7,7 @@ import 'authorization_token_response.dart';
 import 'end_session_request.dart';
 import 'end_session_response.dart';
 import 'flutter_appauth_platform.dart';
+import 'method_channel_mappers.dart';
 import 'token_request.dart';
 import 'token_response.dart';
 

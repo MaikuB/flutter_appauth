@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_appauth/flutter_appauth.dart';
@@ -28,7 +29,8 @@ class _MyAppState extends State<MyApp> {
       TextEditingController();
   String _userInfo = '';
 
-  final String _clientId = 'native.code';
+  // For a list of client IDs, go to https://demo.identityserver.io
+  final String _clientId = 'interactive.public';
   final String _redirectUrl = 'io.identityserver.demo:/oauthredirect';
   final String _issuer = 'https://demo.identityserver.io';
   final String _discoveryUrl =
@@ -51,29 +53,6 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
-  Future<void> _refresh() async {
-    setBusyState();
-    final TokenResponse result = await _appAuth.token(TokenRequest(
-        _clientId, _redirectUrl,
-        refreshToken: _refreshToken,
-        discoveryUrl: _discoveryUrl,
-        scopes: _scopes));
-    _processTokenResponse(result);
-    await _testApi(result);
-  }
-
-  Future<void> _exchangeCode() async {
-    setBusyState();
-    final TokenResponse result = await _appAuth.token(TokenRequest(
-        _clientId, _redirectUrl,
-        authorizationCode: _authorizationCode,
-        discoveryUrl: _discoveryUrl,
-        codeVerifier: _codeVerifier,
-        scopes: _scopes));
-    _processTokenResponse(result);
-    await _testApi(result);
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -90,29 +69,7 @@ class _MyAppState extends State<MyApp> {
               ),
               RaisedButton(
                 child: const Text('Sign in with no code exchange'),
-                onPressed: () async {
-                  setBusyState();
-                  // use the discovery endpoint to find the configuration
-                  final AuthorizationResponse result = await _appAuth.authorize(
-                    AuthorizationRequest(_clientId, _redirectUrl,
-                        discoveryUrl: _discoveryUrl,
-                        scopes: _scopes,
-                        loginHint: 'bob'),
-                  );
-
-                  // or just use the issuer
-                  // var result = await _appAuth.authorize(
-                  //   AuthorizationRequest(
-                  //     _clientId,
-                  //     _redirectUrl,
-                  //     issuer: _issuer,
-                  //     scopes: _scopes,
-                  //   ),
-                  // );
-                  if (result != null) {
-                    _processAuthResponse(result);
-                  }
-                },
+                onPressed: _signInWithNoCodeExchange,
               ),
               RaisedButton(
                 child: const Text('Exchange code'),
@@ -120,31 +77,20 @@ class _MyAppState extends State<MyApp> {
               ),
               RaisedButton(
                 child: const Text('Sign in with auto code exchange'),
-                onPressed: () async {
-                  setBusyState();
-
-                  // show that we can also explicitly specify the endpoints rather than getting from the details from the discovery document
-                  final AuthorizationTokenResponse result =
-                      await _appAuth.authorizeAndExchangeCode(
-                    AuthorizationTokenRequest(_clientId, _redirectUrl,
-                        serviceConfiguration: _serviceConfiguration,
-                        scopes: _scopes),
-                  );
-
-                  // this code block demonstrates passing in values for the prompt parameter. in this case it prompts the user login even if they have already signed in. the list of supported values depends on the identity provider
-                  // final AuthorizationTokenResponse result = await _appAuth.authorizeAndExchangeCode(
-                  //   AuthorizationTokenRequest(_clientId, _redirectUrl,
-                  //       serviceConfiguration: _serviceConfiguration,
-                  //       scopes: _scopes,
-                  //       promptValues: ['login']),
-                  // );
-
-                  if (result != null) {
-                    _processAuthTokenResponse(result);
-                    await _testApi(result);
-                  }
-                },
+                onPressed: () => _signInWithAutoCodeExchange(),
               ),
+              if (Platform.isIOS)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: RaisedButton(
+                    child: const Text(
+                      'Sign in with auto code exchange using ephemeral session (iOS only)',
+                      textAlign: TextAlign.center,
+                    ),
+                    onPressed: () => _signInWithAutoCodeExchange(
+                        preferEphemeralSession: true),
+                  ),
+                ),
               RaisedButton(
                 child: const Text('Refresh token'),
                 onPressed: _refreshToken != null ? _refresh : null,
@@ -178,7 +124,104 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void setBusyState() {
+  Future<void> _refresh() async {
+    try {
+      _setBusyState();
+      final TokenResponse result = await _appAuth.token(TokenRequest(
+          _clientId, _redirectUrl,
+          refreshToken: _refreshToken,
+          discoveryUrl: _discoveryUrl,
+          scopes: _scopes));
+      _processTokenResponse(result);
+      await _testApi(result);
+    } catch (_) {
+      _clearBusyState();
+    }
+  }
+
+  Future<void> _exchangeCode() async {
+    try {
+      _setBusyState();
+      final TokenResponse result = await _appAuth.token(TokenRequest(
+          _clientId, _redirectUrl,
+          authorizationCode: _authorizationCode,
+          discoveryUrl: _discoveryUrl,
+          codeVerifier: _codeVerifier,
+          scopes: _scopes));
+      _processTokenResponse(result);
+      await _testApi(result);
+    } catch (_) {
+      _clearBusyState();
+    }
+  }
+
+  Future<void> _signInWithNoCodeExchange() async {
+    try {
+      _setBusyState();
+      // use the discovery endpoint to find the configuration
+      final AuthorizationResponse result = await _appAuth.authorize(
+        AuthorizationRequest(_clientId, _redirectUrl,
+            discoveryUrl: _discoveryUrl, scopes: _scopes, loginHint: 'bob'),
+      );
+
+      // or just use the issuer
+      // var result = await _appAuth.authorize(
+      //   AuthorizationRequest(
+      //     _clientId,
+      //     _redirectUrl,
+      //     issuer: _issuer,
+      //     scopes: _scopes,
+      //   ),
+      // );
+      if (result != null) {
+        _processAuthResponse(result);
+      }
+    } catch (_) {
+      _clearBusyState();
+    }
+  }
+
+  Future<void> _signInWithAutoCodeExchange(
+      {bool preferEphemeralSession = false}) async {
+    try {
+      _setBusyState();
+
+      // show that we can also explicitly specify the endpoints rather than getting from the details from the discovery document
+      final AuthorizationTokenResponse result =
+          await _appAuth.authorizeAndExchangeCode(
+        AuthorizationTokenRequest(
+          _clientId,
+          _redirectUrl,
+          serviceConfiguration: _serviceConfiguration,
+          scopes: _scopes,
+          preferEphemeralSession: preferEphemeralSession,
+        ),
+      );
+
+      // this code block demonstrates passing in values for the prompt parameter. in this case it prompts the user login even if they have already signed in. the list of supported values depends on the identity provider
+      // final AuthorizationTokenResponse result = await _appAuth.authorizeAndExchangeCode(
+      //   AuthorizationTokenRequest(_clientId, _redirectUrl,
+      //       serviceConfiguration: _serviceConfiguration,
+      //       scopes: _scopes,
+      //       promptValues: ['login']),
+      // );
+
+      if (result != null) {
+        _processAuthTokenResponse(result);
+        await _testApi(result);
+      }
+    } catch (_) {
+      _clearBusyState();
+    }
+  }
+
+  void _clearBusyState() {
+    setState(() {
+      _isBusy = false;
+    });
+  }
+
+  void _setBusyState() {
     setState(() {
       _isBusy = true;
     });

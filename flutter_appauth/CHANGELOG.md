@@ -1,3 +1,56 @@
+## 0.9.2+6
+
+* [Android] community has reported that there seem to be instances where the plugin encounters a null intent on some devices upon processing a authorisation request. This resulted in a crash before but will now throw a `PlatformException`. Thanks to the PR from [Leon Havenga](https://github.com/li0nza)
+
+## 0.9.2+5
+
+* Updated the Android setup section in the readme to include information for apps targeting Android 11 (API 30) or newer
+* [Android] bumped compile SDK version for the plugin to 30
+* Updated example app to use compile and target SDK version 30
+
+## 0.9.2+4
+
+* [Android] fix issue [131](https://github.com/MaikuB/flutter_appauth/issues/131) where setting the `allowInsecureConnections` flag to true whilst doing an authorisation or token request didn't behave as expected. Thanks to the PR from [Hongxu Xu](https://github.com/xuhongxu96)
+
+## 0.9.2+3
+
+* [Android] fix issue [79](https://github.com/MaikuB/flutter_appauth/issues/79) where an authorisation request could cause the UI to momentarily hang due to AppAuth trying to warm up the browser
+
+## 0.9.2+2
+
+* Updated example app to use a new client id that works with the demo IdentityServer instance
+
+## 0.9.2+1
+
+* Updated readme to add a link to Auth0 blog post and mention that the value assigned to `appAuthRedirectScheme` within the Android application's `build.gradle` file should be all in lowercase
+
+## 0.9.2
+
+* [iOS] Fixes release build issue about including a non-modular header that came about from release 0.9.1+1. If you experienced issues with 0.9.1+1 (in my experience only occurs if your iOS app uses Swift), please update to 0.9.2
+
+## 0.9.1+1
+
+* Fixes warnings picked up in Xcode raised in issue [123](https://github.com/MaikuB/flutter_appauth/issues/123)
+
+## 0.9.1
+
+* [iOS] Update AppAuth SDK dependency to 1.3.1
+
+## 0.9.0
+
+* Bumped dependency on `flutter_appauth_platform_interface`
+* [iOS] The `preferEphemeralSession` property has been added to the `AuthorizationRequest` and `AuthorizationTokenRequest` classes. This enables authorization requests to be done a in private session that won't share cookies and other data with the user's regular browser. This property only works when run on iOS versions 13 and above. Thanks to the PR from [Matthew Smith](https://github.com/matthewtsmith)
+* **BREAKING CHANGE** bumping the `flutter_appauth_platform_interface` dependency includes the removal of the `toMap` method from all classes. These methods were used internally by plugin and thus have been removed
+* **BREAKING CHANGE** Bumped Gradle plugin to 3.6.3
+
+## 0.8.3
+
+* [Android] Fixed an issue where a `NullPointerException` could occur when too many operations are started at one time. Thanks to the PR from [Josh Burton](https://github.com/athornz)
+
+## 0.8.2
+
+* [Android] Fixed issue [98](https://github.com/MaikuB/flutter_appauth/issues/98) where certain exceptions on Android could prevent the plugin from being able to perform more operations
+
 ## 0.8.1
 
 * Bump dependency on `flutter_appauth_platform_interface` to take in fix for casting error that could apply upon calling `token()` method

@@ -9,6 +9,11 @@ A Flutter bridge for AppAuth (https://appauth.io) used authenticating and author
 - This plugin requires apps to be using AndroidX. The Flutter tooling supports creating apps with AndroidX support but requires passing the `androidx` flag. Details on AndroidX compatibility and migration can be found [here](https://flutter.dev/docs/development/packages-and-plugins/androidx-compatibility)
 - If Chrome Custom Tabs are not working in your Android app, check to make sure that you have the latest version of this plugin, Android Studio, Gradle distribution and Android Gradle plugin for your app. There was previously a known [issue](https://issuetracker.google.com/issues/119183822) with the Android tooling with AndroidX that should now be resolved since Android Studio 3.4 has been released
 
+## Tutorials from identity providers
+
+* [Auth0](https://auth0.com/blog/get-started-with-flutter-authentication/)
+* [FusionAuth](https://fusionauth.io/blog/2020/11/23/securing-flutter-oauth/)
+
 
 ## Getting Started
 
@@ -100,6 +105,26 @@ android {
         ]
     }
 }
+```
+
+Please ensure that value of `<your_custom_scheme>` is all in lowercase as there've been reports from the community who had issues with redirects if there were any capital letters.
+
+If your app is target API 30 or above (i.e. Android 11 or newer), make sure to add the following to your `AndroidManifest.xml` file a level underneath the `<manifest>` element
+
+
+```xml
+<queries>
+    <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="https" />
+    </intent>
+    <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.APP_BROWSER" />
+        <data android:scheme="https" />
+    </intent>
+</queries>
 ```
 
 ## iOS setup
