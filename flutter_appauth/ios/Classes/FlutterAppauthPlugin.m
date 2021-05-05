@@ -73,19 +73,17 @@
 @interface EndSessionRequestParameters: NSObject
 @property(nonatomic, strong) NSString *issuer;
 @property(nonatomic, strong) NSString *idTokenHint;
-@property(nonatomic, strong) NSString *redirectUrl;
+@property(nonatomic, strong) NSString *postLogoutRedirectURL;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSString *discoveryUrl;
-@property(nonatomic, readwrite) BOOL preferEphemeralSession;
-
 @end
 
 @implementation EndSessionRequestParameters
 - (id)initWithArguments:(NSDictionary *)arguments {
     _issuer = [ArgumentProcessor processArgumentValue:arguments withKey:@"issuer"];
     _idTokenHint = [ArgumentProcessor processArgumentValue:arguments withKey:@"idTokenHint"];
-    _redirectUrl = [ArgumentProcessor processArgumentValue:arguments withKey:@"redirectUrl"];
+    _postLogoutRedirectURL = [ArgumentProcessor processArgumentValue:arguments withKey:@"postLogoutRedirectURL"];
     _additionalParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"additionalParameters"];
     _serviceConfigurationParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"serviceConfiguration"];
     _discoveryUrl = [ArgumentProcessor processArgumentValue:arguments withKey:@"discoveryUrl"];
@@ -151,7 +149,7 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
          registrationEndpoint: nil
          endSessionEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"endSessionEndpoint"]]];
 
-        [self performLogout:serviceConfiguration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters result:result];
+        [self performLogout:serviceConfiguration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:requestParameters.postLogoutRedirectURL additionalParameters:requestParameters.additionalParameters result:result];
     } else if (requestParameters.discoveryUrl) {
         NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
         
@@ -164,7 +162,7 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
                                                                         return;
                                                                     }
                                                                     
-                                                                    [self performLogout:configuration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters result:result];
+                                                                    [self performLogout:configuration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:requestParameters.postLogoutRedirectURL additionalParameters:requestParameters.additionalParameters result:result];
                                                                 }];
     } else {
         NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -177,7 +175,7 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
                                                                         return;
                                                                     }
                                                                     
-                                                                    [self performLogout:configuration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters result:result];
+                                                                    [self performLogout:configuration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:requestParameters.postLogoutRedirectURL additionalParameters:requestParameters.additionalParameters result:result];
                                                                 }];
     }
 
@@ -294,7 +292,7 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
     UIViewController *rootViewController =
     [UIApplication sharedApplication].delegate.window.rootViewController;
 
-    NSObject<OIDExternalUserAgent> *agent = [self userAgentWithViewController:rootViewController];
+    NSObject<OIDExternalUserAgent> *agent = [self userAgentWithViewController:rootViewController useEphemeralSession:false];
     
     _currentAuthorizationFlow = [OIDAuthorizationService presentEndSessionRequest:request externalUserAgent:agent callback:^(OIDEndSessionResponse *_Nullable endSessionResponse, NSError *_Nullable error) {
             if(endSessionResponse) {
