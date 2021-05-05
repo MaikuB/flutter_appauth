@@ -24,5 +24,7 @@ task:
   pub_cache:
     folder: ~/.pub-cache
   build_script:
+    - flutter channel stable
+    - flutter upgrade
     - cd flutter_appauth/example
     - flutter build ios --no-codesign

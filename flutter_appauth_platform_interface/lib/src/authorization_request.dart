@@ -8,13 +8,13 @@ class AuthorizationRequest extends CommonRequestDetails
   AuthorizationRequest(
     String clientId,
     String redirectUrl, {
-    String loginHint,
-    List<String> scopes,
-    AuthorizationServiceConfiguration serviceConfiguration,
-    Map<String, String> additionalParameters,
-    String issuer,
-    String discoveryUrl,
-    List<String> promptValues,
+    String? loginHint,
+    List<String>? scopes,
+    AuthorizationServiceConfiguration? serviceConfiguration,
+    Map<String, String>? additionalParameters,
+    String? issuer,
+    String? discoveryUrl,
+    List<String>? promptValues,
     bool allowInsecureConnections = false,
     bool preferEphemeralSession = false,
   }) {

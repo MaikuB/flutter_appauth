@@ -1,10 +1,9 @@
 class AuthorizationServiceConfiguration {
-  AuthorizationServiceConfiguration(
+  const AuthorizationServiceConfiguration(
     this.authorizationEndpoint,
     this.tokenEndpoint, [
     this.endSessionEndpoint,
-  ]) : assert(tokenEndpoint != null && authorizationEndpoint != null,
-            'Must specify both the authorization and token endpoints');
+  ]);
 
   final String authorizationEndpoint;
 

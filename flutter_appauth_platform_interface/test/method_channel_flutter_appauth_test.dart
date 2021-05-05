@@ -27,7 +27,7 @@ void main() {
     expect(
       log,
       <Matcher>[
-        isMethodCall('authorize', arguments: <String, Object>{
+        isMethodCall('authorize', arguments: <String, Object?>{
           'clientId': 'someClientId',
           'issuer': null,
           'redirectUrl': 'someRedirectUrl',
@@ -51,7 +51,7 @@ void main() {
     expect(
       log,
       <Matcher>[
-        isMethodCall('authorizeAndExchangeCode', arguments: <String, Object>{
+        isMethodCall('authorizeAndExchangeCode', arguments: <String, Object?>{
           'clientId': 'someClientId',
           'issuer': null,
           'redirectUrl': 'someRedirectUrl',
@@ -114,7 +114,7 @@ void main() {
       expect(
         log,
         <Matcher>[
-          isMethodCall('token', arguments: <String, Object>{
+          isMethodCall('token', arguments: <String, Object?>{
             'clientId': 'someClientId',
             'issuer': null,
             'redirectUrl': 'someRedirectUrl',
@@ -143,7 +143,7 @@ void main() {
       expect(
         log,
         <Matcher>[
-          isMethodCall('token', arguments: <String, Object>{
+          isMethodCall('token', arguments: <String, Object?>{
             'clientId': 'someClientId',
             'issuer': null,
             'redirectUrl': 'someRedirectUrl',
@@ -168,7 +168,7 @@ void main() {
       expect(
         log,
         <Matcher>[
-          isMethodCall('token', arguments: <String, Object>{
+          isMethodCall('token', arguments: <String, Object?>{
             'clientId': 'someClientId',
             'issuer': null,
             'redirectUrl': 'someRedirectUrl',
