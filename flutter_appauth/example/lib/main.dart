@@ -1,7 +1,8 @@
 import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_appauth/flutter_appauth.dart';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(MyApp());
 
@@ -46,7 +47,8 @@ class _MyAppState extends State<MyApp> {
   final AuthorizationServiceConfiguration _serviceConfiguration =
       AuthorizationServiceConfiguration(
           'https://demo.identityserver.io/connect/authorize',
-          'https://demo.identityserver.io/connect/token');
+          'https://demo.identityserver.io/connect/token',
+          'https://demo.identityserver.io/connect/endsession');
 
   @override
   void initState() {

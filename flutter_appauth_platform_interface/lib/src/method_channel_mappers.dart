@@ -3,6 +3,7 @@ import 'authorization_request.dart';
 import 'authorization_service_configuration.dart';
 import 'authorization_token_request.dart';
 import 'common_request_details.dart';
+import 'end_session_request.dart';
 import 'grant_types.dart';
 import 'token_request.dart';
 
@@ -33,6 +34,7 @@ extension AuthorizationServiceConfigurationMapper
     return <String, Object>{
       'tokenEndpoint': tokenEndpoint,
       'authorizationEndpoint': authorizationEndpoint,
+      'endSessionEndpoint': endSessionEndpoint,
     };
   }
 }
@@ -82,4 +84,13 @@ Map<String, Object> _convertAuthorizationParametersToMap(
     'promptValues': authorizationParameters.promptValues,
     'preferEphemeralSession': authorizationParameters.preferEphemeralSession,
   };
+}
+
+extension EndSessionRequestMapper on EndSessionRequest {
+  Map<String, Object> toMap() {
+    return <String, Object>{
+      'idTokenHint': this.idTokenHint,
+      'postLogoutRedirectURL': this.postLogoutRedirectURL,
+    }..addAll(_convertCommonRequestDetailsToMap(this));
+  }
 }

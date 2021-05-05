@@ -77,6 +77,8 @@
 @property(nonatomic, strong) NSDictionary *additionalParameters;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSString *discoveryUrl;
+@property(nonatomic, readwrite) BOOL preferEphemeralSession;
+
 @end
 
 @implementation EndSessionRequestParameters
@@ -240,22 +242,6 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
     UIViewController *rootViewController =
     [UIApplication sharedApplication].delegate.window.rootViewController;
 
-    // Will use AppAuth-iOS defaults
-    // OIDExternalUserAgentIOS *externalUserAgent =
-    // [[OIDExternalUserAgentIOS alloc] initWithPresentingViewController:rootViewController];
-
-    // Will use SFSafariViewController for all supported iOS versions
-    OIDExternalUserAgentIOSSafariViewController *externalUserAgent =
-    [[OIDExternalUserAgentIOSSafariViewController alloc] initWithPresentingViewController:rootViewController];
-
-    // Uncomment to test using ASWebAuthenticationSession with prefersEphemeralWebBrowserSession = true
-    // Remarks : SSO will not work in iOS 13. In iOS 12 it will be SSO enbabled and will still ask for user permissions.
-    // Behavior : Will use ASWebAuthenticationSession with prefersEphemeralWebBrowserSession = true only for iOS 13, however it will not display the prompt asking the user for persmissions.
-    // For more infos :  https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio?language=objc
-
-    //OIDExternalUserAgentIOSEphemeral *externalUserAgent =
-    //[[OIDExternalUserAgentIOSEphemeral alloc] initWithPresentingViewController:rootViewController];
-
     if(exchangeCode) {
         NSObject<OIDExternalUserAgent> *agent = [self userAgentWithViewController:rootViewController useEphemeralSession:preferEphemeralSession];
         
@@ -289,11 +275,16 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
         return [[OIDExternalUserAgentIOSNoSSO alloc]
                 initWithPresentingViewController:rootViewController];
     }
-    return [[OIDExternalUserAgentIOS alloc]
+    
+    // This is using SFSafariViewController instead of the default ASWebAuthenticationSession
+    // ASWebAuthenticationSession shows a prompt at login and logout
+    //    return [[OIDExternalUserAgentIOS alloc]
+    //            initWithPresentingViewController:rootViewController];
+    return [[OIDExternalUserAgentIOSSafariViewController alloc]
             initWithPresentingViewController:rootViewController];
 }
   
-- (void)performLogout:(OIDServiceConfiguration *)serviceConfiguration idTokenHint:(NSString*)idTokenHint postLogoutRedirectURL:(NSString*)postLogoutRedirectURL additionalParameters:(NSDictionary *)additionalParameters result:(FlutterResult)result{
+- (void)performLogout:(OIDServiceConfiguration *)serviceConfiguration idTokenHint:(NSString*)idTokenHint postLogoutRedirectURL:(NSString*)postLogoutRedirectURL additionalParameters:(NSDictionary *)additionalParameters result:(FlutterResult)result {
     OIDEndSessionRequest *request =
     [[OIDEndSessionRequest alloc] initWithConfiguration:serviceConfiguration
                                                   idTokenHint:idTokenHint
@@ -301,27 +292,11 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
                                       additionalParameters:additionalParameters];
 
     UIViewController *rootViewController =
-    [UIApplication sharedApplication].delegate.window.rootViewController;     
+    [UIApplication sharedApplication].delegate.window.rootViewController;
 
-    // Will use AppAuth-iOS defaults
-    // OIDExternalUserAgentIOS *externalUserAgent =
-    // [[OIDExternalUserAgentIOS alloc] initWithPresentingViewController:rootViewController];
-
-
-    // Will use SFSafariViewController for all supported iOS versions
-    OIDExternalUserAgentIOSSafariViewController *externalUserAgent =
-    [[OIDExternalUserAgentIOSSafariViewController alloc] initWithPresentingViewController:rootViewController];
-
+    NSObject<OIDExternalUserAgent> *agent = [self userAgentWithViewController:rootViewController];
     
-    // Uncomment to test using ASWebAuthenticationSession with prefersEphemeralWebBrowserSession = true
-    // Remarks : SSO will not work in iOS 13. In iOS 12 it will be SSO enbabled and will still ask for user permissions.
-    // Behavior : Will use ASWebAuthenticationSession with prefersEphemeralWebBrowserSession = true only for iOS 13, however it will not display the prompt asking the user for persmissions.
-    // For more infos :  https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3237231-prefersephemeralwebbrowsersessio?language=objc
-
-    //OIDExternalUserAgentIOSEphemeral *externalUserAgent =
-    //[[OIDExternalUserAgentIOSEphemeral alloc] initWithPresentingViewController:rootViewController];
-    
-    _currentAuthorizationFlow = [OIDAuthorizationService presentEndSessionRequest:request externalUserAgent:externalUserAgent callback:^(OIDEndSessionResponse *_Nullable endSessionResponse, NSError *_Nullable error) {
+    _currentAuthorizationFlow = [OIDAuthorizationService presentEndSessionRequest:request externalUserAgent:agent callback:^(OIDEndSessionResponse *_Nullable endSessionResponse, NSError *_Nullable error) {
             if(endSessionResponse) {
                 NSMutableDictionary *processedResponse = [[NSMutableDictionary alloc] init];
                 [processedResponse setObject:endSessionResponse.additionalParameters forKey:@"endSessionAdditionalParameters"];

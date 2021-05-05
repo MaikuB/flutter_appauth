@@ -61,7 +61,7 @@ final AuthorizationTokenResponse result = await appAuth.authorizeAndExchangeCode
                     AuthorizationTokenRequest(
                       '<client_id>',
                       '<redirect_url>',
-                      serviceConfiguration: AuthorizationServiceConfiguration('<authorization_endpoint>', '<token_endpoint>'),
+                      serviceConfiguration: AuthorizationServiceConfiguration('<authorization_endpoint>', '<token_endpoint>', '<endsession_endpoint>'),
                       scopes: ['openid','profile', 'email', 'offline_access', 'api']
                     ),
                   );

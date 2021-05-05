@@ -1,8 +1,7 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_appauth_platform_interface/flutter_appauth_platform_interface.dart';
 import 'package:flutter_appauth_platform_interface/src/method_channel_flutter_appauth.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:flutter_appauth_platform_interface/flutter_appauth_platform_interface.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -12,6 +11,7 @@ void main() {
       MethodChannel('crossingthestreams.io/flutter_appauth');
   final List<MethodCall> log = <MethodCall>[];
   channel.setMockMethodCallHandler((MethodCall methodCall) async {
+    print(methodCall);
     log.add(methodCall);
   });
 
@@ -73,6 +73,33 @@ void main() {
     );
   });
 
+  test('endsession', () async {
+    await flutterAppAuth.endSession(EndSessionRequest(
+      'issuer',
+      'idTokenHint',
+      'someDiscoveryUrl',
+      'postLogoutRedirectURL',
+      null,
+    ));
+    expect(
+      log,
+      <Matcher>[
+        isMethodCall('endSession', arguments: <String, Object>{
+          'idTokenHint': 'idTokenHint',
+          'postLogoutRedirectURL': 'postLogoutRedirectURL',
+          'clientId': null,
+          'issuer': 'issuer',
+          'discoveryUrl': 'someDiscoveryUrl',
+          'redirectUrl': null,
+          'scopes': null,
+          'serviceConfiguration': null,
+          'additionalParameters': {},
+          'allowInsecureConnections': false
+        })
+      ],
+    );
+  });
+
   group('token', () {
     test('cannot infer grant type', () async {
       expect(
@@ -107,9 +134,12 @@ void main() {
     });
 
     test('infers authorization code grant type', () async {
-      await flutterAppAuth.token(TokenRequest('someClientId', 'someRedirectUrl',
-          discoveryUrl: 'someDiscoveryUrl',
-          authorizationCode: 'someAuthorizationCode'));
+      await flutterAppAuth.token(TokenRequest(
+        'someClientId',
+        'someRedirectUrl',
+        discoveryUrl: 'someDiscoveryUrl',
+        authorizationCode: 'someAuthorizationCode',
+      ));
       expect(
         log,
         <Matcher>[
