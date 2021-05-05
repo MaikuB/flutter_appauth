@@ -7,8 +7,8 @@ class EndSessionRequest with CommonRequestDetails {
     this.idTokenHint,
     String discoveryUrl,
     this.postLogoutRedirectURL,
-    AuthorizationServiceConfiguration serviceConfiguration, {
-    Map<String, String> additionalParameters = const {},
+    AuthorizationServiceConfiguration? serviceConfiguration, {
+    Map<String, String>? additionalParameters,
     bool allowInsecureConnections = false,
   }) {
     this.serviceConfiguration = serviceConfiguration;

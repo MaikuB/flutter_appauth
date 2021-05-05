@@ -87,8 +87,8 @@ Map<String, Object?> _convertAuthorizationParametersToMap(
 }
 
 extension EndSessionRequestMapper on EndSessionRequest {
-  Map<String, Object> toMap() {
-    return <String, Object>{
+  Map<String, Object?> toMap() {
+    return <String, Object?>{
       'idTokenHint': this.idTokenHint,
       'postLogoutRedirectURL': this.postLogoutRedirectURL,
     }..addAll(_convertCommonRequestDetailsToMap(this));

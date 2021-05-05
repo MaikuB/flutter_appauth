@@ -20,7 +20,7 @@ class FlutterAppAuth {
   }
 
   /// For logging out
-  Future<EndSessionResponse> endSession(EndSessionRequest request) {
+  Future<EndSessionResponse?> endSession(EndSessionRequest request) {
     if (Platform.isIOS) {
       return FlutterAppAuthPlatform.instance.endSession(request);
     } else {

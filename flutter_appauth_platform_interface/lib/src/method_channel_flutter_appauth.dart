@@ -69,8 +69,8 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
   }
 
   @override
-  Future<EndSessionResponse> endSession(EndSessionRequest request) async {
-    dynamic result = await _channel.invokeMethod('endSession', request.toMap());
+  Future<EndSessionResponse?> endSession(EndSessionRequest request) async {
+    final Map<dynamic, dynamic>? result = await _channel.invokeMethod('endSession', request.toMap());
     if (result == null) {
       return null;
     }

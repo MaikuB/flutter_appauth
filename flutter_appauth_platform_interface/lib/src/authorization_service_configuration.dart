@@ -2,7 +2,7 @@ class AuthorizationServiceConfiguration {
   const AuthorizationServiceConfiguration(
     this.authorizationEndpoint,
     this.tokenEndpoint, [
-    this.endSessionEndpoint,
+    this.endSessionEndpoint = '',
   ]);
 
   final String authorizationEndpoint;

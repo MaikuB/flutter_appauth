@@ -1,7 +1,6 @@
 #import "FlutterAppauthPlugin.h"
 #import "OIDExternalUserAgentIOSNoSSO.h"
 #import "OIDExternalUserAgentIOSSafariViewController.h"
-#import "OIDExternalUserAgentIOSEphemeral.h"
 
 @interface ArgumentProcessor : NSObject
 + (id _Nullable)processArgumentValue:(NSDictionary *)arguments withKey:(NSString *)key;

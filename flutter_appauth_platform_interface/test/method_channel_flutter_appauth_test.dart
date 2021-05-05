@@ -84,7 +84,7 @@ void main() {
     expect(
       log,
       <Matcher>[
-        isMethodCall('endSession', arguments: <String, Object>{
+        isMethodCall('endSession', arguments: <String, Object?>{
           'idTokenHint': 'idTokenHint',
           'postLogoutRedirectURL': 'postLogoutRedirectURL',
           'clientId': null,
