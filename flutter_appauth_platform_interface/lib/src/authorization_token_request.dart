@@ -6,6 +6,7 @@ import 'token_request.dart';
 /// Details required for a combined authorization and code exchange request
 class AuthorizationTokenRequest extends TokenRequest
     with AuthorizationParameters {
+
   AuthorizationTokenRequest(
     String clientId,
     String redirectUrl, {
@@ -19,6 +20,7 @@ class AuthorizationTokenRequest extends TokenRequest
     List<String>? promptValues,
     bool allowInsecureConnections = false,
     bool preferEphemeralSession = false,
+    bool plainCodeVerifierChallengeMethod = false, 
   }) : super(
           clientId,
           redirectUrl,
@@ -34,5 +36,6 @@ class AuthorizationTokenRequest extends TokenRequest
     this.loginHint = loginHint;
     this.promptValues = promptValues;
     this.preferEphemeralSession = preferEphemeralSession;
+    this.plainCodeVerifierChallengeMethod = plainCodeVerifierChallengeMethod;
   }
 }

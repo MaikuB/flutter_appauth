@@ -191,7 +191,8 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         Map<String, String> serviceConfigurationParameters = (Map<String, String>) arguments.get("serviceConfiguration");
         Map<String, String> additionalParameters = (Map<String, String>) arguments.get("additionalParameters");
         allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
-        return new AuthorizationTokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, serviceConfigurationParameters, additionalParameters, loginHint, promptValues);
+        final boolean plainCodeVerifierChallengeMethod = (boolean) arguments.get("plainCodeVerifierChallengeMethod");
+        return new AuthorizationTokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, serviceConfigurationParameters, additionalParameters, loginHint, promptValues, plainCodeVerifierChallengeMethod);
     }
 
     @SuppressWarnings("unchecked")
@@ -225,13 +226,13 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         final AuthorizationTokenRequestParameters tokenRequestParameters = processAuthorizationTokenRequestArguments(arguments);
         if (tokenRequestParameters.serviceConfigurationParameters != null) {
             AuthorizationServiceConfiguration serviceConfiguration = requestParametersToServiceConfiguration(tokenRequestParameters);
-            performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues);
+            performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues, tokenRequestParameters.plainCodeVerifierChallengeMethod);
         } else {
             AuthorizationServiceConfiguration.RetrieveConfigurationCallback callback = new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
                 @Override
                 public void onFetchConfigurationCompleted(@Nullable AuthorizationServiceConfiguration serviceConfiguration, @Nullable AuthorizationException ex) {
                     if (ex == null) {
-                        performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues);
+                        performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues, tokenRequestParameters.plainCodeVerifierChallengeMethod);
                     } else {
                         finishWithDiscoveryError(ex);
                     }
@@ -286,7 +287,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     }
 
 
-    private void performAuthorization(AuthorizationServiceConfiguration serviceConfiguration, String clientId, String redirectUrl, ArrayList<String> scopes, String loginHint, Map<String, String> additionalParameters, boolean exchangeCode, ArrayList<String> promptValues) {
+    private void performAuthorization(AuthorizationServiceConfiguration serviceConfiguration, String clientId, String redirectUrl, ArrayList<String> scopes, String loginHint, Map<String, String> additionalParameters, boolean exchangeCode, ArrayList<String> promptValues, boolean plainCodeVerifierChallengeMethod) {
         AuthorizationRequest.Builder authRequestBuilder =
                 new AuthorizationRequest.Builder(
                         serviceConfiguration,
@@ -309,6 +310,10 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             authRequestBuilder.setAdditionalParameters(additionalParameters);
         }
 
+        if (plainCodeVerifierChallengeMethod) {
+          String codeVerifier = CodeVerifierUtil.generateRandomCodeVerifier();
+          authRequestBuilder.setCodeVerifier(codeVerifier, codeVerifier, "plain");
+        }
 
         AuthorizationService authorizationService = allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
         Intent authIntent = authorizationService.getAuthorizationRequestIntent(authRequestBuilder.build());
@@ -497,11 +502,13 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private class AuthorizationTokenRequestParameters extends TokenRequestParameters {
         final String loginHint;
         final ArrayList<String> promptValues;
+        final boolean plainCodeVerifierChallengeMethod;
 
-        private AuthorizationTokenRequestParameters(String clientId, String issuer, String discoveryUrl, ArrayList<String> scopes, String redirectUrl, Map<String, String> serviceConfigurationParameters, Map<String, String> additionalParameters, String loginHint, ArrayList<String> promptValues) {
+        private AuthorizationTokenRequestParameters(String clientId, String issuer, String discoveryUrl, ArrayList<String> scopes, String redirectUrl, Map<String, String> serviceConfigurationParameters, Map<String, String> additionalParameters, String loginHint, ArrayList<String> promptValues, boolean plainCodeVerifierChallengeMethod) {
             super(clientId, issuer, discoveryUrl, scopes, redirectUrl, null, null, null, null, serviceConfigurationParameters, additionalParameters);
             this.loginHint = loginHint;
             this.promptValues = promptValues;
+            this.plainCodeVerifierChallengeMethod = plainCodeVerifierChallengeMethod;
         }
     }
 
