@@ -15,6 +15,7 @@ import net.openid.appauth.ClientSecretBasic;
 import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenRequest;
 import net.openid.appauth.TokenResponse;
+import net.openid.appauth.CodeVerifierUtil;
 
 import net.openid.appauth.connectivity.DefaultConnectionBuilder;
 
