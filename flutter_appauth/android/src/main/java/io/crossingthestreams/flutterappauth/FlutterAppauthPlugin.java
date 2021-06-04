@@ -33,8 +33,6 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
-import io.flutter.view.FlutterNativeView;
 
 /**
  * FlutterAppauthPlugin
@@ -65,10 +63,8 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private AuthorizationService defaultAuthorizationService;
     private AuthorizationService insecureAuthorizationService;
 
-    /**
-     * Plugin registration.
-     */
-    public static void registerWith(Registrar registrar) {
+    @SuppressWarnings("deprecation")
+    public static void registerWith(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
         final FlutterAppauthPlugin plugin = new FlutterAppauthPlugin();
         plugin.setActivity(registrar.activity());
         plugin.onAttachedToEngine(registrar.context(), registrar.messenger());
@@ -76,7 +72,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         registrar.addViewDestroyListener(
                 new PluginRegistry.ViewDestroyListener() {
                     @Override
-                    public boolean onViewDestroy(FlutterNativeView view) {
+                    public boolean onViewDestroy(io.flutter.view.FlutterNativeView view) {
                         plugin.disposeAuthorizationServices();
                         return false;
                     }
