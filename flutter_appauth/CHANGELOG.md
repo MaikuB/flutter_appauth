@@ -1,3 +1,7 @@
+## 1.0.0+1
+
+* There are no functional changes in this release. The only changes done were to suppress warnings that were occurring as a result of making use of Android v1 embedding APIs for backwards compatibility
+
 ## 1.0.0
 
 * Migrated to null safety
