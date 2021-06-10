@@ -1,5 +1,6 @@
 #import "FlutterAppauthPlugin.h"
 #import "OIDExternalUserAgentIOSNoSSO.h"
+#import "OIDExternalUserAgentIOSSafariViewController.h"
 
 @interface ArgumentProcessor : NSObject
 + (id _Nullable)processArgumentValue:(NSDictionary *)arguments withKey:(NSString *)key;
@@ -68,16 +69,39 @@
 }
 @end
 
+@interface EndSessionRequestParameters: NSObject
+@property(nonatomic, strong) NSString *issuer;
+@property(nonatomic, strong) NSString *idTokenHint;
+@property(nonatomic, strong) NSString *postLogoutRedirectURL;
+@property(nonatomic, strong) NSDictionary *additionalParameters;
+@property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
+@property(nonatomic, strong) NSString *discoveryUrl;
+@end
+
+@implementation EndSessionRequestParameters
+- (id)initWithArguments:(NSDictionary *)arguments {
+    _issuer = [ArgumentProcessor processArgumentValue:arguments withKey:@"issuer"];
+    _idTokenHint = [ArgumentProcessor processArgumentValue:arguments withKey:@"idTokenHint"];
+    _postLogoutRedirectURL = [ArgumentProcessor processArgumentValue:arguments withKey:@"postLogoutRedirectURL"];
+    _additionalParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"additionalParameters"];
+    _serviceConfigurationParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"serviceConfiguration"];
+    _discoveryUrl = [ArgumentProcessor processArgumentValue:arguments withKey:@"discoveryUrl"];
+    return self;
+}
+@end
+
 @implementation FlutterAppauthPlugin
 
 FlutterMethodChannel* channel;
 NSString *const AUTHORIZE_METHOD = @"authorize";
 NSString *const AUTHORIZE_AND_EXCHANGE_CODE_METHOD = @"authorizeAndExchangeCode";
 NSString *const TOKEN_METHOD = @"token";
+NSString *const END_SESSION_METHOD = @"endSession";
 NSString *const AUTHORIZE_ERROR_CODE = @"authorize_failed";
 NSString *const AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE = @"authorize_and_exchange_code_failed";
 NSString *const DISCOVERY_ERROR_CODE = @"discovery_failed";
 NSString *const TOKEN_ERROR_CODE = @"token_failed";
+NSString *const END_SESSION_ERROR_CODE = @"end_session_failed";
 NSString *const DISCOVERY_ERROR_MESSAGE_FORMAT = @"Error retrieving discovery document: %@";
 NSString *const TOKEN_ERROR_MESSAGE_FORMAT = @"Failed to get token: %@";
 NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
@@ -99,6 +123,8 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
         [self handleAuthorizeMethodCall:[call arguments] result:result exchangeCode:false];
     } else if([TOKEN_METHOD isEqualToString:call.method]) {
         [self handleTokenMethodCall:[call arguments] result:result];
+    } else if([END_SESSION_METHOD isEqualToString:call.method]) {
+        [self handleLogoutMethodCall:[call arguments] result:result];    
     } else {
         result(FlutterMethodNotImplemented);
     }
@@ -108,6 +134,50 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
     if(!requestParameters.additionalParameters) {
         requestParameters.additionalParameters = [[NSMutableDictionary alloc] init];
     }
+}
+
+-(void)handleLogoutMethodCall:(NSDictionary*)arguments result:(FlutterResult) result {
+
+    EndSessionRequestParameters *requestParameters = [[EndSessionRequestParameters alloc] initWithArguments:arguments];
+    if(requestParameters.serviceConfigurationParameters != nil) {
+        OIDServiceConfiguration *serviceConfiguration =
+        [[OIDServiceConfiguration alloc]
+         initWithAuthorizationEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"authorizationEndpoint"]]
+         tokenEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"tokenEndpoint"]]
+         issuer: nil
+         registrationEndpoint: nil
+         endSessionEndpoint:[NSURL URLWithString:requestParameters.serviceConfigurationParameters[@"endSessionEndpoint"]]];
+
+        [self performLogout:serviceConfiguration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:requestParameters.postLogoutRedirectURL additionalParameters:requestParameters.additionalParameters result:result];
+    } else if (requestParameters.discoveryUrl) {
+        NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
+        
+        [OIDAuthorizationService discoverServiceConfigurationForDiscoveryURL:discoveryUrl
+                                                                completion:^(OIDServiceConfiguration *_Nullable configuration,
+                                                                             NSError *_Nullable error) {
+                                                                    
+                                                                    if (!configuration) {
+                                                                        [self finishWithDiscoveryError:error result:result];
+                                                                        return;
+                                                                    }
+                                                                    
+                                                                    [self performLogout:configuration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:requestParameters.postLogoutRedirectURL additionalParameters:requestParameters.additionalParameters result:result];
+                                                                }];
+    } else {
+        NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
+        [OIDAuthorizationService discoverServiceConfigurationForIssuer:issuerUrl
+                                                                completion:^(OIDServiceConfiguration *_Nullable configuration,
+                                                                             NSError *_Nullable error) {
+                                                                            
+                                                                    if (!configuration) {
+                                                                        [self finishWithDiscoveryError:error result:result];
+                                                                        return;
+                                                                    }
+                                                                    
+                                                                    [self performLogout:configuration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:requestParameters.postLogoutRedirectURL additionalParameters:requestParameters.additionalParameters result:result];
+                                                                }];
+    }
+
 }
 
 -(void)handleAuthorizeMethodCall:(NSDictionary*)arguments result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode {
@@ -168,6 +238,7 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
                                       additionalParameters:additionalParameters];
     UIViewController *rootViewController =
     [UIApplication sharedApplication].delegate.window.rootViewController;
+
     if(exchangeCode) {
         NSObject<OIDExternalUserAgent> *agent = [self userAgentWithViewController:rootViewController useEphemeralSession:preferEphemeralSession];
         
@@ -201,8 +272,37 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
         return [[OIDExternalUserAgentIOSNoSSO alloc]
                 initWithPresentingViewController:rootViewController];
     }
-    return [[OIDExternalUserAgentIOS alloc]
+    
+    // This is using SFSafariViewController instead of the default ASWebAuthenticationSession
+    // ASWebAuthenticationSession shows a prompt at login and logout
+    //    return [[OIDExternalUserAgentIOS alloc]
+    //            initWithPresentingViewController:rootViewController];
+    return [[OIDExternalUserAgentIOSSafariViewController alloc]
             initWithPresentingViewController:rootViewController];
+}
+  
+- (void)performLogout:(OIDServiceConfiguration *)serviceConfiguration idTokenHint:(NSString*)idTokenHint postLogoutRedirectURL:(NSString*)postLogoutRedirectURL additionalParameters:(NSDictionary *)additionalParameters result:(FlutterResult)result {
+    OIDEndSessionRequest *request =
+    [[OIDEndSessionRequest alloc] initWithConfiguration:serviceConfiguration
+                                                  idTokenHint:idTokenHint
+                                               postLogoutRedirectURL:[NSURL URLWithString:postLogoutRedirectURL]
+                                      additionalParameters:additionalParameters];
+
+    UIViewController *rootViewController =
+    [UIApplication sharedApplication].delegate.window.rootViewController;
+
+    NSObject<OIDExternalUserAgent> *agent = [self userAgentWithViewController:rootViewController useEphemeralSession:false];
+    
+    _currentAuthorizationFlow = [OIDAuthorizationService presentEndSessionRequest:request externalUserAgent:agent callback:^(OIDEndSessionResponse *_Nullable endSessionResponse, NSError *_Nullable error) {
+            if(endSessionResponse) {
+                NSMutableDictionary *processedResponse = [[NSMutableDictionary alloc] init];
+                [processedResponse setObject:endSessionResponse.additionalParameters forKey:@"endSessionAdditionalParameters"];
+                [processedResponse setObject:endSessionResponse.state forKey:@"state"];
+                result(processedResponse);
+            } else {
+                [self finishWithError:END_SESSION_ERROR_CODE message:[self formatMessageWithError:END_SESSION_ERROR_CODE error:error] result:result];
+            }
+        }];                           
 }
 
 - (NSString *) formatMessageWithError:(NSString *)messageFormat error:(NSError * _Nullable)error {

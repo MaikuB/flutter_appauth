@@ -4,6 +4,8 @@ import 'authorization_request.dart';
 import 'authorization_response.dart';
 import 'authorization_token_request.dart';
 import 'authorization_token_response.dart';
+import 'end_session_request.dart';
+import 'end_session_response.dart';
 import 'flutter_appauth_platform.dart';
 import 'method_channel_mappers.dart';
 import 'token_request.dart';
@@ -64,5 +66,17 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
         result['idToken'],
         result['tokenType'],
         result['tokenAdditionalParameters']?.cast<String, dynamic>());
+  }
+
+  @override
+  Future<EndSessionResponse?> endSession(EndSessionRequest request) async {
+    final Map<dynamic, dynamic>? result = await _channel.invokeMethod('endSession', request.toMap());
+    if (result == null) {
+      return null;
+    }
+    return EndSessionResponse(
+      result['state'],
+      result['endSessionAdditionalParameters']?.cast<String, dynamic>(),
+    );
   }
 }

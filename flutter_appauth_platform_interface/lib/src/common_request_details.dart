@@ -2,7 +2,7 @@ import 'authorization_service_configuration.dart';
 
 class CommonRequestDetails {
   /// The client id.
-  late String clientId;
+  String? clientId;
 
   /// The issuer.
   String? issuer;
@@ -11,7 +11,7 @@ class CommonRequestDetails {
   String? discoveryUrl;
 
   /// The redirect URL.
-  late String redirectUrl;
+  String? redirectUrl;
 
   /// The request scopes.
   List<String>? scopes;
