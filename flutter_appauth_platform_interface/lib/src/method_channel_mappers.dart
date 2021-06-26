@@ -41,10 +41,11 @@ extension AuthorizationRequestParameters on AuthorizationRequest {
 
 extension AuthorizationServiceConfigurationMapper
     on AuthorizationServiceConfiguration {
-  Map<String, Object> toMap() {
-    return <String, Object>{
+  Map<String, Object?> toMap() {
+    return <String, Object?>{
       'tokenEndpoint': tokenEndpoint,
       'authorizationEndpoint': authorizationEndpoint,
+      'endSessionEndpoint': endSessionEndpoint,
     };
   }
 }
