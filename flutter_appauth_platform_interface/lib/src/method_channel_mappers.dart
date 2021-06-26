@@ -22,10 +22,12 @@ Map<String, Object?> _convertCommonRequestDetailsToMap(
 }
 
 extension EndSessionRequestMapper on EndSessionRequest {
-  Map<String, Object> toMap() {
-    return <String, Object>{
+  Map<String, Object?> toMap() {
+    return <String, Object?>{
       'idTokenHint': idTokenHint,
       'postLogoutRedirectUrl': postLogoutRedirectUrl,
+      'discoveryUrl': discoveryUrl,
+      'serviceConfiguration': serviceConfiguration?.toMap(),
     };
   }
 }

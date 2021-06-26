@@ -5,6 +5,7 @@ import 'authorization_response.dart';
 import 'authorization_token_request.dart';
 import 'authorization_token_response.dart';
 import 'end_session_request.dart';
+import 'end_session_response.dart';
 import 'method_channel_flutter_appauth.dart';
 import 'token_request.dart';
 import 'token_response.dart';
@@ -46,7 +47,7 @@ abstract class FlutterAppAuthPlatform extends PlatformInterface {
     throw UnimplementedError('token() has not been implemented');
   }
 
-  Future<void> endSession(EndSessionRequest request) {
+  Future<EndSessionResponse?> endSession(EndSessionRequest request) {
     throw UnimplementedError('endSession() has not been implemented');
   }
 }

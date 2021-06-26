@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_appauth_platform_interface/src/end_session_request.dart';
+import 'package:flutter_appauth_platform_interface/src/end_session_response.dart';
 
 import 'authorization_request.dart';
 import 'authorization_response.dart';
@@ -68,7 +69,12 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
   }
 
   @override
-  Future<void> endSession(EndSessionRequest request) async {
-    await _channel.invokeMethod('endSession', request.toMap());
+  Future<EndSessionResponse?> endSession(EndSessionRequest request) async {
+    final Map<dynamic, dynamic>? result =
+        await _channel.invokeMethod('endSession', request.toMap());
+    if (result == null) {
+      return null;
+    }
+    return EndSessionResponse(result['state']);
   }
 }
