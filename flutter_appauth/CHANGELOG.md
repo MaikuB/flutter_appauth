@@ -1,3 +1,8 @@
+## 2.0.0-dev.0
+
+* **Breaking change** `AuthorizationServiceConfiguration` constructor has changed to take named parameters
+* Added `endSession()` method, `EndSessionRequest` and `EndSessionResponse` classes to support end session requests
+
 ## 1.0.0+1
 
 * There are no functional changes in this release. The only changes done were to suppress warnings that were occurring as a result of making use of Android v1 embedding APIs for backwards compatibility
