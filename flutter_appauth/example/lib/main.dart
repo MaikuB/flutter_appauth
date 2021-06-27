@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
   final TextEditingController _idTokenTextController = TextEditingController();
   final TextEditingController _refreshTokenTextController =
       TextEditingController();
-  String _userInfo = '';
+  String? _userInfo;
 
   // For a list of client IDs, go to https://demo.identityserver.io
   final String _clientId = 'interactive.public';
@@ -37,6 +37,7 @@ class _MyAppState extends State<MyApp> {
   final String _issuer = 'https://demo.identityserver.io';
   final String _discoveryUrl =
       'https://demo.identityserver.io/.well-known/openid-configuration';
+  final String _postLogoutRedirectUrl = 'io.identityserver.demo:/';
   final List<String> _scopes = <String>[
     'openid',
     'profile',
@@ -47,13 +48,10 @@ class _MyAppState extends State<MyApp> {
 
   final AuthorizationServiceConfiguration _serviceConfiguration =
       const AuthorizationServiceConfiguration(
-          'https://demo.identityserver.io/connect/authorize',
-          'https://demo.identityserver.io/connect/token');
-
-  @override
-  void initState() {
-    super.initState();
-  }
+    authorizationEndpoint: 'https://demo.identityserver.io/connect/authorize',
+    tokenEndpoint: 'https://demo.identityserver.io/connect/token',
+    endSessionEndpoint: 'https://demo.identityserver.io/connect/endsession',
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -101,8 +99,7 @@ class _MyAppState extends State<MyApp> {
                 child: const Text('End session'),
                 onPressed: _idToken != null
                     ? () async {
-                        _appAuth.endSession(
-                            EndSessionRequest(_idToken!, _redirectUrl));
+                        await _endSession();
                       }
                     : null,
               ),
@@ -127,7 +124,7 @@ class _MyAppState extends State<MyApp> {
                 controller: _refreshTokenTextController,
               ),
               const Text('test api results'),
-              Text(_userInfo),
+              Text(_userInfo ?? ''),
             ],
           ),
         ),
@@ -135,14 +132,40 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  Future<void> _endSession() async {
+    try {
+      _setBusyState();
+      await _appAuth.endSession(EndSessionRequest(
+          idTokenHint: _idToken,
+          postLogoutRedirectUrl: _postLogoutRedirectUrl,
+          serviceConfiguration: _serviceConfiguration));
+      _clearSessionInfo();
+    } catch (_) {}
+    _clearBusyState();
+  }
+
+  void _clearSessionInfo() {
+    setState(() {
+      _codeVerifier = null;
+      _authorizationCode = null;
+      _authorizationCodeTextController.clear();
+      _accessToken = null;
+      _accessTokenTextController.clear();
+      _idToken = null;
+      _idTokenTextController.clear();
+      _refreshToken = null;
+      _refreshTokenTextController.clear();
+      _accessTokenExpirationTextController.clear();
+      _userInfo = null;
+    });
+  }
+
   Future<void> _refresh() async {
     try {
       _setBusyState();
       final TokenResponse? result = await _appAuth.token(TokenRequest(
-          _clientId, _redirectUrl,
-          refreshToken: _refreshToken,
-          discoveryUrl: _discoveryUrl,
-          scopes: _scopes));
+          _clientId, _postLogoutRedirectUrl,
+          refreshToken: _refreshToken, issuer: _issuer, scopes: _scopes));
       _processTokenResponse(result);
       await _testApi(result);
     } catch (_) {

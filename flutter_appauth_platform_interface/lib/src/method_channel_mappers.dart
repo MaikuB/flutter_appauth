@@ -26,6 +26,10 @@ extension EndSessionRequestMapper on EndSessionRequest {
     return <String, Object?>{
       'idTokenHint': idTokenHint,
       'postLogoutRedirectUrl': postLogoutRedirectUrl,
+      'state': state,
+      'allowInsecureConnections': allowInsecureConnections,
+      'additionalParameters': additionalParameters,
+      'issuer': issuer,
       'discoveryUrl': discoveryUrl,
       'serviceConfiguration': serviceConfiguration?.toMap(),
     };

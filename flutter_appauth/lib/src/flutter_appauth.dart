@@ -17,7 +17,7 @@ class FlutterAppAuth {
     return FlutterAppAuthPlatform.instance.token(request);
   }
 
-  Future<void> endSession(EndSessionRequest request) {
+  Future<EndSessionResponse?> endSession(EndSessionRequest request) {
     return FlutterAppAuthPlatform.instance.endSession(request);
   }
 }

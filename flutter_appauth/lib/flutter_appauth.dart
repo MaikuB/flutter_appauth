@@ -6,6 +6,7 @@ export 'package:flutter_appauth_platform_interface/flutter_appauth_platform_inte
         AuthorizationTokenRequest,
         AuthorizationTokenResponse,
         EndSessionRequest,
+        EndSessionResponse,
         GrantType,
         TokenRequest,
         TokenResponse;
