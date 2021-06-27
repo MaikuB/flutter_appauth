@@ -2,6 +2,7 @@
 
 * **Breaking change** `AuthorizationServiceConfiguration` constructor has changed to take named parameters
 * Added `endSession()` method, `EndSessionRequest` and `EndSessionResponse` classes to support end session requests
+* Bumped AppAuth Android and iOS SDK dependencies 
 
 ## 1.0.0+1
 
