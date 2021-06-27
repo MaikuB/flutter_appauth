@@ -161,6 +161,6 @@ Go to the `Info.plist` for your iOS app to specify the custom scheme so that the
 
 ## FAQs
 
-* **When connecting to Azure B2C or Azure AD, the login request redirects properly on Android but not on iOS. What's going on?**
+**When connecting to Azure B2C or Azure AD, the login request redirects properly on Android but not on iOS. What's going on?**
 
 The AppAuth iOS SDK has some logic to validate the redirect URL to see if it should be responsible for processing the redirect. This appears to be failing under certain circumstances. Adding a trailing slash to the redirect URL specified in your code has been reported to fix the issue.

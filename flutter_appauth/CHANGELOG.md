@@ -2,7 +2,8 @@
 
 * **Breaking change** `AuthorizationServiceConfiguration` constructor has changed to take named parameters
 * Added `endSession()` method, `EndSessionRequest` and `EndSessionResponse` classes to support end session requests
-* Bumped AppAuth Android and iOS SDK dependencies 
+* Bumped AppAuth Android and iOS SDK dependencies
+* Added FAQs section to readme to describe a common iOS issue with Azure B2C and Azure AD
 
 ## 1.0.0+1
 
