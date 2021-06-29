@@ -1,3 +1,7 @@
+## 2.0.0-dev.1
+
+* [iOS] Fixed a crash when passing an instance `AuthorizationServiceConfiguration` with a null `endSessionEndpoint`
+
 ## 2.0.0-dev.0
 
 * **Breaking change** `AuthorizationServiceConfiguration` constructor has changed to take named parameters

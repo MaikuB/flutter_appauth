@@ -244,11 +244,11 @@ NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end session: %@";
 
 
 - (OIDServiceConfiguration *)processServiceConfigurationParameters:(NSDictionary*)serviceConfigurationParameters {
-    NSString *endSessionEndpoint = serviceConfigurationParameters[@"endSessionEndpoint"];
+    NSURL *endSessionEndpoint = serviceConfigurationParameters[@"endSessionEndpoint"] == [NSNull null] ? nil : [NSURL URLWithString:serviceConfigurationParameters[@"endSessionEndpoint"]];
     OIDServiceConfiguration *serviceConfiguration =
     [[OIDServiceConfiguration alloc]
      initWithAuthorizationEndpoint:[NSURL URLWithString:serviceConfigurationParameters[@"authorizationEndpoint"]]
-     tokenEndpoint:[NSURL URLWithString:serviceConfigurationParameters[@"tokenEndpoint"]] issuer:nil registrationEndpoint:nil endSessionEndpoint:endSessionEndpoint ? [NSURL URLWithString:endSessionEndpoint] : nil];
+     tokenEndpoint:[NSURL URLWithString:serviceConfigurationParameters[@"tokenEndpoint"]] issuer:nil registrationEndpoint:nil endSessionEndpoint:endSessionEndpoint];
     return serviceConfiguration;
 }
 
@@ -331,6 +331,7 @@ NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end session: %@";
     }
     
     _currentAuthorizationFlow = [OIDAuthorizationService presentEndSessionRequest:endSessionRequest externalUserAgent:_externalUserAgent callback:^(OIDEndSessionResponse * _Nullable endSessionResponse, NSError * _Nullable error) {
+        self->_currentAuthorizationFlow = nil;
         if(!endSessionResponse) {
             NSString *message = [NSString stringWithFormat:END_SESSION_ERROR_MESSAGE_FORMAT, [error localizedDescription]];
             [self finishWithError:END_SESSION_ERROR_CODE message:message result:result];
