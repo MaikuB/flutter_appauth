@@ -1,3 +1,7 @@
+## [3.1.0]
+* Add responseMode as parameter
+* responseMode is part of AuthorizationTokenRequest constructor and has not to be added to additionalParameters map. Reason was a validation check on Android side on this map, which does not must include responseMode.
+
 ## [3.0.0]
 
 * Migrated to null safety
