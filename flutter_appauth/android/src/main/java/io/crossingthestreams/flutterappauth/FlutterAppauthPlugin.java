@@ -285,7 +285,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
 
     private void performAuthorization(AuthorizationServiceConfiguration serviceConfiguration, String clientId, String redirectUrl, ArrayList<String> scopes, String loginHint, Map<String, String> additionalParameters, boolean exchangeCode, ArrayList<String> promptValues, String responseMode) {
-        System.out.println("START");
         AuthorizationRequest.Builder authRequestBuilder =
                 new AuthorizationRequest.Builder(
                         serviceConfiguration,
@@ -304,7 +303,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             authRequestBuilder.setPromptValues(promptValues);
         }
 
-        System.out.println("responseMode: " + responseMode);
         if (responseMode != null) {
             authRequestBuilder.setResponseMode(responseMode);
         }
