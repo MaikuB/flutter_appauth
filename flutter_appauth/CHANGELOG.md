@@ -1,3 +1,6 @@
+## 1.1.0
+* Make use of responseMode inside FlutterAppauthPlugin for authorizeAndExchangeCode flow. Was needed otherwise an exception was thrown in the AuthorizationRequest.Builder when setting the responseMode via additionalParameters map.
+
 ## 1.0.0+1
 
 * There are no functional changes in this release. The only changes done were to suppress warnings that were occurring as a result of making use of Android v1 embedding APIs for backwards compatibility
