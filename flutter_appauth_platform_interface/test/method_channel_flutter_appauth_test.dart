@@ -23,7 +23,7 @@ void main() {
   test('authorize', () async {
     await flutterAppAuth.authorize(AuthorizationRequest(
         'someClientId', 'someRedirectUrl',
-        discoveryUrl: 'someDiscoveryUrl', loginHint: 'someLoginHint', responseMode: 'fragment'));
+        discoveryUrl: 'someDiscoveryUrl', loginHint: 'someLoginHint'));
     expect(
       log,
       <Matcher>[
@@ -39,7 +39,7 @@ void main() {
           'allowInsecureConnections': false,
           'preferEphemeralSession': false,
           'promptValues': null,
-          'responseMode': 'fragment'
+          'responseMode': null
         })
       ],
     );
