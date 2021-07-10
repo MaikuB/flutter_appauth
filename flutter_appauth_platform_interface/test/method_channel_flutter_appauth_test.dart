@@ -159,6 +159,26 @@ void main() {
       );
     });
   });
+
+  test('endSession', () async {
+    await flutterAppAuth.endSession(EndSessionRequest(
+        idTokenHint: 'someIdToken',
+        postLogoutRedirectUrl: 'somePostLogoutRedirectUrl',
+        state: 'someState',
+        discoveryUrl: 'someDiscoveryUrl'));
+    expect(log, <Matcher>[
+      isMethodCall('endSession', arguments: <String, Object?>{
+        'idTokenHint': 'someIdToken',
+        'postLogoutRedirectUrl': 'somePostLogoutRedirectUrl',
+        'state': 'someState',
+        'allowInsecureConnections': false,
+        'additionalParameters': null,
+        'issuer': null,
+        'discoveryUrl': 'someDiscoveryUrl',
+        'serviceConfiguration': null,
+      })
+    ]);
+  });
 }
 
 class FlutterAppAuthPlatformMock extends Mock

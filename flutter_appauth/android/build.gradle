@@ -34,5 +34,5 @@ android {
 }
 
 dependencies {
-    implementation 'net.openid:appauth:0.7.1'
+    implementation 'net.openid:appauth:0.9.0'
 }

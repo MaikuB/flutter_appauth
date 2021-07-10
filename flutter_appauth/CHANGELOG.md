@@ -1,3 +1,18 @@
+## 2.0.0-dev.2
+
+* Includes changes from 1.1.0
+
+## 2.0.0-dev.1
+
+* [iOS] Fixed a crash when passing an instance `AuthorizationServiceConfiguration` with a null `endSessionEndpoint`
+
+## 2.0.0-dev.0
+
+* **Breaking change** `AuthorizationServiceConfiguration` constructor has changed to take named parameters
+* Added `endSession()` method, `EndSessionRequest` and `EndSessionResponse` classes to support end session requests
+* Bumped AppAuth Android and iOS SDK dependencies
+* Added FAQs section to readme to describe a common iOS issue with Azure B2C and Azure AD
+
 ## 1.1.0
 
 * * Added the ability to specify the response mode for authorization requests. This can be done using the `responseMode` parameter  when constructing either an `AuthorizationRequest` or `AuthorizationTokenRequest`. This was done as the AppAuth Android SDK throws an exception when this was done via `additionalParameters`
