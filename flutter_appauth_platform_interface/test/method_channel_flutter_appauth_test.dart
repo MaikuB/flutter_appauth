@@ -39,6 +39,7 @@ void main() {
           'allowInsecureConnections': false,
           'preferEphemeralSession': false,
           'promptValues': null,
+          'responseMode': null
         })
       ],
     );
@@ -47,7 +48,7 @@ void main() {
   test('authorizeAndExchangeCode', () async {
     await flutterAppAuth.authorizeAndExchangeCode(AuthorizationTokenRequest(
         'someClientId', 'someRedirectUrl',
-        discoveryUrl: 'someDiscoveryUrl', loginHint: 'someLoginHint'));
+        discoveryUrl: 'someDiscoveryUrl', loginHint: 'someLoginHint', responseMode: 'fragment'));
     expect(
       log,
       <Matcher>[
@@ -67,7 +68,8 @@ void main() {
           'refreshToken': null,
           'authorizationCode': null,
           'grantType': 'authorization_code',
-          'codeVerifier': null
+          'codeVerifier': null,
+          'responseMode': 'fragment'
         })
       ],
     );

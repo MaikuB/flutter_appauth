@@ -1,3 +1,7 @@
+## [3.1.0]
+
+* Added the ability to specify the response mode for authorization requests. This can be done using the `responseMode` parameter  when constructing either an `AuthorizationRequest` or `AuthorizationTokenRequest`. This was done as the AppAuth Android SDK throws an exception when this was done via `additionalParameters`.
+
 ## [3.0.0]
 
 * Migrated to null safety
