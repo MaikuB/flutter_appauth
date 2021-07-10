@@ -1,5 +1,6 @@
 ## 1.1.0
-* Make use of responseMode inside FlutterAppauthPlugin for authorizeAndExchangeCode flow. Was needed otherwise an exception was thrown in the AuthorizationRequest.Builder when setting the responseMode via additionalParameters map.
+
+* * Added the ability to specify the response mode for authorization requests. This can be done using the `responseMode` parameter  when constructing either an `AuthorizationRequest` or `AuthorizationTokenRequest`. This was done as the AppAuth Android SDK throws an exception when this was done via `additionalParameters`.
 
 ## 1.0.0+1
 

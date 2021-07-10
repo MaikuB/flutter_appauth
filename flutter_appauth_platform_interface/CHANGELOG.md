@@ -1,6 +1,6 @@
 ## [3.1.0]
-* Add responseMode as parameter
-* responseMode is part of AuthorizationTokenRequest constructor and has not to be added to additionalParameters map. Reason was a validation check on Android side on this map, which does not must include responseMode.
+
+* Added the ability to specify the response mode for authorization requests. This can be done using the `responseMode` parameter  when constructing either an `AuthorizationRequest` or `AuthorizationTokenRequest`. This was done as the AppAuth Android SDK throws an exception when this was done via `additionalParameters`.
 
 ## [3.0.0]
 

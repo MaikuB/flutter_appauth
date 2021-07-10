@@ -17,6 +17,7 @@ class AuthorizationRequest extends CommonRequestDetails
     List<String>? promptValues,
     bool allowInsecureConnections = false,
     bool preferEphemeralSession = false,
+    String? responseMode,
   }) {
     this.clientId = clientId;
     this.redirectUrl = redirectUrl;
@@ -29,5 +30,6 @@ class AuthorizationRequest extends CommonRequestDetails
     this.promptValues = promptValues;
     this.allowInsecureConnections = allowInsecureConnections;
     this.preferEphemeralSession = preferEphemeralSession;
+    this.responseMode = responseMode;
   }
 }
