@@ -57,6 +57,7 @@
 @interface AuthorizationTokenRequestParameters : TokenRequestParameters
 @property(nonatomic, strong) NSString *loginHint;
 @property(nonatomic, strong) NSArray *promptValues;
+@property(nonatomic, strong) NSString *responseMode;
 @end
 
 @implementation AuthorizationTokenRequestParameters
@@ -64,6 +65,7 @@
     [super processArguments:arguments];
     _loginHint = [ArgumentProcessor processArgumentValue:arguments withKey:@"loginHint"];
     _promptValues = [ArgumentProcessor processArgumentValue:arguments withKey:@"promptValues"];
+    _responseMode = [ArgumentProcessor processArgumentValue:arguments withKey:@"responseMode"];
     return self;
 }
 @end
@@ -148,6 +150,10 @@ NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end session: %@";
     if(requestParameters.promptValues) {
         [self ensureAdditionalParametersInitialized:requestParameters];
         [requestParameters.additionalParameters setValue:[requestParameters.promptValues componentsJoinedByString:@","] forKey:@"prompt"];
+    }
+    if(requestParameters.responseMode) {
+        [self ensureAdditionalParametersInitialized:requestParameters];
+        [requestParameters.additionalParameters setValue:requestParameters.responseMode forKey:@"response_mode"];
     }
     if(requestParameters.serviceConfigurationParameters != nil) {
         OIDServiceConfiguration *serviceConfiguration = [self processServiceConfigurationParameters:requestParameters.serviceConfigurationParameters];
