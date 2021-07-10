@@ -1,3 +1,7 @@
+## [4.0.0-dev.1]
+
+* Includes changes from 3.1.0
+
 ## [4.0.0-dev.0]
 
 * **Breaking change** `AuthorizationServiceConfiguration` constructor has changed to take named parameters
