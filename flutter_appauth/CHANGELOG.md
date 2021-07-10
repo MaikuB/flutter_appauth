@@ -1,3 +1,7 @@
+## 2.0.0-dev.2
+
+* Includes changes from 1.1.0
+
 ## 2.0.0-dev.1
 
 * [iOS] Fixed a crash when passing an instance `AuthorizationServiceConfiguration` with a null `endSessionEndpoint`
