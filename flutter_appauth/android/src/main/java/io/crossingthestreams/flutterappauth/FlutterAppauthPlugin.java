@@ -252,7 +252,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private void handleAuthorizeMethodCall(Map<String, Object> arguments, final boolean exchangeCode) {
         final AuthorizationTokenRequestParameters tokenRequestParameters = processAuthorizationTokenRequestArguments(arguments);
         if (tokenRequestParameters.serviceConfigurationParameters != null) {
-            AuthorizationServiceConfiguration serviceConfiguration = requestParametersToServiceConfiguration(tokenRequestParameters);
+            AuthorizationServiceConfiguration serviceConfiguration = processServiceConfigurationParameters(tokenRequestParameters.serviceConfigurationParameters);
             performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues, tokenRequestParameters.responseMode);
         } else {
             AuthorizationServiceConfiguration.RetrieveConfigurationCallback callback = new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
