@@ -488,6 +488,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                 AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
                 if (allowInsecureConnections) {
                     authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
+                    authConfigBuilder.setSkipIssuerHttpsCheck(true);
                 }
 
                 AuthorizationService authService = new AuthorizationService(applicationContext, authConfigBuilder.build());
