@@ -1,3 +1,7 @@
+## 2.0.0-dev.3
+
+* [Android] skips https issuer check if `allowInsecureConnections` is true. Thanks to the PR from [Roman Fürst](https://github.com/rfuerst87)
+
 ## 2.0.0-dev.2
 
 * Includes changes from 1.1.0
