@@ -1,3 +1,7 @@
+## 2.0.0-dev.4
+
+* Includes changes from 1.1.0+1 release
+
 ## 2.0.0-dev.3
 
 * [Android] skips https issuer check if `allowInsecureConnections` is true. Thanks to the PR from [Roman Fürst](https://github.com/rfuerst87)
@@ -16,6 +20,10 @@
 * Added `endSession()` method, `EndSessionRequest` and `EndSessionResponse` classes to support end session requests
 * Bumped AppAuth Android and iOS SDK dependencies
 * Added FAQs section to readme to describe a common iOS issue with Azure B2C and Azure AD
+
+## 1.1.0+1
+
+* Updated the minimum version iOS supported by the example app to 9.0 since Flutter 2.5 has deprecated support for 8.0
 
 ## 1.1.0
 
