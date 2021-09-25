@@ -1,3 +1,7 @@
+## 2.0.0-dev.5
+
+* Bumped AppAuth Android dependency
+
 ## 2.0.0-dev.4
 
 * Includes changes from 1.1.0+1 release
