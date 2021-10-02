@@ -25,6 +25,10 @@
 * Bumped AppAuth Android and iOS SDK dependencies
 * Added FAQs section to readme to describe a common iOS issue with Azure B2C and Azure AD
 
+## 1.1.0+2
+
+* Bumped AppAuth Android and iOS dependencies
+
 ## 1.1.0+1
 
 * Updated the minimum version iOS supported by the example app to 9.0 since Flutter 2.5 has deprecated support for 8.0
