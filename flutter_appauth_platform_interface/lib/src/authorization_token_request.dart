@@ -9,16 +9,17 @@ class AuthorizationTokenRequest extends TokenRequest
   AuthorizationTokenRequest(
     String clientId,
     String redirectUrl, {
-    String loginHint,
-    String clientSecret,
-    List<String> scopes,
-    AuthorizationServiceConfiguration serviceConfiguration,
-    Map<String, String> additionalParameters,
-    String issuer,
-    String discoveryUrl,
-    List<String> promptValues,
+    String? loginHint,
+    String? clientSecret,
+    List<String>? scopes,
+    AuthorizationServiceConfiguration? serviceConfiguration,
+    Map<String, String>? additionalParameters,
+    String? issuer,
+    String? discoveryUrl,
+    List<String>? promptValues,
     bool allowInsecureConnections = false,
     bool preferEphemeralSession = false,
+    String? responseMode,
   }) : super(
           clientId,
           redirectUrl,
@@ -34,5 +35,6 @@ class AuthorizationTokenRequest extends TokenRequest
     this.loginHint = loginHint;
     this.promptValues = promptValues;
     this.preferEphemeralSession = preferEphemeralSession;
+    this.responseMode = responseMode;
   }
 }

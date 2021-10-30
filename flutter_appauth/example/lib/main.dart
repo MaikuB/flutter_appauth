@@ -13,10 +13,10 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool _isBusy = false;
   final FlutterAppAuth _appAuth = FlutterAppAuth();
-  String _codeVerifier;
-  String _authorizationCode;
-  String _refreshToken;
-  String _accessToken;
+  String? _codeVerifier;
+  String? _authorizationCode;
+  String? _refreshToken;
+  String? _accessToken;
   final TextEditingController _authorizationCodeTextController =
       TextEditingController();
   final TextEditingController _accessTokenTextController =
@@ -44,7 +44,7 @@ class _MyAppState extends State<MyApp> {
   ];
 
   final AuthorizationServiceConfiguration _serviceConfiguration =
-      AuthorizationServiceConfiguration(
+      const AuthorizationServiceConfiguration(
           'https://demo.identityserver.io/connect/authorize',
           'https://demo.identityserver.io/connect/token');
 
@@ -67,22 +67,22 @@ class _MyAppState extends State<MyApp> {
                 visible: _isBusy,
                 child: const LinearProgressIndicator(),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: const Text('Sign in with no code exchange'),
                 onPressed: _signInWithNoCodeExchange,
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: const Text('Exchange code'),
                 onPressed: _authorizationCode != null ? _exchangeCode : null,
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: const Text('Sign in with auto code exchange'),
                 onPressed: () => _signInWithAutoCodeExchange(),
               ),
               if (Platform.isIOS)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: RaisedButton(
+                  child: ElevatedButton(
                     child: const Text(
                       'Sign in with auto code exchange using ephemeral session (iOS only)',
                       textAlign: TextAlign.center,
@@ -91,7 +91,7 @@ class _MyAppState extends State<MyApp> {
                         preferEphemeralSession: true),
                   ),
                 ),
-              RaisedButton(
+              ElevatedButton(
                 child: const Text('Refresh token'),
                 onPressed: _refreshToken != null ? _refresh : null,
               ),
@@ -127,7 +127,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> _refresh() async {
     try {
       _setBusyState();
-      final TokenResponse result = await _appAuth.token(TokenRequest(
+      final TokenResponse? result = await _appAuth.token(TokenRequest(
           _clientId, _redirectUrl,
           refreshToken: _refreshToken,
           discoveryUrl: _discoveryUrl,
@@ -142,7 +142,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> _exchangeCode() async {
     try {
       _setBusyState();
-      final TokenResponse result = await _appAuth.token(TokenRequest(
+      final TokenResponse? result = await _appAuth.token(TokenRequest(
           _clientId, _redirectUrl,
           authorizationCode: _authorizationCode,
           discoveryUrl: _discoveryUrl,
@@ -159,7 +159,7 @@ class _MyAppState extends State<MyApp> {
     try {
       _setBusyState();
       // use the discovery endpoint to find the configuration
-      final AuthorizationResponse result = await _appAuth.authorize(
+      final AuthorizationResponse? result = await _appAuth.authorize(
         AuthorizationRequest(_clientId, _redirectUrl,
             discoveryUrl: _discoveryUrl, scopes: _scopes, loginHint: 'bob'),
       );
@@ -187,7 +187,7 @@ class _MyAppState extends State<MyApp> {
       _setBusyState();
 
       // show that we can also explicitly specify the endpoints rather than getting from the details from the discovery document
-      final AuthorizationTokenResponse result =
+      final AuthorizationTokenResponse? result =
           await _appAuth.authorizeAndExchangeCode(
         AuthorizationTokenRequest(
           _clientId,
@@ -229,11 +229,11 @@ class _MyAppState extends State<MyApp> {
 
   void _processAuthTokenResponse(AuthorizationTokenResponse response) {
     setState(() {
-      _accessToken = _accessTokenTextController.text = response.accessToken;
-      _idTokenTextController.text = response.idToken;
-      _refreshToken = _refreshTokenTextController.text = response.refreshToken;
+      _accessToken = _accessTokenTextController.text = response.accessToken!;
+      _idTokenTextController.text = response.idToken!;
+      _refreshToken = _refreshTokenTextController.text = response.refreshToken!;
       _accessTokenExpirationTextController.text =
-          response.accessTokenExpirationDateTime?.toIso8601String();
+          response.accessTokenExpirationDateTime!.toIso8601String();
     });
   }
 
@@ -242,24 +242,24 @@ class _MyAppState extends State<MyApp> {
       // save the code verifier as it must be used when exchanging the token
       _codeVerifier = response.codeVerifier;
       _authorizationCode =
-          _authorizationCodeTextController.text = response.authorizationCode;
+          _authorizationCodeTextController.text = response.authorizationCode!;
       _isBusy = false;
     });
   }
 
-  void _processTokenResponse(TokenResponse response) {
+  void _processTokenResponse(TokenResponse? response) {
     setState(() {
-      _accessToken = _accessTokenTextController.text = response.accessToken;
-      _idTokenTextController.text = response.idToken;
-      _refreshToken = _refreshTokenTextController.text = response.refreshToken;
+      _accessToken = _accessTokenTextController.text = response!.accessToken!;
+      _idTokenTextController.text = response.idToken!;
+      _refreshToken = _refreshTokenTextController.text = response.refreshToken!;
       _accessTokenExpirationTextController.text =
-          response.accessTokenExpirationDateTime?.toIso8601String();
+          response.accessTokenExpirationDateTime!.toIso8601String();
     });
   }
 
-  Future<void> _testApi(TokenResponse response) async {
+  Future<void> _testApi(TokenResponse? response) async {
     final http.Response httpResponse = await http.get(
-        'https://demo.identityserver.io/api/test',
+        Uri.parse('https://demo.identityserver.io/api/test'),
         headers: <String, String>{'Authorization': 'Bearer $_accessToken'});
     setState(() {
       _userInfo = httpResponse.statusCode == 200 ? httpResponse.body : '';
