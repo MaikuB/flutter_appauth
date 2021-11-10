@@ -164,7 +164,7 @@ class _MyAppState extends State<MyApp> {
     try {
       _setBusyState();
       final TokenResponse? result = await _appAuth.token(TokenRequest(
-          _clientId, _postLogoutRedirectUrl,
+          _clientId, _redirectUrl,
           refreshToken: _refreshToken, issuer: _issuer, scopes: _scopes));
       _processTokenResponse(result);
       await _testApi(result);
