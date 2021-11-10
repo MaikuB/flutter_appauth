@@ -2,6 +2,7 @@
 
 * [iOS] Fixed issue where cancelling an end session request from dialog prompt prevented subsequent end session requests from working
 * Fixed example app so that refreshing access token would work again
+
 ## 2.0.0-dev.5
 
 * Bumped AppAuth Android dependency
