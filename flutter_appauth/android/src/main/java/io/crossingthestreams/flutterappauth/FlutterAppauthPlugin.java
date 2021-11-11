@@ -307,6 +307,11 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             authRequestBuilder.setResponseMode(responseMode);
         }
 
+        if(additionalParameters != null && !additionalParameters.isEmpty() && additionalParameters.containsKey("ui_locales")){
+            authRequestBuilder.setUiLocales(additionalParameters.get("ui_locales"));
+            additionalParameters.remove("ui_locales");
+        }
+
         if (additionalParameters != null && !additionalParameters.isEmpty()) {
             authRequestBuilder.setAdditionalParameters(additionalParameters);
         }
