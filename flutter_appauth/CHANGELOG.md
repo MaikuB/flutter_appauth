@@ -30,6 +30,10 @@
 * Bumped AppAuth Android and iOS SDK dependencies
 * Added FAQs section to readme to describe a common iOS issue with Azure B2C and Azure AD
 
+## 1.1.1
+
+* [Android] Migrate maven repository from jcenter to mavenCentral.
+
 ## 1.1.0+2
 
 * Bumped AppAuth Android and iOS dependencies
