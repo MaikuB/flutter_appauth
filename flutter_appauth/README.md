@@ -54,15 +54,15 @@ final AuthorizationTokenResponse result = await appAuth.authorizeAndExchangeCode
                   );
 ```
 
-If you already know the authorization and token endpoints, which may be because discovery isn't supported, then these could be explicitly specified
+In the event that discovery isn't supported or that you already know the endpoints for your server, they could be explicitly specified in the event that the dis
 
 ```dart
 final AuthorizationTokenResponse result = await appAuth.authorizeAndExchangeCode(
                     AuthorizationTokenRequest(
                       '<client_id>',
                       '<redirect_url>',
-                      serviceConfiguration: AuthorizationServiceConfiguration('<authorization_endpoint>', '<token_endpoint>'),
-                      scopes: ['openid','profile', 'email', 'offline_access', 'api']
+                      serviceConfiguration: AuthorizationServiceConfiguration(authorizationEndpoint: '<authorization_endpoint>',  tokenEndpooint: '<token_endpoint>', endSessionEndpoint: '<end_session_endpoint>'),
+                      scopes: [...]
                     ),
                   );
 ```
@@ -89,6 +89,19 @@ final TokenResponse result = await appAuth.token(TokenRequest('<client_id>', '<r
         refreshToken: '<refresh_token>',
         scopes: ['openid','profile', 'email', 'offline_access', 'api']));
 ```
+
+### End session
+
+If your server has an [end session endpoint](https://openid.net/specs/openid-connect-rpinitiated-1_0.html), you can trigger an end session request that is typically used for logging out of the built-in browser with code similar to what's shown below
+
+```dart
+await appAuth.endSession(EndSessionRequest(
+          idTokenHint: '<idToken>',
+          postLogoutRedirectUrl: '<postLogoutRedirectUrl>',
+          serviceConfiguration: AuthorizationServiceConfiguration(authorizationEndpoint: '<authorization_endpoint>',  tokenEndpooint: '<token_endpoint>', endSessionEndpoint: '<end_session_endpoint>'));
+```
+
+The above code passes an `AuthorizationServiceConfiguration` with all the endpoints defined but alternatives are to specify an `issuer` or `discoveryUrl` like you would with the other APIs in the plugin (e.g. `authorizeAndExchangeCode()`).
 
 ## Android setup
 
@@ -145,3 +158,9 @@ Go to the `Info.plist` for your iOS app to specify the custom scheme so that the
     </dict>
 </array>
 ```
+
+## FAQs
+
+**When connecting to Azure B2C or Azure AD, the login request redirects properly on Android but not on iOS. What's going on?**
+
+The AppAuth iOS SDK has some logic to validate the redirect URL to see if it should be responsible for processing the redirect. This appears to be failing under certain circumstances. Adding a trailing slash to the redirect URL specified in your code has been reported to fix the issue.

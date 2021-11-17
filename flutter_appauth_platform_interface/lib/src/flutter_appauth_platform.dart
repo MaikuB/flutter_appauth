@@ -1,10 +1,12 @@
-import 'package:flutter_appauth_platform_interface/src/method_channel_flutter_appauth.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'authorization_request.dart';
 import 'authorization_response.dart';
 import 'authorization_token_request.dart';
 import 'authorization_token_response.dart';
+import 'end_session_request.dart';
+import 'end_session_response.dart';
+import 'method_channel_flutter_appauth.dart';
 import 'token_request.dart';
 import 'token_response.dart';
 
@@ -43,5 +45,9 @@ abstract class FlutterAppAuthPlatform extends PlatformInterface {
   /// For exchanging tokens.
   Future<TokenResponse?> token(TokenRequest request) {
     throw UnimplementedError('token() has not been implemented');
+  }
+
+  Future<EndSessionResponse?> endSession(EndSessionRequest request) {
+    throw UnimplementedError('endSession() has not been implemented');
   }
 }

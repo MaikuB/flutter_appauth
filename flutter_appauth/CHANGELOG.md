@@ -1,3 +1,11 @@
+## 2.0.0
+
+* **Breaking change** `AuthorizationServiceConfiguration` constructor has changed to take named parameters
+* Added `endSession()` method, `EndSessionRequest` and `EndSessionResponse` classes to support end session requests
+* [Android] skips https issuer check if `allowInsecureConnections` is true. Thanks to the PR from [Roman Fürst](https://github.com/rfuerst87)
+* Bumped AppAuth Android and iOS SDK dependencies
+* Added FAQs section to readme to describe a common iOS issue with Azure B2C and Azure AD
+
 ## 1.1.1
 
 * [Android] Migrate maven repository from jcenter to mavenCentral.

@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import net.openid.appauth.AppAuthConfiguration;
 import net.openid.appauth.AuthorizationException;
 import net.openid.appauth.AuthorizationRequest;
@@ -12,17 +15,16 @@ import net.openid.appauth.AuthorizationResponse;
 import net.openid.appauth.AuthorizationService;
 import net.openid.appauth.AuthorizationServiceConfiguration;
 import net.openid.appauth.ClientSecretBasic;
+import net.openid.appauth.EndSessionRequest;
+import net.openid.appauth.EndSessionResponse;
 import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenRequest;
 import net.openid.appauth.TokenResponse;
-
 import net.openid.appauth.connectivity.DefaultConnectionBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import androidx.annotation.Nullable;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -41,20 +43,26 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private static final String AUTHORIZE_AND_EXCHANGE_CODE_METHOD = "authorizeAndExchangeCode";
     private static final String AUTHORIZE_METHOD = "authorize";
     private static final String TOKEN_METHOD = "token";
+    private static final String END_SESSION_METHOD = "endSession";
 
     private static final String DISCOVERY_ERROR_CODE = "discovery_failed";
     private static final String AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE = "authorize_and_exchange_code_failed";
     private static final String AUTHORIZE_ERROR_CODE = "authorize_failed";
     private static final String TOKEN_ERROR_CODE = "token_failed";
+    private static final String END_SESSION_ERROR_CODE = "end_session_failed";
     private static final String NULL_INTENT_ERROR_CODE = "null_intent";
 
     private static final String DISCOVERY_ERROR_MESSAGE_FORMAT = "Error retrieving discovery document: [error: %s, description: %s]";
     private static final String TOKEN_ERROR_MESSAGE_FORMAT = "Failed to get token: [error: %s, description: %s]";
     private static final String AUTHORIZE_ERROR_MESSAGE_FORMAT = "Failed to authorize: [error: %s, description: %s]";
+    private static final String END_SESSION_ERROR_MESSAGE_FORMAT = "Failed to end session: [error: %s, description: %s]";
+
     private static final String NULL_INTENT_ERROR_FORMAT = "Failed to authorize: Null intent received";
 
     private final int RC_AUTH_EXCHANGE_CODE = 65030;
     private final int RC_AUTH = 65031;
+    private final int RC_END_SESSION = 65032;
+
     private Context applicationContext;
     private Activity mainActivity;
     private PendingOperation pendingOperation;
@@ -100,7 +108,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     }
 
     @Override
-    public void onDetachedFromEngine(FlutterPluginBinding binding) {
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         disposeAuthorizationServices();
     }
 
@@ -141,15 +149,16 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         pendingOperation = new PendingOperation(method, result);
     }
 
+
     @Override
-    public void onMethodCall(MethodCall call, Result result) {
+    public void onMethodCall(MethodCall call, @NonNull Result result) {
         Map<String, Object> arguments = call.arguments();
         switch (call.method) {
             case AUTHORIZE_AND_EXCHANGE_CODE_METHOD:
                 try {
                     checkAndSetPendingOperation(call.method, result);
                     handleAuthorizeMethodCall(arguments, true);
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     finishWithError(AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE, ex.getLocalizedMessage());
                 }
                 break;
@@ -157,7 +166,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                 try {
                     checkAndSetPendingOperation(call.method, result);
                     handleAuthorizeMethodCall(arguments, false);
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     finishWithError(AUTHORIZE_ERROR_CODE, ex.getLocalizedMessage());
                 }
                 break;
@@ -165,8 +174,16 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                 try {
                     checkAndSetPendingOperation(call.method, result);
                     handleTokenMethodCall(arguments);
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     finishWithError(TOKEN_ERROR_CODE, ex.getLocalizedMessage());
+                }
+                break;
+            case END_SESSION_METHOD:
+                try {
+                    checkAndSetPendingOperation(call.method, result);
+                    handleEndSessionMethodCall(arguments);
+                } catch (Exception ex) {
+                    finishWithError(END_SESSION_ERROR_CODE, ex.getLocalizedMessage());
                 }
                 break;
             default:
@@ -213,16 +230,29 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             codeVerifier = (String) arguments.get("codeVerifier");
         }
         final ArrayList<String> scopes = (ArrayList<String>) arguments.get("scopes");
-        Map<String, String> serviceConfigurationParameters = (Map<String, String>) arguments.get("serviceConfiguration");
-        Map<String, String> additionalParameters = (Map<String, String>) arguments.get("additionalParameters");
+        final Map<String, String> serviceConfigurationParameters = (Map<String, String>) arguments.get("serviceConfiguration");
+        final Map<String, String> additionalParameters = (Map<String, String>) arguments.get("additionalParameters");
         allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
         return new TokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, refreshToken, authorizationCode, codeVerifier, grantType, serviceConfigurationParameters, additionalParameters);
+    }
+
+    @SuppressWarnings("unchecked")
+    private EndSessionRequestParameters processEndSessionRequestArguments(Map<String, Object> arguments) {
+        final String idTokenHint = (String) arguments.get("idTokenHint");
+        final String postLogoutRedirectUrl = (String) arguments.get("postLogoutRedirectUrl");
+        final String state = (String) arguments.get("state");
+        final boolean allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
+        final String issuer = (String) arguments.get("issuer");
+        final String discoveryUrl = (String) arguments.get("discoveryUrl");
+        final Map<String, String> serviceConfigurationParameters = (Map<String, String>) arguments.get("serviceConfiguration");
+        final Map<String, String> additionalParameters = (Map<String, String>) arguments.get("additionalParameters");
+        return new EndSessionRequestParameters(idTokenHint, postLogoutRedirectUrl, state, issuer, discoveryUrl, allowInsecureConnections, serviceConfigurationParameters, additionalParameters);
     }
 
     private void handleAuthorizeMethodCall(Map<String, Object> arguments, final boolean exchangeCode) {
         final AuthorizationTokenRequestParameters tokenRequestParameters = processAuthorizationTokenRequestArguments(arguments);
         if (tokenRequestParameters.serviceConfigurationParameters != null) {
-            AuthorizationServiceConfiguration serviceConfiguration = requestParametersToServiceConfiguration(tokenRequestParameters);
+            AuthorizationServiceConfiguration serviceConfiguration = processServiceConfigurationParameters(tokenRequestParameters.serviceConfigurationParameters);
             performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues, tokenRequestParameters.responseMode);
         } else {
             AuthorizationServiceConfiguration.RetrieveConfigurationCallback callback = new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
@@ -238,47 +268,36 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             if (tokenRequestParameters.discoveryUrl != null) {
                 AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), callback, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
             } else {
-                AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(tokenRequestParameters.issuer), callback);
+                AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(tokenRequestParameters.issuer), callback, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
             }
         }
-
     }
 
-    private AuthorizationServiceConfiguration requestParametersToServiceConfiguration(TokenRequestParameters tokenRequestParameters) {
-        return new AuthorizationServiceConfiguration(Uri.parse(tokenRequestParameters.serviceConfigurationParameters.get("authorizationEndpoint")), Uri.parse(tokenRequestParameters.serviceConfigurationParameters.get("tokenEndpoint")));
+    private AuthorizationServiceConfiguration processServiceConfigurationParameters(Map<String, String> serviceConfigurationArguments) {
+        final String endSessionEndpoint = serviceConfigurationArguments.get("endSessionEndpoint");
+        return new AuthorizationServiceConfiguration(Uri.parse(serviceConfigurationArguments.get("authorizationEndpoint")), Uri.parse(serviceConfigurationArguments.get("tokenEndpoint")), null, endSessionEndpoint == null ? null : Uri.parse(endSessionEndpoint));
     }
 
     private void handleTokenMethodCall(Map<String, Object> arguments) {
         final TokenRequestParameters tokenRequestParameters = processTokenRequestArguments(arguments);
         if (tokenRequestParameters.serviceConfigurationParameters != null) {
-
-            AuthorizationServiceConfiguration serviceConfiguration = requestParametersToServiceConfiguration(tokenRequestParameters);
+            AuthorizationServiceConfiguration serviceConfiguration = processServiceConfigurationParameters(tokenRequestParameters.serviceConfigurationParameters);
             performTokenRequest(serviceConfiguration, tokenRequestParameters);
         } else {
+            AuthorizationServiceConfiguration.RetrieveConfigurationCallback callback = new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
+                @Override
+                public void onFetchConfigurationCompleted(@Nullable AuthorizationServiceConfiguration serviceConfiguration, @Nullable AuthorizationException ex) {
+                    if (ex == null) {
+                        performTokenRequest(serviceConfiguration, tokenRequestParameters);
+                    } else {
+                        finishWithDiscoveryError(ex);
+                    }
+                }
+            };
             if (tokenRequestParameters.discoveryUrl != null) {
-                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
-                    @Override
-                    public void onFetchConfigurationCompleted(@Nullable AuthorizationServiceConfiguration serviceConfiguration, @Nullable AuthorizationException ex) {
-                        if (ex == null) {
-                            performTokenRequest(serviceConfiguration, tokenRequestParameters);
-                        } else {
-                            finishWithDiscoveryError(ex);
-                        }
-                    }
-                }, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
-
+                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(tokenRequestParameters.discoveryUrl), callback, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
             } else {
-
-                AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(tokenRequestParameters.issuer), new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
-                    @Override
-                    public void onFetchConfigurationCompleted(@Nullable AuthorizationServiceConfiguration serviceConfiguration, @Nullable AuthorizationException ex) {
-                        if (ex == null) {
-                            performTokenRequest(serviceConfiguration, tokenRequestParameters);
-                        } else {
-                            finishWithDiscoveryError(ex);
-                        }
-                    }
-                });
+                AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(tokenRequestParameters.issuer), callback, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
             }
         }
     }
@@ -355,7 +374,55 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         } else {
             authorizationService.performTokenRequest(tokenRequest, new ClientSecretBasic(clientSecret), tokenResponseCallback);
         }
+    }
 
+    private void handleEndSessionMethodCall(Map<String, Object> arguments) {
+        final EndSessionRequestParameters endSessionRequestParameters = processEndSessionRequestArguments(arguments);
+        if (endSessionRequestParameters.serviceConfigurationParameters != null) {
+            AuthorizationServiceConfiguration serviceConfiguration = processServiceConfigurationParameters(endSessionRequestParameters.serviceConfigurationParameters);
+            performEndSessionRequest(serviceConfiguration, endSessionRequestParameters);
+        } else {
+            AuthorizationServiceConfiguration.RetrieveConfigurationCallback callback = new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
+                @Override
+                public void onFetchConfigurationCompleted(@Nullable AuthorizationServiceConfiguration serviceConfiguration, @Nullable AuthorizationException ex) {
+                    if (ex == null) {
+                        performEndSessionRequest(serviceConfiguration, endSessionRequestParameters);
+                    } else {
+                        finishWithDiscoveryError(ex);
+                    }
+                }
+            };
+
+            if (endSessionRequestParameters.discoveryUrl != null) {
+                AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(endSessionRequestParameters.discoveryUrl), callback, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
+            } else {
+                AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(endSessionRequestParameters.issuer), callback, allowInsecureConnections ? InsecureConnectionBuilder.INSTANCE : DefaultConnectionBuilder.INSTANCE);
+            }
+        }
+    }
+
+    private void performEndSessionRequest(AuthorizationServiceConfiguration serviceConfiguration, final EndSessionRequestParameters endSessionRequestParameters) {
+        EndSessionRequest.Builder endSessionRequestBuilder = new EndSessionRequest.Builder(serviceConfiguration);
+        if (endSessionRequestParameters.idTokenHint != null) {
+            endSessionRequestBuilder.setIdTokenHint(endSessionRequestParameters.idTokenHint);
+        }
+
+        if (endSessionRequestParameters.postLogoutRedirectUrl != null) {
+            endSessionRequestBuilder.setPostLogoutRedirectUri(Uri.parse(endSessionRequestParameters.postLogoutRedirectUrl));
+        }
+
+        if (endSessionRequestParameters.state != null) {
+            endSessionRequestBuilder.setState(endSessionRequestParameters.state);
+        }
+
+        if (endSessionRequestParameters.additionalParameters != null) {
+            endSessionRequestBuilder.setAdditionalParameters(endSessionRequestParameters.additionalParameters);
+        }
+
+        final EndSessionRequest endSessionRequest = endSessionRequestBuilder.build();
+        AuthorizationService authorizationService = allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
+        Intent endSessionIntent = authorizationService.getEndSessionRequestIntent(endSessionRequest);
+        mainActivity.startActivityForResult(endSessionIntent, RC_END_SESSION);
     }
 
     private void finishWithTokenError(AuthorizationException ex) {
@@ -381,6 +448,10 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         finishWithError(DISCOVERY_ERROR_CODE, String.format(DISCOVERY_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription));
     }
 
+    private void finishWithEndSessionError(AuthorizationException ex) {
+        finishWithError(END_SESSION_ERROR_CODE, String.format(END_SESSION_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription));
+    }
+
 
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -397,6 +468,17 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             }
             return true;
         }
+        if (requestCode == RC_END_SESSION) {
+            final EndSessionResponse endSessionResponse = EndSessionResponse.fromIntent(intent);
+            AuthorizationException ex = AuthorizationException.fromIntent(intent);
+            if (ex != null) {
+                finishWithEndSessionError(ex);
+            } else {
+                Map<String, Object> responseMap = new HashMap<>();
+                responseMap.put("state", endSessionResponse.state);
+                finishWithSuccess(responseMap);
+            }
+        }
         return false;
     }
 
@@ -406,6 +488,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                 AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
                 if (allowInsecureConnections) {
                     authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
+                    authConfigBuilder.setSkipIssuerHttpsCheck(true);
                 }
 
                 AuthorizationService authService = new AuthorizationService(applicationContext, authConfigBuilder.build());
@@ -466,7 +549,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         }
     }
 
-
     private class TokenRequestParameters {
         final String clientId;
         final String issuer;
@@ -490,6 +572,28 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             this.authorizationCode = authorizationCode;
             this.codeVerifier = codeVerifier;
             this.grantType = grantType;
+            this.serviceConfigurationParameters = serviceConfigurationParameters;
+            this.additionalParameters = additionalParameters;
+        }
+    }
+
+    private class EndSessionRequestParameters {
+        final String idTokenHint;
+        final String postLogoutRedirectUrl;
+        final String state;
+        final String issuer;
+        final String discoveryUrl;
+        final boolean allowInsecureConnections;
+        final Map<String, String> serviceConfigurationParameters;
+        final Map<String, String> additionalParameters;
+
+        private EndSessionRequestParameters(String idTokenHint, String postLogoutRedirectUrl, String state, String issuer, String discoveryUrl, boolean allowInsecureConnections, Map<String, String> serviceConfigurationParameters, Map<String, String> additionalParameters) {
+            this.idTokenHint = idTokenHint;
+            this.postLogoutRedirectUrl = postLogoutRedirectUrl;
+            this.state = state;
+            this.issuer = issuer;
+            this.discoveryUrl = discoveryUrl;
+            this.allowInsecureConnections = allowInsecureConnections;
             this.serviceConfigurationParameters = serviceConfigurationParameters;
             this.additionalParameters = additionalParameters;
         }

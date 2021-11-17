@@ -2,27 +2,22 @@ import 'authorization_service_configuration.dart';
 import 'common_request_details.dart';
 
 /// Details for a token exchange request.
-class TokenRequest with CommonRequestDetails {
+class TokenRequest extends CommonRequestDetails {
   TokenRequest(
     String clientId,
     String redirectUrl, {
     this.clientSecret,
     List<String>? scopes,
+    String? issuer,
+    String? discoveryUrl,
     AuthorizationServiceConfiguration? serviceConfiguration,
     Map<String, String>? additionalParameters,
     this.refreshToken,
     this.grantType,
-    String? issuer,
-    String? discoveryUrl,
     this.authorizationCode,
     this.codeVerifier,
     bool allowInsecureConnections = false,
-  }) : assert(
-            issuer != null ||
-                discoveryUrl != null ||
-                (serviceConfiguration?.authorizationEndpoint != null &&
-                    serviceConfiguration?.tokenEndpoint != null),
-            'Either the issuer, discovery URL or service configuration must be provided') {
+  }) {
     this.clientId = clientId;
     this.redirectUrl = redirectUrl;
     this.scopes = scopes;
@@ -31,6 +26,7 @@ class TokenRequest with CommonRequestDetails {
     this.issuer = issuer;
     this.discoveryUrl = discoveryUrl;
     this.allowInsecureConnections = allowInsecureConnections;
+    assertConfigurationInfo();
   }
 
   /// The client secret.
