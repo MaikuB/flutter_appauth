@@ -1,32 +1,8 @@
-## 2.0.0-dev.6
-
-* [iOS] Fixed issue where cancelling an end session request from dialog prompt prevented subsequent end session requests from working
-* Fixed example app so that refreshing access token would work again
-
-## 2.0.0-dev.5
-
-* Bumped AppAuth Android dependency
-
-## 2.0.0-dev.4
-
-* Includes changes from 1.1.0+1 release
-
-## 2.0.0-dev.3
-
-* [Android] skips https issuer check if `allowInsecureConnections` is true. Thanks to the PR from [Roman Fürst](https://github.com/rfuerst87)
-
-## 2.0.0-dev.2
-
-* Includes changes from 1.1.0
-
-## 2.0.0-dev.1
-
-* [iOS] Fixed a crash when passing an instance `AuthorizationServiceConfiguration` with a null `endSessionEndpoint`
-
-## 2.0.0-dev.0
+## 2.0.0
 
 * **Breaking change** `AuthorizationServiceConfiguration` constructor has changed to take named parameters
 * Added `endSession()` method, `EndSessionRequest` and `EndSessionResponse` classes to support end session requests
+* [Android] skips https issuer check if `allowInsecureConnections` is true. Thanks to the PR from [Roman Fürst](https://github.com/rfuerst87)
 * Bumped AppAuth Android and iOS SDK dependencies
 * Added FAQs section to readme to describe a common iOS issue with Azure B2C and Azure AD
 
