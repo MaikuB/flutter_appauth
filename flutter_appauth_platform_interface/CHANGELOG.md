@@ -1,8 +1,4 @@
-## [4.0.0-dev.1]
-
-* Includes changes from 3.1.0
-
-## [4.0.0-dev.0]
+## [4.0.0]
 
 * **Breaking change** `AuthorizationServiceConfiguration` constructor has changed to take named parameters
 * Added `endSession()` method, `EndSessionRequest` and `EndSessionResponse` classes to support end session requests
