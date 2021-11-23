@@ -1,6 +1,10 @@
+## 2.1.0+1
+
+* Fix grammar in 2.1.0 changelog entry
+
 ## 2.1.0
 
-* [Android] `ui_locales` can now be passed as part of the `additionParameters` as part of the requests without triggering an exception by the AppAuth Android SDK. Thanks to the PR from [dimitristoz](https://github.com/dimitristoz)
+* [Android] `ui_locales` can now be passed as part of the `additionalParameters` included with requests without triggering an exception by the AppAuth Android SDK. Thanks to the PR from [dimitristoz](https://github.com/dimitristoz)
 
 ## 2.0.0
 
