@@ -1,3 +1,7 @@
+## 2.1.0
+
+* [Android] `ui_locales` can now be passed as part of the `additionParameters` as part of the requests without triggering an exception by the AppAuth Android SDK. Thanks to the PR from [dimitristoz](https://github.com/dimitristoz)
+
 ## 2.0.0
 
 * **Breaking change** `AuthorizationServiceConfiguration` constructor has changed to take named parameters
