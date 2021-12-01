@@ -310,6 +310,8 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                         clientId,
                         ResponseTypeValues.CODE,
                         Uri.parse(redirectUrl));
+//        authRequestBuilder.setNonce(null);
+
         if (scopes != null && !scopes.isEmpty()) {
             authRequestBuilder.setScopes(scopes);
         }
@@ -431,7 +433,9 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     }
 
     private void finishWithTokenError(AuthorizationException ex) {
-        finishWithError(TOKEN_ERROR_CODE, String.format(TOKEN_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription));
+        final Throwable cause = ex.getCause();
+        final String causeDescription = cause != null ? cause.getMessage() : null;
+        finishWithError(TOKEN_ERROR_CODE, String.format(TOKEN_ERROR_MESSAGE_FORMAT, ex.errorDescription, causeDescription));
     }
 
 
