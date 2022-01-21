@@ -1,3 +1,7 @@
+## 2.2.0+1
+
+* Updated Android setup section in the readme around setting the redirect scheme via manifest placeholders. If you've experienced Android build errors that says `applicationName` can't be found then check the readme for updated instructions, which is to use the `+=` operation instead of `=` on the `manifestPlaceholders` property in the `build.gradle` file
+
 ## 2.2.0
 
 * [Android] updated error handling so more details are returned. Thanks to [Andreas Kägi](https://github.com/akaegi) for originally starting on the PR
