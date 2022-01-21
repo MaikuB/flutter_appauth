@@ -113,14 +113,20 @@ android {
     ...
     defaultConfig {
         ...
-        manifestPlaceholders = [
+        manifestPlaceholders += [
                 'appAuthRedirectScheme': '<your_custom_scheme>'
         ]
     }
 }
 ```
 
-Please ensure that value of `<your_custom_scheme>` is all in lowercase as there've been reports from the community who had issues with redirects if there were any capital letters.
+Please ensure that value of `<your_custom_scheme>` is all in lowercase as there've been reports from the community who had issues with redirects if there were any capital letters. You may also notice the `+=` operation is applied on `manifestPlaceholders` instead of `=`. This is intentional and required as newer versions of the Flutter SDK has made some changes underneath the hood to deal with multidex. Using `=` instead of `+=` can lead to errors like the following
+
+```
+Attribute application@name at AndroidManifest.xml:5:9-42 requires a placeholder substitution but no value for <applicationName> is provided.
+```
+
+If you see this error then update your `build.gradle` to use `+=` instead.
 
 If your app is target API 30 or above (i.e. Android 11 or newer), make sure to add the following to your `AndroidManifest.xml` file a level underneath the `<manifest>` element
 
