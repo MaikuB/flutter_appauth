@@ -22,6 +22,9 @@ import net.openid.appauth.TokenRequest;
 import net.openid.appauth.TokenResponse;
 import net.openid.appauth.connectivity.DefaultConnectionBuilder;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +54,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private static final String TOKEN_ERROR_CODE = "token_failed";
     private static final String END_SESSION_ERROR_CODE = "end_session_failed";
     private static final String NULL_INTENT_ERROR_CODE = "null_intent";
+    private static final String INVALID_CLAIMS_ERROR_CODE = "invalid_claims";
 
     private static final String DISCOVERY_ERROR_MESSAGE_FORMAT = "Error retrieving discovery document: [error: %s, description: %s]";
     private static final String TOKEN_ERROR_MESSAGE_FORMAT = "Failed to get token: [error: %s, description: %s]";
@@ -332,6 +336,18 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             if(additionalParameters.containsKey("ui_locales")){
                 authRequestBuilder.setUiLocales(additionalParameters.get("ui_locales"));
                 additionalParameters.remove("ui_locales");
+            }
+
+            if(additionalParameters.containsKey("claims")){
+                try {
+                    final JSONObject claimsAsJson = new JSONObject(additionalParameters.get("claims"));
+                    authRequestBuilder.setClaims(claimsAsJson);
+                    additionalParameters.remove("claims");
+                }
+                catch (JSONException ex) {
+                    finishWithError(INVALID_CLAIMS_ERROR_CODE, ex.getLocalizedMessage(), getCauseFromException(ex));
+                    return;
+                }
             }
             authRequestBuilder.setAdditionalParameters(additionalParameters);
         }
