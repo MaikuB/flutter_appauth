@@ -8,10 +8,11 @@ class AuthorizationTokenResponse extends TokenResponse {
     DateTime? accessTokenExpirationDateTime,
     String? idToken,
     String? tokenType,
+    List<String>? scopes,
     this.authorizationAdditionalParameters,
     Map<String, dynamic>? tokenAdditionalParameters,
   ) : super(accessToken, refreshToken, accessTokenExpirationDateTime, idToken,
-            tokenType, tokenAdditionalParameters);
+            tokenType, scopes, tokenAdditionalParameters);
 
   /// Contains additional parameters returned by the authorization server from making the authorization request.
   final Map<String, dynamic>? authorizationAdditionalParameters;
