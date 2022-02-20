@@ -102,6 +102,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         defaultAuthorizationService = new AuthorizationService(this.applicationContext);
         AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
         authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
+        authConfigBuilder.setSkipIssuerHttpsCheck(true);
         insecureAuthorizationService = new AuthorizationService(applicationContext, authConfigBuilder.build());
         final MethodChannel channel = new MethodChannel(binaryMessenger, "crossingthestreams.io/flutter_appauth");
         channel.setMethodCallHandler(this);
