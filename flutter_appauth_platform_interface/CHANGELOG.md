@@ -1,3 +1,7 @@
+## [4.1.0]
+
+* Added `scopes` property to `TokenResponse` class and `AuthorizationTokenResponse` class that inherits from it. Thanks to PR from [leoshusar](https://github.com/leoshusar)
+
 ## [4.0.0]
 
 * **Breaking change** `AuthorizationServiceConfiguration` constructor has changed to take named parameters

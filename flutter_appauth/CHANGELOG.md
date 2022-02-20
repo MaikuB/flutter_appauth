@@ -1,3 +1,8 @@
+## 2.4.0
+
+* Added `scopes` property to `TokenResponse` class and `AuthorizationTokenResponse` class that inherits from it. Thanks to PR from [leoshusar](https://github.com/leoshusar)
+* [Android] applied fix to a scenario where skipping https check on the issuer wasn't done for refreshing tokens. Thanks to the PR from [Javier Puerto](https://github.com/jpuerto)
+
 ## 2.3.0
 
 * [Android] `claims` can now be passed as part of the `additionalParameters` included with requests without triggering an exception by the AppAuth Android SDK. Thanks to the PR from [Garry Jeromson](https://github.com/garry-jeromson)
