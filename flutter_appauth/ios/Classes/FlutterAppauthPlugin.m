@@ -395,6 +395,9 @@ NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end session: %@";
     if(tokenResponse.tokenType) {
         [processedResponses setValue:tokenResponse.tokenType forKey:@"tokenType"];
     }
+    if (tokenResponse.scope) {
+        [processedResponses setObject:[tokenResponse.scope componentsSeparatedByString: @" "] forKey:@"scopes"];
+    }
     
     return processedResponses;
 }

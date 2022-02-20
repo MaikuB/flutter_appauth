@@ -26,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -550,6 +551,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         responseMap.put("refreshToken", tokenResponse.refreshToken);
         responseMap.put("idToken", tokenResponse.idToken);
         responseMap.put("tokenType", tokenResponse.tokenType);
+        responseMap.put("scopes", tokenResponse.scope != null ? Arrays.asList(tokenResponse.scope.split(" ")) : null);
         if (authResponse != null) {
             responseMap.put("authorizationAdditionalParameters", authResponse.additionalParameters);
         }
