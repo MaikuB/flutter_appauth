@@ -149,7 +149,7 @@ NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end session: %@";
     }
     if(requestParameters.promptValues) {
         [self ensureAdditionalParametersInitialized:requestParameters];
-        [requestParameters.additionalParameters setValue:[requestParameters.promptValues componentsJoinedByString:@","] forKey:@"prompt"];
+        [requestParameters.additionalParameters setValue:[requestParameters.promptValues componentsJoinedByString:@" "] forKey:@"prompt"];
     }
     if(requestParameters.responseMode) {
         [self ensureAdditionalParametersInitialized:requestParameters];
