@@ -1,3 +1,7 @@
+## 2.4.1
+
+* [iOS] fixed issue with `scopes` not being sent correctly as they should've been space-delimited instead of comma-delimited. Thanks to the PR from [Angle Wang](https://github.com/angle319)
+
 ## 2.4.0
 
 * Added `scopes` property to `TokenResponse` class and `AuthorizationTokenResponse` class that inherits from it. Thanks to PR from [leoshusar](https://github.com/leoshusar)
