@@ -54,14 +54,14 @@ final AuthorizationTokenResponse result = await appAuth.authorizeAndExchangeCode
                   );
 ```
 
-In the event that discovery isn't supported or that you already know the endpoints for your server, they could be explicitly specified in the event that the dis
+In the event that discovery isn't supported or that you already know the endpoints for your server, they could be explicitly specified
 
 ```dart
 final AuthorizationTokenResponse result = await appAuth.authorizeAndExchangeCode(
                     AuthorizationTokenRequest(
                       '<client_id>',
                       '<redirect_url>',
-                      serviceConfiguration: AuthorizationServiceConfiguration(authorizationEndpoint: '<authorization_endpoint>',  tokenEndpooint: '<token_endpoint>', endSessionEndpoint: '<end_session_endpoint>'),
+                      serviceConfiguration: AuthorizationServiceConfiguration(authorizationEndpoint: '<authorization_endpoint>',  tokenEndpoint: '<token_endpoint>', endSessionEndpoint: '<end_session_endpoint>'),
                       scopes: [...]
                     ),
                   );
