@@ -11,6 +11,7 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
     String? issuer,
     String? discoveryUrl,
     AuthorizationServiceConfiguration? serviceConfiguration,
+    this.defaultSystemBrowser = false,
   }) {
     assert((idTokenHint == null && postLogoutRedirectUrl == null) ||
         (idTokenHint != null && postLogoutRedirectUrl != null));
@@ -37,4 +38,9 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
   bool allowInsecureConnections;
 
   final Map<String, String>? additionalParameters;
+
+  /// Whether to open the default system browser outside the app.
+  ///
+  /// This property is only applicable to iOS.
+  final bool defaultSystemBrowser;
 }

@@ -32,6 +32,7 @@ extension EndSessionRequestMapper on EndSessionRequest {
       'issuer': issuer,
       'discoveryUrl': discoveryUrl,
       'serviceConfiguration': serviceConfiguration?.toMap(),
+      'defaultSystemBrowser': defaultSystemBrowser,
     };
   }
 }
@@ -99,5 +100,6 @@ Map<String, Object?> _convertAuthorizationParametersToMap(
     'promptValues': authorizationParameters.promptValues,
     'preferEphemeralSession': authorizationParameters.preferEphemeralSession,
     'responseMode': authorizationParameters.responseMode,
+    'defaultSystemBrowser': authorizationParameters.defaultSystemBrowser,
   };
 }

@@ -39,7 +39,8 @@ void main() {
           'allowInsecureConnections': false,
           'preferEphemeralSession': false,
           'promptValues': null,
-          'responseMode': null
+          'responseMode': null,
+          'defaultSystemBrowser': false,
         })
       ],
     );
@@ -48,7 +49,9 @@ void main() {
   test('authorizeAndExchangeCode', () async {
     await flutterAppAuth.authorizeAndExchangeCode(AuthorizationTokenRequest(
         'someClientId', 'someRedirectUrl',
-        discoveryUrl: 'someDiscoveryUrl', loginHint: 'someLoginHint', responseMode: 'fragment'));
+        discoveryUrl: 'someDiscoveryUrl',
+        loginHint: 'someLoginHint',
+        responseMode: 'fragment'));
     expect(
       log,
       <Matcher>[
@@ -69,7 +72,8 @@ void main() {
           'authorizationCode': null,
           'grantType': 'authorization_code',
           'codeVerifier': null,
-          'responseMode': 'fragment'
+          'responseMode': 'fragment',
+          'defaultSystemBrowser': false,
         })
       ],
     );
@@ -176,6 +180,7 @@ void main() {
         'issuer': null,
         'discoveryUrl': 'someDiscoveryUrl',
         'serviceConfiguration': null,
+        'defaultSystemBrowser': false,
       })
     ]);
   });

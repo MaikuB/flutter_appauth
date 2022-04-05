@@ -18,6 +18,7 @@ class AuthorizationRequest extends CommonRequestDetails
     bool allowInsecureConnections = false,
     bool preferEphemeralSession = false,
     String? responseMode,
+    bool defaultSystemBrowser = false,
   }) {
     this.clientId = clientId;
     this.redirectUrl = redirectUrl;
@@ -31,6 +32,7 @@ class AuthorizationRequest extends CommonRequestDetails
     this.allowInsecureConnections = allowInsecureConnections;
     this.preferEphemeralSession = preferEphemeralSession;
     this.responseMode = responseMode;
+    this.defaultSystemBrowser = defaultSystemBrowser;
     assertConfigurationInfo();
   }
 }

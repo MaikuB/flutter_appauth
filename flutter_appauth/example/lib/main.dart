@@ -91,6 +91,18 @@ class _MyAppState extends State<MyApp> {
                         preferEphemeralSession: true),
                   ),
                 ),
+              if (Platform.isIOS)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    child: const Text(
+                      'Sign in with auto code exchange using default system browser (iOS only)',
+                      textAlign: TextAlign.center,
+                    ),
+                    onPressed: () =>
+                        _signInWithAutoCodeExchange(defaultSystemBrowser: true),
+                  ),
+                ),
               ElevatedButton(
                 child: const Text('Refresh token'),
                 onPressed: _refreshToken != null ? _refresh : null,
@@ -216,7 +228,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _signInWithAutoCodeExchange(
-      {bool preferEphemeralSession = false}) async {
+      {bool preferEphemeralSession = false,
+      bool defaultSystemBrowser = false}) async {
     try {
       _setBusyState();
 
@@ -229,6 +242,7 @@ class _MyAppState extends State<MyApp> {
           serviceConfiguration: _serviceConfiguration,
           scopes: _scopes,
           preferEphemeralSession: preferEphemeralSession,
+          defaultSystemBrowser: defaultSystemBrowser,
         ),
       );
 

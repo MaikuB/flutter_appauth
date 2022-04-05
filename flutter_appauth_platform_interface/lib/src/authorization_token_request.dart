@@ -20,6 +20,7 @@ class AuthorizationTokenRequest extends TokenRequest
     bool allowInsecureConnections = false,
     bool preferEphemeralSession = false,
     String? responseMode,
+    bool defaultSystemBrowser = false,
   }) : super(
           clientId,
           redirectUrl,
@@ -36,5 +37,6 @@ class AuthorizationTokenRequest extends TokenRequest
     this.promptValues = promptValues;
     this.preferEphemeralSession = preferEphemeralSession;
     this.responseMode = responseMode;
+    this.defaultSystemBrowser = defaultSystemBrowser;
   }
 }
