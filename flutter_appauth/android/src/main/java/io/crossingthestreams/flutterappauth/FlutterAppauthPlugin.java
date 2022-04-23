@@ -204,6 +204,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         final String discoveryUrl = (String) arguments.get("discoveryUrl");
         final String redirectUrl = (String) arguments.get("redirectUrl");
         final String loginHint = (String) arguments.get("loginHint");
+        final String state = (String) arguments.get("state");
         clientSecret = (String) arguments.get("clientSecret");
         final ArrayList<String> scopes = (ArrayList<String>) arguments.get("scopes");
         final ArrayList<String> promptValues = (ArrayList<String>) arguments.get("promptValues");
@@ -212,7 +213,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
         final String responseMode = (String) arguments.get("responseMode");
 
-        return new AuthorizationTokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, serviceConfigurationParameters, additionalParameters, loginHint, promptValues, responseMode);
+        return new AuthorizationTokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, serviceConfigurationParameters, additionalParameters, loginHint, promptValues, responseMode, state);
     }
 
     @SuppressWarnings("unchecked")
@@ -259,13 +260,13 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         final AuthorizationTokenRequestParameters tokenRequestParameters = processAuthorizationTokenRequestArguments(arguments);
         if (tokenRequestParameters.serviceConfigurationParameters != null) {
             AuthorizationServiceConfiguration serviceConfiguration = processServiceConfigurationParameters(tokenRequestParameters.serviceConfigurationParameters);
-            performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues, tokenRequestParameters.responseMode);
+            performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues, tokenRequestParameters.responseMode,  tokenRequestParameters.state);
         } else {
             AuthorizationServiceConfiguration.RetrieveConfigurationCallback callback = new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
                 @Override
                 public void onFetchConfigurationCompleted(@Nullable AuthorizationServiceConfiguration serviceConfiguration, @Nullable AuthorizationException ex) {
                     if (ex == null) {
-                        performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues, tokenRequestParameters.responseMode);
+                        performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues, tokenRequestParameters.responseMode,  tokenRequestParameters.state);
                     } else {
                         finishWithDiscoveryError(ex);
                     }
@@ -323,6 +324,10 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
         if (loginHint != null) {
             authRequestBuilder.setLoginHint(loginHint);
+        }
+
+        if(state  != null){
+            authRequestBuilder.setState(state);
         }
 
         if (promptValues != null && !promptValues.isEmpty()) {
@@ -634,11 +639,12 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         final ArrayList<String> promptValues;
         final String responseMode;
 
-        private AuthorizationTokenRequestParameters(String clientId, String issuer, String discoveryUrl, ArrayList<String> scopes, String redirectUrl, Map<String, String> serviceConfigurationParameters, Map<String, String> additionalParameters, String loginHint, ArrayList<String> promptValues, String responseMode) {
+        private AuthorizationTokenRequestParameters(String clientId, String issuer, String discoveryUrl, ArrayList<String> scopes, String redirectUrl, Map<String, String> serviceConfigurationParameters, Map<String, String> additionalParameters, String loginHint, ArrayList<String> promptValues, String responseMode, String state) {
             super(clientId, issuer, discoveryUrl, scopes, redirectUrl, null, null, null, null, serviceConfigurationParameters, additionalParameters);
             this.loginHint = loginHint;
             this.promptValues = promptValues;
             this.responseMode = responseMode;
+            this.state = state;
         }
     }
 

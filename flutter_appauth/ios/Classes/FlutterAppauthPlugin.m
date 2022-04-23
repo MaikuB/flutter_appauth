@@ -23,10 +23,12 @@
 @property(nonatomic, strong) NSString *refreshToken;
 @property(nonatomic, strong) NSString *codeVerifier;
 @property(nonatomic, strong) NSString *authorizationCode;
+@property(nonatomic, strong) NSString *state;
 @property(nonatomic, strong) NSArray *scopes;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
 @property(nonatomic, readwrite) BOOL preferEphemeralSession;
+
 
 @end
 
@@ -66,6 +68,7 @@
     _loginHint = [ArgumentProcessor processArgumentValue:arguments withKey:@"loginHint"];
     _promptValues = [ArgumentProcessor processArgumentValue:arguments withKey:@"promptValues"];
     _responseMode = [ArgumentProcessor processArgumentValue:arguments withKey:@"responseMode"];
+    _state = [ArgumentProcessor processArguments:arguments withKey:@"state"];
     return self;
 }
 @end
@@ -150,6 +153,10 @@ NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end session: %@";
     if(requestParameters.promptValues) {
         [self ensureAdditionalParametersInitialized:requestParameters];
         [requestParameters.additionalParameters setValue:[requestParameters.promptValues componentsJoinedByString:@" "] forKey:@"prompt"];
+    }
+    if(requestParameters.state){
+        [self ensureAdditionalParametersInitialized:requestParameters];
+        [requestParameters.additionalParameters setValue:requestParameters.state forKey:@"state"]
     }
     if(requestParameters.responseMode) {
         [self ensureAdditionalParametersInitialized:requestParameters];
