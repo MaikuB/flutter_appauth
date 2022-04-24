@@ -11,4 +11,9 @@ mixin AuthorizationParameters {
   bool? preferEphemeralSession;
 
   String? responseMode;
+
+  // Authorization protocols provide a state parameter that allows you to restore the previous state of your application. The state parameter
+  // preserves some state objects set by the client in the auhtorization request and makes it available to the client in the response
+
+  String? state;
 }
