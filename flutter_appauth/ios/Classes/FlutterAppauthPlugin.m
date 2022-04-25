@@ -156,7 +156,7 @@ NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end session: %@";
     }
     if(requestParameters.state){
         [self ensureAdditionalParametersInitialized:requestParameters];
-        [requestParameters.additionalParameters setValue:requestParameters.state forKey:@"state"]
+        [requestParameters.additionalParameters setValue:requestParameters.state forKey:@"state"];
     }
     if(requestParameters.responseMode) {
         [self ensureAdditionalParametersInitialized:requestParameters];
