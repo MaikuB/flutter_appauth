@@ -68,7 +68,7 @@
     _loginHint = [ArgumentProcessor processArgumentValue:arguments withKey:@"loginHint"];
     _promptValues = [ArgumentProcessor processArgumentValue:arguments withKey:@"promptValues"];
     _responseMode = [ArgumentProcessor processArgumentValue:arguments withKey:@"responseMode"];
-    _state = [ArgumentProcessor processArguments:arguments withKey:@"state"];
+    _state = [ArgumentProcessor processArgumentValue:arguments withKey:@"state"];
     return self;
 }
 @end
