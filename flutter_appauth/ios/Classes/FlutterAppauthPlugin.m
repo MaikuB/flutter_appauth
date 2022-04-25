@@ -23,7 +23,6 @@
 @property(nonatomic, strong) NSString *refreshToken;
 @property(nonatomic, strong) NSString *codeVerifier;
 @property(nonatomic, strong) NSString *authorizationCode;
-@property(nonatomic, strong) NSString *state;
 @property(nonatomic, strong) NSArray *scopes;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
@@ -60,6 +59,7 @@
 @property(nonatomic, strong) NSString *loginHint;
 @property(nonatomic, strong) NSArray *promptValues;
 @property(nonatomic, strong) NSString *responseMode;
+@property(nonatomic, strong) NSString *state;
 @end
 
 @implementation AuthorizationTokenRequestParameters
