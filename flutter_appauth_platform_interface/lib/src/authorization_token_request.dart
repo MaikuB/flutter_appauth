@@ -10,6 +10,7 @@ class AuthorizationTokenRequest extends TokenRequest
     String clientId,
     String redirectUrl, {
     String? loginHint,
+    String? state,
     String? clientSecret,
     List<String>? scopes,
     AuthorizationServiceConfiguration? serviceConfiguration,
@@ -36,5 +37,6 @@ class AuthorizationTokenRequest extends TokenRequest
     this.promptValues = promptValues;
     this.preferEphemeralSession = preferEphemeralSession;
     this.responseMode = responseMode;
+    this.state = state;
   }
 }

@@ -194,8 +194,13 @@ class _MyAppState extends State<MyApp> {
       _setBusyState();
       // use the discovery endpoint to find the configuration
       final AuthorizationResponse? result = await _appAuth.authorize(
-        AuthorizationRequest(_clientId, _redirectUrl,
-            discoveryUrl: _discoveryUrl, scopes: _scopes, loginHint: 'bob'),
+        AuthorizationRequest(
+          _clientId,
+          _redirectUrl,
+          discoveryUrl: _discoveryUrl,
+          scopes: _scopes,
+          loginHint: 'bob',
+        ),
       );
 
       // or just use the issuer

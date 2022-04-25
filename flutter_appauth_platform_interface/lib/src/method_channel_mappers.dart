@@ -96,6 +96,7 @@ Map<String, Object?> _convertAuthorizationParametersToMap(
     AuthorizationParameters authorizationParameters) {
   return <String, Object?>{
     'loginHint': authorizationParameters.loginHint,
+    'state': authorizationParameters.state,
     'promptValues': authorizationParameters.promptValues,
     'preferEphemeralSession': authorizationParameters.preferEphemeralSession,
     'responseMode': authorizationParameters.responseMode,
