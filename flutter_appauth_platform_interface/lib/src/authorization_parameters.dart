@@ -12,8 +12,9 @@ mixin AuthorizationParameters {
 
   String? responseMode;
 
-  // Authorization protocols provide a state parameter that allows you to restore the previous state of your application. The state parameter
+  // Authorization protocols provide a custom state parameter that allows you to restore the previous state of your application. The custom state parameter
   // preserves some state objects set by the client in the auhtorization request and makes it available to the client in the response
+  // if the state parameter is not set it will be handled natively by generating a random string
 
   String? state;
 }
