@@ -31,13 +31,13 @@ class _MyAppState extends State<MyApp> {
       TextEditingController();
   String? _userInfo;
 
-  // For a list of client IDs, go to https://demo.identityserver.io
+  // For a list of client IDs, go to https://demo.duendesoftware.com
   final String _clientId = 'interactive.public';
-  final String _redirectUrl = 'io.identityserver.demo:/oauthredirect';
-  final String _issuer = 'https://demo.identityserver.io';
+  final String _redirectUrl = 'com.duendesoftware.demo:/oauthredirect';
+  final String _issuer = 'https://demo.duendesoftware.com';
   final String _discoveryUrl =
-      'https://demo.identityserver.io/.well-known/openid-configuration';
-  final String _postLogoutRedirectUrl = 'io.identityserver.demo:/';
+      'https://demo.duendesoftware.com/.well-known/openid-configuration';
+  final String _postLogoutRedirectUrl = 'com.duendesoftware.demo:/';
   final List<String> _scopes = <String>[
     'openid',
     'profile',
@@ -48,9 +48,9 @@ class _MyAppState extends State<MyApp> {
 
   final AuthorizationServiceConfiguration _serviceConfiguration =
       const AuthorizationServiceConfiguration(
-    authorizationEndpoint: 'https://demo.identityserver.io/connect/authorize',
-    tokenEndpoint: 'https://demo.identityserver.io/connect/token',
-    endSessionEndpoint: 'https://demo.identityserver.io/connect/endsession',
+    authorizationEndpoint: 'https://demo.duendesoftware.com/connect/authorize',
+    tokenEndpoint: 'https://demo.duendesoftware.com/connect/token',
+    endSessionEndpoint: 'https://demo.duendesoftware.com/connect/endsession',
   );
 
   @override
@@ -293,7 +293,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _testApi(TokenResponse? response) async {
     final http.Response httpResponse = await http.get(
-        Uri.parse('https://demo.identityserver.io/api/test'),
+        Uri.parse('https://demo.duendesoftware.com/api/test'),
         headers: <String, String>{'Authorization': 'Bearer $_accessToken'});
     setState(() {
       _userInfo = httpResponse.statusCode == 200 ? httpResponse.body : '';
