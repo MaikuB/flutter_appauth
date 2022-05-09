@@ -1,3 +1,7 @@
+## 2.4.2
+
+* Added const constructor to `FlutterAppAuth`
+
 ## 2.4.1+1
 
 * Example app has been updated to point to the new demo IdentityServer instance
