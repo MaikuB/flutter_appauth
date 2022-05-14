@@ -1,3 +1,11 @@
+## 2.4.2
+
+* Added const constructor to `FlutterAppAuth`
+
+## 2.4.1+1
+
+* Example app has been updated to point to the new demo IdentityServer instance
+
 ## 2.4.1
 
 * [iOS] fixed issue with `scopes` not being sent correctly as they should've been space-delimited instead of comma-delimited. Thanks to the PR from [Angle Wang](https://github.com/angle319)

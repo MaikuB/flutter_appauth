@@ -1,6 +1,8 @@
 import 'package:flutter_appauth_platform_interface/flutter_appauth_platform_interface.dart';
 
 class FlutterAppAuth {
+  const FlutterAppAuth();
+
   /// Convenience method for authorizing and then exchanges code
   Future<AuthorizationTokenResponse?> authorizeAndExchangeCode(
       AuthorizationTokenRequest request) {
