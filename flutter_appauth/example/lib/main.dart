@@ -12,7 +12,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _isBusy = false;
-  final FlutterAppAuth _appAuth = FlutterAppAuth();
+  final FlutterAppAuth _appAuth = const FlutterAppAuth();
   String? _codeVerifier;
   String? _authorizationCode;
   String? _refreshToken;
@@ -71,20 +71,22 @@ class _MyAppState extends State<MyApp> {
                 child: const Text('Sign in with no code exchange'),
                 onPressed: _signInWithNoCodeExchange,
               ),
+              const SizedBox(height: 8),
               ElevatedButton(
                 child: const Text('Exchange code'),
                 onPressed: _authorizationCode != null ? _exchangeCode : null,
               ),
+              const SizedBox(height: 8),
               ElevatedButton(
                 child: const Text('Sign in with auto code exchange'),
                 onPressed: () => _signInWithAutoCodeExchange(),
               ),
-              if (Platform.isIOS)
+              if (Platform.isIOS || Platform.isMacOS)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     child: const Text(
-                      'Sign in with auto code exchange using ephemeral session (iOS only)',
+                      'Sign in with auto code exchange using ephemeral session',
                       textAlign: TextAlign.center,
                     ),
                     onPressed: () => _signInWithAutoCodeExchange(
@@ -95,6 +97,7 @@ class _MyAppState extends State<MyApp> {
                 child: const Text('Refresh token'),
                 onPressed: _refreshToken != null ? _refresh : null,
               ),
+              const SizedBox(height: 8),
               ElevatedButton(
                 child: const Text('End session'),
                 onPressed: _idToken != null
@@ -103,6 +106,7 @@ class _MyAppState extends State<MyApp> {
                       }
                     : null,
               ),
+              const SizedBox(height: 8),
               const Text('authorization code'),
               TextField(
                 controller: _authorizationCodeTextController,

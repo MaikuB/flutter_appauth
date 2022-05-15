@@ -159,7 +159,7 @@ AppAuthAuthorization* authorization;
                 return;
             }
             
-          _currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode];
+            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode];
         }];
     } else {
         NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -172,7 +172,7 @@ AppAuthAuthorization* authorization;
                 return;
             }
             
-          _currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode];
+            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode];
         }];
     }
 }
@@ -241,7 +241,7 @@ AppAuthAuthorization* authorization;
                 return;
             }
             
-          _currentAuthorizationFlow = [authorization performEndSessionRequest:configuration requestParameters:requestParameters result:result];
+            self->_currentAuthorizationFlow = [authorization performEndSessionRequest:configuration requestParameters:requestParameters result:result];
         }];
     } else {
         NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -253,7 +253,7 @@ AppAuthAuthorization* authorization;
                 return;
             }
             
-          _currentAuthorizationFlow = [authorization performEndSessionRequest:configuration requestParameters:requestParameters result:result];
+            self->_currentAuthorizationFlow = [authorization performEndSessionRequest:configuration requestParameters:requestParameters result:result];
         }];
     }
 }
