@@ -95,19 +95,19 @@ AppAuthAuthorization* authorization;
                binaryMessenger:[registrar messenger]];
     FlutterAppauthPlugin* instance = [[FlutterAppauthPlugin alloc] init];
     [registrar addMethodCallDelegate:instance channel:channel];
-  
+    
 #if TARGET_OS_OSX
-  authorization = [[AppAuthMacOSAuthorization alloc] init];
-  
-  NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
-  [appleEventManager setEventHandler:instance
-                          andSelector:@selector(handleGetURLEvent:withReplyEvent:)
-                      forEventClass:kInternetEventClass
-                          andEventID:kAEGetURL];
+    authorization = [[AppAuthMacOSAuthorization alloc] init];
+    
+    NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
+    [appleEventManager setEventHandler:instance
+                           andSelector:@selector(handleGetURLEvent:withReplyEvent:)
+                         forEventClass:kInternetEventClass
+                            andEventID:kAEGetURL];
 #else
-  authorization = [[AppAuthIOSAuthorization alloc] init];
-  
-  [registrar addApplicationDelegate:instance];
+    authorization = [[AppAuthIOSAuthorization alloc] init];
+    
+    [registrar addApplicationDelegate:instance];
 #endif
 }
 
@@ -304,10 +304,10 @@ AppAuthAuthorization* authorization;
 #if TARGET_OS_OSX
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event
            withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
-  NSString *URLString = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
-  NSURL *URL = [NSURL URLWithString:URLString];
-  [_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:URL];
-  _currentAuthorizationFlow = nil;
+    NSString *URLString = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
+    NSURL *URL = [NSURL URLWithString:URLString];
+    [_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:URL];
+    _currentAuthorizationFlow = nil;
 }
 #endif
 
