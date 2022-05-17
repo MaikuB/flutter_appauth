@@ -12,6 +12,7 @@ Map<String, Object?> _convertCommonRequestDetailsToMap(
   return <String, Object?>{
     'clientId': commonRequestDetails.clientId,
     'issuer': commonRequestDetails.issuer,
+    'nonce': commonRequestDetails.nonce,
     'discoveryUrl': commonRequestDetails.discoveryUrl,
     'redirectUrl': commonRequestDetails.redirectUrl,
     'scopes': commonRequestDetails.scopes,

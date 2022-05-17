@@ -12,8 +12,9 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _isBusy = false;
-  final FlutterAppAuth _appAuth = FlutterAppAuth();
+  final FlutterAppAuth _appAuth = const FlutterAppAuth();
   String? _codeVerifier;
+  String? _nonce;
   String? _authorizationCode;
   String? _refreshToken;
   String? _accessToken;
@@ -147,6 +148,7 @@ class _MyAppState extends State<MyApp> {
   void _clearSessionInfo() {
     setState(() {
       _codeVerifier = null;
+      _nonce = null;
       _authorizationCode = null;
       _authorizationCodeTextController.clear();
       _accessToken = null;
@@ -181,10 +183,12 @@ class _MyAppState extends State<MyApp> {
           authorizationCode: _authorizationCode,
           discoveryUrl: _discoveryUrl,
           codeVerifier: _codeVerifier,
+          nonce: _nonce,
           scopes: _scopes));
       _processTokenResponse(result);
       await _testApi(result);
-    } catch (_) {
+    } catch (e) {
+      print(e);
       _clearBusyState();
     }
   }
@@ -273,8 +277,9 @@ class _MyAppState extends State<MyApp> {
 
   void _processAuthResponse(AuthorizationResponse response) {
     setState(() {
-      // save the code verifier as it must be used when exchanging the token
+      // save the code verifier and nonce as it must be used when exchanging the token
       _codeVerifier = response.codeVerifier;
+      _nonce = response.nonce;
       _authorizationCode =
           _authorizationCodeTextController.text = response.authorizationCode!;
       _isBusy = false;

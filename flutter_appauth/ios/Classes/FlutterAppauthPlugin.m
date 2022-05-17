@@ -22,6 +22,7 @@
 @property(nonatomic, strong) NSString *redirectUrl;
 @property(nonatomic, strong) NSString *refreshToken;
 @property(nonatomic, strong) NSString *codeVerifier;
+@property(nonatomic, strong) NSString *nonce;
 @property(nonatomic, strong) NSString *authorizationCode;
 @property(nonatomic, strong) NSArray *scopes;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
@@ -201,7 +202,7 @@ NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end session: %@";
     if(exchangeCode) {
         id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithViewController:rootViewController useEphemeralSession:preferEphemeralSession];
         _currentAuthorizationFlow = [OIDAuthState authStateByPresentingAuthorizationRequest:request externalUserAgent:externalUserAgent callback:^(OIDAuthState *_Nullable authState,
-                                                                                                                                                    NSError *_Nullable error) {
+                                                                                                                                                   NSError *_Nullable error) {
             if(authState) {
                 result([self processResponses:authState.lastTokenResponse authResponse:authState.lastAuthorizationResponse]);
                 
@@ -330,11 +331,11 @@ NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end session: %@";
     OIDEndSessionRequest *endSessionRequest = requestParameters.state ? [[OIDEndSessionRequest alloc] initWithConfiguration:serviceConfiguration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:postLogoutRedirectURL
                                                                                                                       state:requestParameters.state additionalParameters:requestParameters.additionalParameters] :[[OIDEndSessionRequest alloc] initWithConfiguration:serviceConfiguration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:postLogoutRedirectURL
                                                                                                                                                                                                                                                  additionalParameters:requestParameters.additionalParameters];
-
+    
     UIViewController *rootViewController =
     [UIApplication sharedApplication].delegate.window.rootViewController;
     id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithViewController:rootViewController useEphemeralSession:false];
-
+    
     
     _currentAuthorizationFlow = [OIDAuthorizationService presentEndSessionRequest:endSessionRequest externalUserAgent:externalUserAgent callback:^(OIDEndSessionResponse * _Nullable endSessionResponse, NSError * _Nullable error) {
         self->_currentAuthorizationFlow = nil;
@@ -380,8 +381,13 @@ NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end session: %@";
     if(tokenResponse.accessTokenExpirationDate) {
         [processedResponses setValue:[[NSNumber alloc] initWithDouble:[tokenResponse.accessTokenExpirationDate timeIntervalSince1970] * 1000] forKey:@"accessTokenExpirationTime"];
     }
-    if(authResponse && authResponse.additionalParameters) {
-        [processedResponses setObject:authResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
+    if(authResponse) {
+        if (authResponse.additionalParameters) {
+            [processedResponses setObject:authResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
+        }
+        if (authResponse.request && authResponse.request.nonce) {
+            [processedResponses setObject:authResponse.request.nonce forKey:@"nonce"];
+        }
     }
     if(tokenResponse.additionalParameters) {
         [processedResponses setObject:tokenResponse.additionalParameters forKey:@"tokenAdditionalParameters"];

@@ -3,7 +3,7 @@ import 'package:flutter_appauth_platform_interface/src/method_channel_flutter_ap
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_appauth_platform_interface/flutter_appauth_platform_interface.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 void main() {
@@ -39,7 +39,8 @@ void main() {
           'allowInsecureConnections': false,
           'preferEphemeralSession': false,
           'promptValues': null,
-          'responseMode': null
+          'responseMode': null,
+          'nonce': null,
         })
       ],
     );
@@ -48,7 +49,9 @@ void main() {
   test('authorizeAndExchangeCode', () async {
     await flutterAppAuth.authorizeAndExchangeCode(AuthorizationTokenRequest(
         'someClientId', 'someRedirectUrl',
-        discoveryUrl: 'someDiscoveryUrl', loginHint: 'someLoginHint', responseMode: 'fragment'));
+        discoveryUrl: 'someDiscoveryUrl',
+        loginHint: 'someLoginHint',
+        responseMode: 'fragment'));
     expect(
       log,
       <Matcher>[
@@ -69,7 +72,8 @@ void main() {
           'authorizationCode': null,
           'grantType': 'authorization_code',
           'codeVerifier': null,
-          'responseMode': 'fragment'
+          'responseMode': 'fragment',
+          'nonce': null,
         })
       ],
     );
@@ -102,7 +106,8 @@ void main() {
             'refreshToken': 'someRefreshToken',
             'authorizationCode': null,
             'grantType': 'refresh_token',
-            'codeVerifier': null
+            'codeVerifier': null,
+            'nonce': null,
           })
         ],
       );
@@ -128,7 +133,8 @@ void main() {
             'refreshToken': null,
             'authorizationCode': 'someAuthorizationCode',
             'grantType': 'authorization_code',
-            'codeVerifier': null
+            'codeVerifier': null,
+            'nonce': null,
           })
         ],
       );
@@ -153,7 +159,8 @@ void main() {
             'refreshToken': null,
             'authorizationCode': null,
             'grantType': 'someGrantType',
-            'codeVerifier': null
+            'codeVerifier': null,
+            'nonce': null,
           })
         ],
       );
