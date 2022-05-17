@@ -11,6 +11,9 @@ class CommonRequestDetails
   /// The request scopes.
   List<String>? scopes;
 
+  /// The nonce.
+  String? nonce;
+
   /// Additional parameters to include in the request.
   Map<String, String>? additionalParameters;
 

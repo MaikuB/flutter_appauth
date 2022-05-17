@@ -12,6 +12,7 @@ class TokenRequest extends CommonRequestDetails {
     String? discoveryUrl,
     AuthorizationServiceConfiguration? serviceConfiguration,
     Map<String, String>? additionalParameters,
+    String? nonce,
     this.refreshToken,
     this.grantType,
     this.authorizationCode,
@@ -23,6 +24,7 @@ class TokenRequest extends CommonRequestDetails {
     this.scopes = scopes;
     this.serviceConfiguration = serviceConfiguration;
     this.additionalParameters = additionalParameters;
+    this.nonce = nonce;
     this.issuer = issuer;
     this.discoveryUrl = discoveryUrl;
     this.allowInsecureConnections = allowInsecureConnections;

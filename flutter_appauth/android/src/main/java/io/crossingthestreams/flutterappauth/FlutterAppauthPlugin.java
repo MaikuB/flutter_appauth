@@ -235,11 +235,15 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         if (arguments.containsKey("codeVerifier")) {
             codeVerifier = (String) arguments.get("codeVerifier");
         }
+        String nonce = null;
+        if (arguments.containsKey("nonce")) {
+            nonce = (String) arguments.get("nonce");
+        }
         final ArrayList<String> scopes = (ArrayList<String>) arguments.get("scopes");
         final Map<String, String> serviceConfigurationParameters = (Map<String, String>) arguments.get("serviceConfiguration");
         final Map<String, String> additionalParameters = (Map<String, String>) arguments.get("additionalParameters");
         allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
-        return new TokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, refreshToken, authorizationCode, codeVerifier, grantType, serviceConfigurationParameters, additionalParameters);
+        return new TokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, refreshToken, authorizationCode, codeVerifier, nonce, grantType, serviceConfigurationParameters, additionalParameters);
     }
 
     @SuppressWarnings("unchecked")
@@ -366,6 +370,9 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                 .setCodeVerifier(tokenRequestParameters.codeVerifier)
                 .setRedirectUri(Uri.parse(tokenRequestParameters.redirectUrl));
 
+        if (tokenRequestParameters.nonce != null) {
+            builder.setNonce(tokenRequestParameters.nonce);
+        }
         if (tokenRequestParameters.grantType != null) {
             builder.setGrantType(tokenRequestParameters.grantType);
         }
@@ -564,6 +571,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private Map<String, Object> authorizationResponseToMap(AuthorizationResponse authResponse) {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("codeVerifier", authResponse.request.codeVerifier);
+        responseMap.put("nonce", authResponse.request.nonce);
         responseMap.put("authorizationCode", authResponse.authorizationCode);
         responseMap.put("authorizationAdditionalParameters", authResponse.additionalParameters);
         return responseMap;
@@ -588,11 +596,12 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         final String refreshToken;
         final String grantType;
         final String codeVerifier;
+        final String nonce;
         final String authorizationCode;
         final Map<String, String> serviceConfigurationParameters;
         final Map<String, String> additionalParameters;
 
-        private TokenRequestParameters(String clientId, String issuer, String discoveryUrl, ArrayList<String> scopes, String redirectUrl, String refreshToken, String authorizationCode, String codeVerifier, String grantType, Map<String, String> serviceConfigurationParameters, Map<String, String> additionalParameters) {
+        private TokenRequestParameters(String clientId, String issuer, String discoveryUrl, ArrayList<String> scopes, String redirectUrl, String refreshToken, String authorizationCode, String codeVerifier, String nonce, String grantType, Map<String, String> serviceConfigurationParameters, Map<String, String> additionalParameters) {
             this.clientId = clientId;
             this.issuer = issuer;
             this.discoveryUrl = discoveryUrl;
@@ -601,6 +610,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             this.refreshToken = refreshToken;
             this.authorizationCode = authorizationCode;
             this.codeVerifier = codeVerifier;
+            this.nonce = nonce;
             this.grantType = grantType;
             this.serviceConfigurationParameters = serviceConfigurationParameters;
             this.additionalParameters = additionalParameters;
@@ -635,7 +645,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         final String responseMode;
 
         private AuthorizationTokenRequestParameters(String clientId, String issuer, String discoveryUrl, ArrayList<String> scopes, String redirectUrl, Map<String, String> serviceConfigurationParameters, Map<String, String> additionalParameters, String loginHint, ArrayList<String> promptValues, String responseMode) {
-            super(clientId, issuer, discoveryUrl, scopes, redirectUrl, null, null, null, null, serviceConfigurationParameters, additionalParameters);
+            super(clientId, issuer, discoveryUrl, scopes, redirectUrl, null, null, null, null, null, serviceConfigurationParameters, additionalParameters);
             this.loginHint = loginHint;
             this.promptValues = promptValues;
             this.responseMode = responseMode;
