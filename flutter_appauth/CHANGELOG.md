@@ -1,3 +1,7 @@
+## 3.0.1
+
+* [iOS] fix `nonce` not being returned correctly on iOS
+
 ## 3.0.0
 
 * **Breaking change** `AuthorizationResponse`'s  constructor now includes `nonce` and has changed to take positional parameters

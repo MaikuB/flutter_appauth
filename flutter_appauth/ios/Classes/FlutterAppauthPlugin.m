@@ -218,6 +218,7 @@ NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end session: %@";
                 [processedResponse setObject:authorizationResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
                 [processedResponse setObject:authorizationResponse.authorizationCode forKey:@"authorizationCode"];
                 [processedResponse setObject:authorizationResponse.request.codeVerifier forKey:@"codeVerifier"];
+                [processedResponse setObject:authorizationResponse.request.nonce forKey:@"nonce"];
                 result(processedResponse);
             } else {
                 [self finishWithError:AUTHORIZE_ERROR_CODE message:[self formatMessageWithError:AUTHORIZE_ERROR_MESSAGE_FORMAT error:error] result:result];
@@ -381,13 +382,8 @@ NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end session: %@";
     if(tokenResponse.accessTokenExpirationDate) {
         [processedResponses setValue:[[NSNumber alloc] initWithDouble:[tokenResponse.accessTokenExpirationDate timeIntervalSince1970] * 1000] forKey:@"accessTokenExpirationTime"];
     }
-    if(authResponse) {
-        if (authResponse.additionalParameters) {
-            [processedResponses setObject:authResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
-        }
-        if (authResponse.request && authResponse.request.nonce) {
-            [processedResponses setObject:authResponse.request.nonce forKey:@"nonce"];
-        }
+    if(authResponse && authResponse.additionalParameters) {
+        [processedResponses setObject:authResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
     }
     if(tokenResponse.additionalParameters) {
         [processedResponses setObject:tokenResponse.additionalParameters forKey:@"tokenAdditionalParameters"];
