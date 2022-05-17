@@ -23,6 +23,7 @@
 @property(nonatomic, strong) NSString *redirectUrl;
 @property(nonatomic, strong) NSString *refreshToken;
 @property(nonatomic, strong) NSString *codeVerifier;
+@property(nonatomic, strong) NSString *nonce;
 @property(nonatomic, strong) NSString *authorizationCode;
 @property(nonatomic, strong) NSArray *scopes;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;

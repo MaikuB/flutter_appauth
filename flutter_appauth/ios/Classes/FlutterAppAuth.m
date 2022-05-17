@@ -10,9 +10,14 @@
     if(tokenResponse.accessTokenExpirationDate) {
         [processedResponses setValue:[[NSNumber alloc] initWithDouble:[tokenResponse.accessTokenExpirationDate timeIntervalSince1970] * 1000] forKey:@"accessTokenExpirationTime"];
     }
-    if(authResponse && authResponse.additionalParameters) {
-        [processedResponses setObject:authResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
-    }
+    if(authResponse) {
+        if (authResponse.additionalParameters) {
+            [processedResponses setObject:authResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
+        }
+        if (authResponse.request && authResponse.request.nonce) {
+            [processedResponses setObject:authResponse.request.nonce forKey:@"nonce"];
+        }
+     }
     if(tokenResponse.additionalParameters) {
         [processedResponses setObject:tokenResponse.additionalParameters forKey:@"tokenAdditionalParameters"];
     }
