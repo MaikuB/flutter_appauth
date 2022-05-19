@@ -1,3 +1,7 @@
+## 4.0.0
+
+* Added support for macOS. Thanks to the PR from [Jordy Langen](https://github.com/JordyLangen)
+
 ## 3.0.1
 
 * [iOS] fix `nonce` not being returned correctly on iOS
