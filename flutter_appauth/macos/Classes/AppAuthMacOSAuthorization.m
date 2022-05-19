@@ -31,6 +31,7 @@
                 [processedResponse setObject:authorizationResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
                 [processedResponse setObject:authorizationResponse.authorizationCode forKey:@"authorizationCode"];
                 [processedResponse setObject:authorizationResponse.request.codeVerifier forKey:@"codeVerifier"];
+                [processedResponse setObject:authorizationResponse.request.nonce forKey:@"nonce"];
                 result(processedResponse);
             } else {
                 [FlutterAppAuth finishWithError:AUTHORIZE_ERROR_CODE message:[FlutterAppAuth formatMessageWithError:AUTHORIZE_ERROR_MESSAGE_FORMAT error:error] result:result];
