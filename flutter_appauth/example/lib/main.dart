@@ -61,72 +61,79 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Visibility(
-                visible: _isBusy,
-                child: const LinearProgressIndicator(),
-              ),
-              ElevatedButton(
-                child: const Text('Sign in with no code exchange'),
-                onPressed: _signInWithNoCodeExchange,
-              ),
-              ElevatedButton(
-                child: const Text('Exchange code'),
-                onPressed: _authorizationCode != null ? _exchangeCode : null,
-              ),
-              ElevatedButton(
-                child: const Text('Sign in with auto code exchange'),
-                onPressed: () => _signInWithAutoCodeExchange(),
-              ),
-              if (Platform.isIOS)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    child: const Text(
-                      'Sign in with auto code exchange using ephemeral session (iOS only)',
-                      textAlign: TextAlign.center,
-                    ),
-                    onPressed: () => _signInWithAutoCodeExchange(
-                        preferEphemeralSession: true),
-                  ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Visibility(
+                  visible: _isBusy,
+                  child: const LinearProgressIndicator(),
                 ),
-              ElevatedButton(
-                child: const Text('Refresh token'),
-                onPressed: _refreshToken != null ? _refresh : null,
-              ),
-              ElevatedButton(
-                child: const Text('End session'),
-                onPressed: _idToken != null
-                    ? () async {
-                        await _endSession();
-                      }
-                    : null,
-              ),
-              const Text('authorization code'),
-              TextField(
-                controller: _authorizationCodeTextController,
-              ),
-              const Text('access token'),
-              TextField(
-                controller: _accessTokenTextController,
-              ),
-              const Text('access token expiration'),
-              TextField(
-                controller: _accessTokenExpirationTextController,
-              ),
-              const Text('id token'),
-              TextField(
-                controller: _idTokenTextController,
-              ),
-              const Text('refresh token'),
-              TextField(
-                controller: _refreshTokenTextController,
-              ),
-              const Text('test api results'),
-              Text(_userInfo ?? ''),
-            ],
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  child: const Text('Sign in with no code exchange'),
+                  onPressed: _signInWithNoCodeExchange,
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  child: const Text('Exchange code'),
+                  onPressed: _authorizationCode != null ? _exchangeCode : null,
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  child: const Text('Sign in with auto code exchange'),
+                  onPressed: () => _signInWithAutoCodeExchange(),
+                ),
+                if (Platform.isIOS || Platform.isMacOS)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: const Text(
+                        'Sign in with auto code exchange using ephemeral session',
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () => _signInWithAutoCodeExchange(
+                          preferEphemeralSession: true),
+                    ),
+                  ),
+                ElevatedButton(
+                  child: const Text('Refresh token'),
+                  onPressed: _refreshToken != null ? _refresh : null,
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  child: const Text('End session'),
+                  onPressed: _idToken != null
+                      ? () async {
+                          await _endSession();
+                        }
+                      : null,
+                ),
+                const SizedBox(height: 8),
+                const Text('authorization code'),
+                TextField(
+                  controller: _authorizationCodeTextController,
+                ),
+                const Text('access token'),
+                TextField(
+                  controller: _accessTokenTextController,
+                ),
+                const Text('access token expiration'),
+                TextField(
+                  controller: _accessTokenExpirationTextController,
+                ),
+                const Text('id token'),
+                TextField(
+                  controller: _idTokenTextController,
+                ),
+                const Text('refresh token'),
+                TextField(
+                  controller: _refreshTokenTextController,
+                ),
+                const Text('test api results'),
+                Text(_userInfo ?? ''),
+              ],
+            ),
           ),
         ),
       ),

@@ -37,3 +37,21 @@ task:
     - export PATH="$PATH":"$HOME/.pub-cache/bin"
     - melos bootstrap
     - melos run build:example_ios
+
+task:
+  name: Build macOS example app
+  osx_instance:
+    image: monterey-xcode
+  pub_cache:
+    folder: ~/.pub-cache
+  upgrade_script:
+    - flutter channel stable
+    - flutter upgrade
+  setup_script:
+    - flutter config --enable-macos-desktop
+  install_melos_script:
+    - dart pub global activate melos
+  build_script:
+    - export PATH="$PATH":"$HOME/.pub-cache/bin"
+    - melos bootstrap
+    - melos run build:example_macos

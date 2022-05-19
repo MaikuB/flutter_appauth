@@ -20,3 +20,5 @@ flutter:
         pluginClass: FlutterAppauthPlugin
       ios:
         pluginClass: FlutterAppauthPlugin
+      macos:
+        pluginClass: FlutterAppauthPlugin

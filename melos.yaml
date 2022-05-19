@@ -36,7 +36,15 @@ scripts:
       dir-exists:
         - ios
       scope: "*example*"
-
+  build:example_macos:
+    run: |
+      melos exec -c 1 -- \
+        "flutter build macos"
+    description: Build a specific example app for macOS.
+    select-package:
+      dir-exists:
+        - macos
+      scope: "*example*"
   clean:
     run: git clean -x -d -f -q
     description: Runs git clean as though repo was just checked out
