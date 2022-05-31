@@ -1,3 +1,7 @@
+## 4.0.1
+
+* Bumped AppAuth iOS dependency. Thanks to PR from [Didier Prophete](https://github.com/dprophete)
+
 ## 4.0.0
 
 * Added support for macOS. Thanks to the PR from [Jordy Langen](https://github.com/JordyLangen)
