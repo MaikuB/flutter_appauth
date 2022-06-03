@@ -400,10 +400,12 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
         TokenRequest tokenRequest = builder.build();
         AuthorizationService authorizationService = allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
-        if (clientSecret == null) {
-            authorizationService.performTokenRequest(tokenRequest, tokenResponseCallback);
-        } else {
-            authorizationService.performTokenRequest(tokenRequest, new ClientSecretBasic(clientSecret), tokenResponseCallback);
+        if (authorizationService != null) {
+            if (clientSecret == null) {
+                authorizationService.performTokenRequest(tokenRequest, tokenResponseCallback);
+            } else {
+                authorizationService.performTokenRequest(tokenRequest, new ClientSecretBasic(clientSecret), tokenResponseCallback);
+            }
         }
     }
 
