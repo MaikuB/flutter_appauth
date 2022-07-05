@@ -144,11 +144,10 @@ AppAuthAuthorization* authorization;
     if(requestParameters.responseMode) {
         [requestParameters.additionalParameters setValue:requestParameters.responseMode forKey:@"response_mode"];
     }
-    NSString* nonce = [requestParameters.additionalParameters objectForKey:@"nonce"];
 
     if(requestParameters.serviceConfigurationParameters != nil) {
         OIDServiceConfiguration *serviceConfiguration = [self processServiceConfigurationParameters:requestParameters.serviceConfigurationParameters];
-        _currentAuthorizationFlow = [authorization performAuthorization:serviceConfiguration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:nonce];
+        _currentAuthorizationFlow = [authorization performAuthorization:serviceConfiguration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:requestParameters.nonce];
     } else if (requestParameters.discoveryUrl) {
         NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
         [OIDAuthorizationService discoverServiceConfigurationForDiscoveryURL:discoveryUrl
@@ -160,7 +159,7 @@ AppAuthAuthorization* authorization;
                 return;
             }
 
-            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:nonce];
+            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:requestParameters.nonce];
         }];
     } else {
         NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -173,7 +172,7 @@ AppAuthAuthorization* authorization;
                 return;
             }
 
-            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:nonce];
+            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:requestParameters.nonce];
         }];
     }
 }

@@ -76,7 +76,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private boolean allowInsecureConnections;
     private AuthorizationService defaultAuthorizationService;
     private AuthorizationService insecureAuthorizationService;
-    private String nonceAuthorization;
 
     @SuppressWarnings("deprecation")
     public static void registerWith(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
@@ -206,6 +205,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         final String discoveryUrl = (String) arguments.get("discoveryUrl");
         final String redirectUrl = (String) arguments.get("redirectUrl");
         final String loginHint = (String) arguments.get("loginHint");
+        final String nonce = (String) arguments.get("nonce");
         clientSecret = (String) arguments.get("clientSecret");
         final ArrayList<String> scopes = (ArrayList<String>) arguments.get("scopes");
         final ArrayList<String> promptValues = (ArrayList<String>) arguments.get("promptValues");
@@ -214,7 +214,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
         final String responseMode = (String) arguments.get("responseMode");
 
-        return new AuthorizationTokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, serviceConfigurationParameters, additionalParameters, loginHint, promptValues, responseMode);
+        return new AuthorizationTokenRequestParameters(clientId, issuer, discoveryUrl, scopes, redirectUrl, serviceConfigurationParameters, additionalParameters, loginHint, nonce, promptValues, responseMode);
     }
 
     @SuppressWarnings("unchecked")
@@ -265,13 +265,13 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         final AuthorizationTokenRequestParameters tokenRequestParameters = processAuthorizationTokenRequestArguments(arguments);
         if (tokenRequestParameters.serviceConfigurationParameters != null) {
             AuthorizationServiceConfiguration serviceConfiguration = processServiceConfigurationParameters(tokenRequestParameters.serviceConfigurationParameters);
-            performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues, tokenRequestParameters.responseMode);
+            performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.nonce, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues, tokenRequestParameters.responseMode);
         } else {
             AuthorizationServiceConfiguration.RetrieveConfigurationCallback callback = new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
                 @Override
                 public void onFetchConfigurationCompleted(@Nullable AuthorizationServiceConfiguration serviceConfiguration, @Nullable AuthorizationException ex) {
                     if (ex == null) {
-                        performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues, tokenRequestParameters.responseMode);
+                        performAuthorization(serviceConfiguration, tokenRequestParameters.clientId, tokenRequestParameters.redirectUrl, tokenRequestParameters.scopes, tokenRequestParameters.loginHint, tokenRequestParameters.nonce, tokenRequestParameters.additionalParameters, exchangeCode, tokenRequestParameters.promptValues, tokenRequestParameters.responseMode);
                     } else {
                         finishWithDiscoveryError(ex);
                     }
@@ -315,7 +315,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     }
 
 
-    private void performAuthorization(AuthorizationServiceConfiguration serviceConfiguration, String clientId, String redirectUrl, ArrayList<String> scopes, String loginHint, Map<String, String> additionalParameters, boolean exchangeCode, ArrayList<String> promptValues, String responseMode) {
+    private void performAuthorization(AuthorizationServiceConfiguration serviceConfiguration, String clientId, String redirectUrl, ArrayList<String> scopes, String loginHint, String nonce, Map<String, String> additionalParameters, boolean exchangeCode, ArrayList<String> promptValues, String responseMode) {
         AuthorizationRequest.Builder authRequestBuilder =
                 new AuthorizationRequest.Builder(
                         serviceConfiguration,
@@ -339,6 +339,10 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             authRequestBuilder.setResponseMode(responseMode);
         }
 
+        if (nonce != null) {
+            authRequestBuilder.setNonce(nonce);
+        }
+
         if (additionalParameters != null && !additionalParameters.isEmpty()) {
 
             if(additionalParameters.containsKey("ui_locales")){
@@ -358,10 +362,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                 }
             }
 
-            if(additionalParameters.containsKey("nonce")){
-                authRequestBuilder.setNonce(additionalParameters.get("nonce"));
-                nonceAuthorization = additionalParameters.get("nonce");
-            }
             authRequestBuilder.setAdditionalParameters(additionalParameters);
         }
 
@@ -389,10 +389,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
         if (tokenRequestParameters.additionalParameters != null && !tokenRequestParameters.additionalParameters.isEmpty()) {
             builder.setAdditionalParameters(tokenRequestParameters.additionalParameters);
-        }
-
-        if(!TextUtils.isEmpty(nonceAuthorization)){
-            builder.setNonce(nonceAuthorization);
         }
 
         AuthorizationService.TokenResponseCallback tokenResponseCallback = new AuthorizationService.TokenResponseCallback() {
@@ -654,8 +650,8 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         final ArrayList<String> promptValues;
         final String responseMode;
 
-        private AuthorizationTokenRequestParameters(String clientId, String issuer, String discoveryUrl, ArrayList<String> scopes, String redirectUrl, Map<String, String> serviceConfigurationParameters, Map<String, String> additionalParameters, String loginHint, ArrayList<String> promptValues, String responseMode) {
-            super(clientId, issuer, discoveryUrl, scopes, redirectUrl, null, null, null, null, null, serviceConfigurationParameters, additionalParameters);
+        private AuthorizationTokenRequestParameters(String clientId, String issuer, String discoveryUrl, ArrayList<String> scopes, String redirectUrl, Map<String, String> serviceConfigurationParameters, Map<String, String> additionalParameters, String loginHint, String nonce, ArrayList<String> promptValues, String responseMode) {
+            super(clientId, issuer, discoveryUrl, scopes, redirectUrl, null, null, null, nonce, null, serviceConfigurationParameters, additionalParameters);
             this.loginHint = loginHint;
             this.promptValues = promptValues;
             this.responseMode = responseMode;
@@ -663,4 +659,3 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     }
 
 }
-
