@@ -134,46 +134,46 @@ AppAuthAuthorization* authorization;
 
 -(void)handleAuthorizeMethodCall:(NSDictionary*)arguments result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode {
     AuthorizationTokenRequestParameters *requestParameters = [[AuthorizationTokenRequestParameters alloc] initWithArguments:arguments];
+    [self ensureAdditionalParametersInitialized:requestParameters];
     if(requestParameters.loginHint) {
-        [self ensureAdditionalParametersInitialized:requestParameters];
         [requestParameters.additionalParameters setValue:requestParameters.loginHint forKey:@"login_hint"];
     }
     if(requestParameters.promptValues) {
-        [self ensureAdditionalParametersInitialized:requestParameters];
         [requestParameters.additionalParameters setValue:[requestParameters.promptValues componentsJoinedByString:@" "] forKey:@"prompt"];
     }
     if(requestParameters.responseMode) {
-        [self ensureAdditionalParametersInitialized:requestParameters];
         [requestParameters.additionalParameters setValue:requestParameters.responseMode forKey:@"response_mode"];
     }
+    NSString* nonce = [requestParameters.additionalParameters objectForKey:@"nonce"];
+
     if(requestParameters.serviceConfigurationParameters != nil) {
         OIDServiceConfiguration *serviceConfiguration = [self processServiceConfigurationParameters:requestParameters.serviceConfigurationParameters];
-        _currentAuthorizationFlow = [authorization performAuthorization:serviceConfiguration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode];
+        _currentAuthorizationFlow = [authorization performAuthorization:serviceConfiguration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:nonce];
     } else if (requestParameters.discoveryUrl) {
         NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
         [OIDAuthorizationService discoverServiceConfigurationForDiscoveryURL:discoveryUrl
                                                                   completion:^(OIDServiceConfiguration *_Nullable configuration,
                                                                                NSError *_Nullable error) {
-            
+
             if (!configuration) {
                 [self finishWithDiscoveryError:error result:result];
                 return;
             }
-            
-            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode];
+
+            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:nonce];
         }];
     } else {
         NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
         [OIDAuthorizationService discoverServiceConfigurationForIssuer:issuerUrl
                                                             completion:^(OIDServiceConfiguration *_Nullable configuration,
                                                                          NSError *_Nullable error) {
-            
+
             if (!configuration) {
                 [self finishWithDiscoveryError:error result:result];
                 return;
             }
-            
-            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode];
+
+            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:nonce];
         }];
     }
 }

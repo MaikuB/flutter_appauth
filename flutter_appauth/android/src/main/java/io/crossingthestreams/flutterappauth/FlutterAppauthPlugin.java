@@ -39,6 +39,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
+import android.text.TextUtils;
 
 /**
  * FlutterAppauthPlugin
@@ -75,6 +76,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private boolean allowInsecureConnections;
     private AuthorizationService defaultAuthorizationService;
     private AuthorizationService insecureAuthorizationService;
+    private String nonceAuthorization;
 
     @SuppressWarnings("deprecation")
     public static void registerWith(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
@@ -355,6 +357,11 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                     return;
                 }
             }
+
+            if(additionalParameters.containsKey("nonce")){
+                authRequestBuilder.setNonce(additionalParameters.get("nonce"));
+                nonceAuthorization = additionalParameters.get("nonce");
+            }
             authRequestBuilder.setAdditionalParameters(additionalParameters);
         }
 
@@ -384,6 +391,9 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             builder.setAdditionalParameters(tokenRequestParameters.additionalParameters);
         }
 
+        if(!TextUtils.isEmpty(nonceAuthorization)){
+            builder.setNonce(nonceAuthorization);
+        }
 
         AuthorizationService.TokenResponseCallback tokenResponseCallback = new AuthorizationService.TokenResponseCallback() {
             @Override

@@ -2,14 +2,19 @@
 
 @implementation AppAuthIOSAuthorization
 
-- (id<OIDExternalUserAgentSession>) performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferEphemeralSession:(BOOL)preferEphemeralSession result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode{
+- (id<OIDExternalUserAgentSession>) performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferEphemeralSession:(BOOL)preferEphemeralSession result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce{
   OIDAuthorizationRequest *request =
   [[OIDAuthorizationRequest alloc] initWithConfiguration:serviceConfiguration
                                                 clientId:clientId
                                             clientSecret:clientSecret
-                                                  scopes:scopes
+                                                   scope:[OIDScopeUtilities scopesWithArray:scopes]
                                              redirectURL:[NSURL URLWithString:redirectUrl]
                                             responseType:OIDResponseTypeCode
+                                                   state:nil
+                                                   nonce:nonce
+                                            codeVerifier:nil
+                                           codeChallenge:nil
+                                     codeChallengeMethod:nil
                                     additionalParameters:additionalParameters];
   UIViewController *rootViewController =
   [UIApplication sharedApplication].delegate.window.rootViewController;
