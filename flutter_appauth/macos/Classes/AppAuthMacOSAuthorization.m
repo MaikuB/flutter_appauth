@@ -3,6 +3,9 @@
 @implementation AppAuthMacOSAuthorization
 
 - (id<OIDExternalUserAgentSession>)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferEphemeralSession:(BOOL)preferEphemeralSession result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode {
+    NSString *codeVerifier = [OIDAuthorizationRequest generateCodeVerifier];
+    NSString *codeChallenge = [OIDAuthorizationRequest codeChallengeS256ForVerifier:codeVerifier];
+
     OIDAuthorizationRequest *request =
     [[OIDAuthorizationRequest alloc] initWithConfiguration:serviceConfiguration
                                                   clientId:clientId
@@ -10,6 +13,11 @@
                                                     scopes:scopes
                                                redirectURL:[NSURL URLWithString:redirectUrl]
                                               responseType:OIDResponseTypeCode
+                                                     state:[OIDAuthorizationRequest generateState]
+                                                     nonce: nonce != nil ? nonce : [OIDAuthorizationRequest generateState]
+                                              codeVerifier:codeVerifier
+                                             codeChallenge:codeChallenge
+                                       codeChallengeMethod:OIDOAuthorizationRequestCodeChallengeMethodS256
                                       additionalParameters:additionalParameters];
     NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
     if(exchangeCode) {

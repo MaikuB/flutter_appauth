@@ -3,6 +3,9 @@
 @implementation AppAuthIOSAuthorization
 
 - (id<OIDExternalUserAgentSession>) performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferEphemeralSession:(BOOL)preferEphemeralSession result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce{
+  NSString *codeVerifier = [OIDAuthorizationRequest generateCodeVerifier];
+  NSString *codeChallenge = [OIDAuthorizationRequest codeChallengeS256ForVerifier:codeVerifier];
+
   OIDAuthorizationRequest *request =
   [[OIDAuthorizationRequest alloc] initWithConfiguration:serviceConfiguration
                                                 clientId:clientId
@@ -10,11 +13,11 @@
                                                    scope:[OIDScopeUtilities scopesWithArray:scopes]
                                              redirectURL:[NSURL URLWithString:redirectUrl]
                                             responseType:OIDResponseTypeCode
-                                                   state:nil
-                                                   nonce:nonce
-                                            codeVerifier:nil
-                                           codeChallenge:nil
-                                     codeChallengeMethod:nil
+                                                   state:[OIDAuthorizationRequest generateState]
+                                                   nonce: nonce != nil ? nonce : [OIDAuthorizationRequest generateState]
+                                            codeVerifier:codeVerifier
+                                           codeChallenge:codeChallenge
+                                     codeChallengeMethod:OIDOAuthorizationRequestCodeChallengeMethodS256
                                     additionalParameters:additionalParameters];
   UIViewController *rootViewController =
   [UIApplication sharedApplication].delegate.window.rootViewController;
