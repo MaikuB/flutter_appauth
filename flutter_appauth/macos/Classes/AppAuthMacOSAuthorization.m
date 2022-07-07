@@ -10,7 +10,7 @@
     [[OIDAuthorizationRequest alloc] initWithConfiguration:serviceConfiguration
                                                   clientId:clientId
                                               clientSecret:clientSecret
-                                                    scopes:scopes
+                                                     scope:[OIDScopeUtilities scopesWithArray:scopes]
                                                redirectURL:[NSURL URLWithString:redirectUrl]
                                               responseType:OIDResponseTypeCode
                                                      state:[OIDAuthorizationRequest generateState]
