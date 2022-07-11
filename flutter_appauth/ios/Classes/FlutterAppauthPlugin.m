@@ -40,6 +40,7 @@
     _discoveryUrl = [ArgumentProcessor processArgumentValue:arguments withKey:@"discoveryUrl"];
     _redirectUrl = [ArgumentProcessor processArgumentValue:arguments withKey:@"redirectUrl"];
     _refreshToken = [ArgumentProcessor processArgumentValue:arguments withKey:@"refreshToken"];
+    _nonce = [ArgumentProcessor processArgumentValue:arguments withKey:@"nonce"];
     _authorizationCode = [ArgumentProcessor processArgumentValue:arguments withKey:@"authorizationCode"];
     _codeVerifier = [ArgumentProcessor processArgumentValue:arguments withKey:@"codeVerifier"];
     _grantType = [ArgumentProcessor processArgumentValue:arguments withKey:@"grantType"];
