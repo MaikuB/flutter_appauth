@@ -39,6 +39,7 @@ static NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end sessio
 @property(nonatomic, strong) NSString *discoveryUrl;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
+@property(nonatomic, readwrite) BOOL preferEphemeralSession;
 @end
 
 @interface AppAuthAuthorization : NSObject

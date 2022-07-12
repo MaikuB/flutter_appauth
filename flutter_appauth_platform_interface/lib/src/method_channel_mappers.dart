@@ -33,6 +33,7 @@ extension EndSessionRequestMapper on EndSessionRequest {
       'issuer': issuer,
       'discoveryUrl': discoveryUrl,
       'serviceConfiguration': serviceConfiguration?.toMap(),
+      'preferEphemeralSession': preferEphemeralSession,
     };
   }
 }

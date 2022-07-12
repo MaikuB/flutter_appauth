@@ -183,6 +183,7 @@ void main() {
         'issuer': null,
         'discoveryUrl': 'someDiscoveryUrl',
         'serviceConfiguration': null,
+        'preferEphemeralSession': false,
       })
     ]);
   });

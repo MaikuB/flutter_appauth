@@ -7,6 +7,7 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
     this.postLogoutRedirectUrl,
     this.state,
     this.allowInsecureConnections = false,
+    this.preferEphemeralSession = false,
     this.additionalParameters,
     String? issuer,
     String? discoveryUrl,
@@ -35,6 +36,11 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
   ///
   /// This property is only applicable to Android.
   bool allowInsecureConnections;
+
+  /// Whether to use an ephemeral session that prevents cookies and other browser data being shared with the user's normal browser session.
+  ///
+  /// This property is only applicable to iOS versions 13 and above.
+  bool? preferEphemeralSession;
 
   final Map<String, String>? additionalParameters;
 }
