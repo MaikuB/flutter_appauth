@@ -1,3 +1,7 @@
+## 4.1.0
+
+* Added ability to specify the `nonce` as part of requests
+
 ## 4.0.1
 
 * Bumped AppAuth iOS dependency. Thanks to PR from [Didier Prophete](https://github.com/dprophete)
