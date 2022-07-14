@@ -1,6 +1,11 @@
+## 4.1.0+1
+
+* Added missing credit to 4.1.0 changelog entry
+* Updated readme to remove Android setup step for setting `queries` in `AndroidManifest.xml` as that is now handled directly with the AppAuth Android SDK
+
 ## 4.1.0
 
-* Added ability to specify the `nonce` as part of requests
+* Added ability to specify the `nonce` as part of requests. Thanks to the PR from [Tiernan](https://github.com/nvx)
 
 ## 4.0.1
 

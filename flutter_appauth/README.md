@@ -131,24 +131,6 @@ Attribute application@name at AndroidManifest.xml:5:9-42 requires a placeholder 
 
 If you see this error then update your `build.gradle` to use `+=` instead.
 
-If your app is target API 30 or above (i.e. Android 11 or newer), make sure to add the following to your `AndroidManifest.xml` file a level underneath the `<manifest>` element
-
-
-```xml
-<queries>
-    <intent>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.BROWSABLE" />
-        <data android:scheme="https" />
-    </intent>
-    <intent>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.APP_BROWSER" />
-        <data android:scheme="https" />
-    </intent>
-</queries>
-```
-
 ## iOS/macOS setup
 
 Go to the `Info.plist` for your iOS/macOS app to specify the custom scheme so that there should be a section in it that look similar to the following but replace `<your_custom_scheme>` with the desired value
