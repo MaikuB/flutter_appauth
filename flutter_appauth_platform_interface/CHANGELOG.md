@@ -1,3 +1,7 @@
+## [5.1.0]
+
+* Added ability to specify the `nonce` as part of requests
+
 ## [5.0.0]
 
 * **Breaking change** `AuthorizationResponse`'s  constructor now includes `nonce` and has changed to take positional parameters

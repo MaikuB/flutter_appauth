@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io' show Platform;
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:http/http.dart' as http;
@@ -72,7 +74,12 @@ class _MyAppState extends State<MyApp> {
                 const SizedBox(height: 8),
                 ElevatedButton(
                   child: const Text('Sign in with no code exchange'),
-                  onPressed: _signInWithNoCodeExchange,
+                  onPressed: () => _signInWithNoCodeExchange(),
+                ),
+                ElevatedButton(
+                  child: const Text(
+                      'Sign in with no code exchange and generated nonce'),
+                  onPressed: () => _signInWithNoCodeExchangeAndGeneratedNonce(),
                 ),
                 const SizedBox(height: 8),
                 ElevatedButton(
@@ -217,6 +224,29 @@ class _MyAppState extends State<MyApp> {
       //     scopes: _scopes,
       //   ),
       // );
+      if (result != null) {
+        _processAuthResponse(result);
+      }
+    } catch (_) {
+      _clearBusyState();
+    }
+  }
+
+  Future<void> _signInWithNoCodeExchangeAndGeneratedNonce() async {
+    try {
+      _setBusyState();
+      final Random random = Random.secure();
+      final String nonce =
+          base64Url.encode(List<int>.generate(16, (_) => random.nextInt(256)));
+      // use the discovery endpoint to find the configuration
+      final AuthorizationResponse? result = await _appAuth.authorize(
+        AuthorizationRequest(_clientId, _redirectUrl,
+            discoveryUrl: _discoveryUrl,
+            scopes: _scopes,
+            loginHint: 'bob',
+            nonce: nonce),
+      );
+
       if (result != null) {
         _processAuthResponse(result);
       }
