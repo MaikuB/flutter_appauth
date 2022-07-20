@@ -39,7 +39,9 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
 
   /// Whether to use an ephemeral session that prevents cookies and other browser data being shared with the user's normal browser session.
   ///
-  /// This property is only applicable to iOS versions 13 and above.
+  /// This property is only applicable to iOS (versions 13 and above) and macOS.
+  ///
+  /// preferEphemeralSession = true must only be used here, if it is also used for the sign in call.
   bool preferEphemeralSession;
 
   final Map<String, String>? additionalParameters;
