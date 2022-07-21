@@ -113,8 +113,8 @@ to sign in and sign out.
 
 With an ephemeral session there will be no warning like `"app_name" Wants to Use "domain_name" to Sign In` on iOS.
 
-The option `preferEphemeralSession = true` must only be used for the end session call, if it is also used for the sign in call. 
-Otherwise there will be still an active login session in the browser.
+The option `preferEphemeralSession = true` must only be used for the end session call if it is also used for the sign in call. 
+Otherwise, there will be still an active login session in the browser.
 
 ## Android setup
 
