@@ -106,6 +106,16 @@ await appAuth.endSession(EndSessionRequest(
 
 The above code passes an `AuthorizationServiceConfiguration` with all the endpoints defined but alternatives are to specify an `issuer` or `discoveryUrl` like you would with the other APIs in the plugin (e.g. `authorizeAndExchangeCode()`).
 
+### Ephemeral Sessions (iOS and macOS only)
+On iOS (versions 13 and above) and macOS you can use the option `preferEphemeralSession = true` to start an 
+[ephemeral browser session](https://developer.apple.com/documentation/foundation/urlsessionconfiguration/1410529-ephemeral)
+to sign in and sign out.
+
+With an ephemeral session there will be no warning like `"app_name" Wants to Use "domain_name" to Sign In` on iOS.
+
+The option `preferEphemeralSession = true` must only be used for the end session call if it is also used for the sign in call. 
+Otherwise, there will be still an active login session in the browser.
+
 ## Android setup
 
 Go to the `build.gradle` file for your Android app to specify the custom scheme so that there should be a section in it that look similar to the following but replace `<your_custom_scheme>` with the desired value

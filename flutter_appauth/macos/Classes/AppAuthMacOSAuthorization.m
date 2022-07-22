@@ -56,7 +56,7 @@
                                                                                                                                                                                                                                                  additionalParameters:requestParameters.additionalParameters];
     
     NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
-    id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithPresentingWindow:keyWindow useEphemeralSession:false];
+    id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithPresentingWindow:keyWindow useEphemeralSession:requestParameters.preferEphemeralSession];
     return [OIDAuthorizationService presentEndSessionRequest:endSessionRequest externalUserAgent:externalUserAgent callback:^(OIDEndSessionResponse * _Nullable endSessionResponse, NSError * _Nullable error) {
         if(!endSessionResponse) {
             NSString *message = [NSString stringWithFormat:END_SESSION_ERROR_MESSAGE_FORMAT, [error localizedDescription]];
