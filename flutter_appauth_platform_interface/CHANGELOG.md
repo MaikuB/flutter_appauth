@@ -1,3 +1,7 @@
+## [5.2.0]
+
+* Added `preferEphemeralSession` to `EndSessionRequest` Thanks to the PR from [Daniel Ziegler](https://github.com/ziegler-daniel).
+
 ## [5.1.0]
 
 * Added ability to specify the `nonce` as part of requests
