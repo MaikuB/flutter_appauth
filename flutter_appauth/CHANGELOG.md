@@ -1,3 +1,7 @@
+## 4.2.0
+
+* Added `preferEphemeralSession` to `EndSessionRequest` Thanks to the PR from [Daniel Ziegler](https://github.com/ziegler-daniel)
+
 ## 4.1.0+1
 
 * Added missing credit to 4.1.0 changelog entry
