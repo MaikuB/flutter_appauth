@@ -19,8 +19,9 @@
                                            codeChallenge:codeChallenge
                                      codeChallengeMethod:OIDOAuthorizationRequestCodeChallengeMethodS256
                                     additionalParameters:additionalParameters];
-  UIViewController *rootViewController =
-  [UIApplication sharedApplication].delegate.window.rootViewController;
+  UIViewController *rootViewController = [[UIApplication sharedApplication].windows filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id window, NSDictionary *bindings) {
+    return [window isKeyWindow];
+  }]].firstObject.rootViewController;
   if(exchangeCode) {
       id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithViewController:rootViewController useEphemeralSession:preferEphemeralSession];
       return [OIDAuthState authStateByPresentingAuthorizationRequest:request externalUserAgent:externalUserAgent callback:^(OIDAuthState *_Nullable authState,
