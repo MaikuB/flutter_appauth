@@ -123,6 +123,8 @@ AppAuthAuthorization* authorization;
         [self handleTokenMethodCall:[call arguments] result:result];
     } else if([END_SESSION_METHOD isEqualToString:call.method]) {
         [self handleEndSessionMethodCall:[call arguments] result:result];
+    } else if([PROCESS_CALLBACK isEqualToString:call.method]) {
+        [self processCallback:[call arguments] result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }
@@ -258,6 +260,12 @@ AppAuthAuthorization* authorization;
             self->_currentAuthorizationFlow = [authorization performEndSessionRequest:configuration requestParameters:requestParameters result:result];
         }];
     }
+}
+
+- (void) processCallback:(NSDictionary*)arguments result:(FlutterResult)result {
+  NSString *url = [arguments valueForKey:@"url"];
+  [_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:url];
+  _currentAuthorizationFlow = nil;
 }
 
 - (void)performTokenRequest:(OIDServiceConfiguration *)serviceConfiguration requestParameters:(TokenRequestParameters *)requestParameters result:(FlutterResult)result {
