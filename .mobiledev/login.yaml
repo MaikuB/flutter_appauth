@@ -1,0 +1,14 @@
+appId: io.crossingthestreams.flutterappauthexample
+---
+- launchApp
+- tapOn: Sign in with auto code exchange
+- tapOn: Username
+- inputText: bob
+- tapOn: Password
+- inputText: bob
+- scroll
+- tapOn:
+    below: Remember My Login
+    text: Login
+- assertVisible: test api results
+- tapOn: End session

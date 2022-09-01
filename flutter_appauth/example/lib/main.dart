@@ -137,8 +137,10 @@ class _MyAppState extends State<MyApp> {
                 TextField(
                   controller: _refreshTokenTextController,
                 ),
-                const Text('test api results'),
-                Text(_userInfo ?? ''),
+                if (_userInfo != null) ...[
+                  const Text('test api results'),
+                  Text(_userInfo!),
+                ]
               ],
             ),
           ),
