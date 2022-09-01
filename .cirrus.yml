@@ -16,7 +16,11 @@ task:
   pub_cache:
     folder: ~/.pub-cache
   install_homebrew_script:
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    - /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    - test -d ~/.linuxbrew && eval "$(~/.linuxbrew/bin/brew shellenv)"
+    - test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    - test -r ~/.bash_profile && echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bash_profile
+    - echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.profile
   install_maestro_script:
     - brew tap mobile-dev-inc/tap
     - brew install maestro
