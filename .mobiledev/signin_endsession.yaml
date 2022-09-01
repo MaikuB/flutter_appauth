@@ -8,7 +8,7 @@ appId: io.crossingthestreams.flutterappauthexample
 - inputText: bob
 - scroll
 - tapOn:
-    below: Remember My Login
-    text: Login
+      below: Remember My Login
+      text: Login
 - assertVisible: test api results
 - tapOn: End session

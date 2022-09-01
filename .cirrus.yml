@@ -55,3 +55,13 @@ task:
     - export PATH="$PATH":"$HOME/.pub-cache/bin"
     - melos bootstrap
     - melos run build:example_macos
+
+task:
+  name: UI test - Sign in with autocode exchange and end session
+  osx_instance:
+    image: monterey-xcode
+  setup_script:
+    - brew tap mobile-dev-inc/tap
+    - brew install maestro
+  test_script:
+    - maestro test .mobiledev/signin_endsession.yaml
