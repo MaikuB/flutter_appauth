@@ -10,17 +10,33 @@ task:
     - melos run test:unit --no-select
 
 task:
-  name: Build Android example app
+  name: Build Android example app and run integration tests
   container:
     image: cirrusci/flutter:stable
   pub_cache:
     folder: ~/.pub-cache
+  install_homebrew_script:
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  install_maestro_script:
+    - brew tap mobile-dev-inc/tap
+    - brew install maestro
   install_melos_script:
     - dart pub global activate melos
   build_script:
     - export PATH="$PATH":"$HOME/.pub-cache/bin"
     - melos bootstrap
     - melos run build:example_android
+  install_images_script: sdkmanager "system-images;android-$EMULATOR_API_LEVEL;$ANDROID_ABI"
+  create_device_script:
+    echo no | avdmanager create avd --force -n test -k "system-images;android-$EMULATOR_API_LEVEL;$ANDROID_ABI"
+  start_emulator_background_script:
+    $ANDROID_HOME/emulator/emulator -no-window -verbose -avd test -no-audio -no-window
+  wait_for_emulator_script:
+    android-wait-for-emulator
+  install_app_script:
+    adb install flutter_appauth/flutter_appauth/example/build/app/outputs/flutter-apk/app-release.apk
+  test_script:
+    maestro test .mobiledev/signin_endsession.yaml
 
 task:
   name: Build iOS example app
@@ -55,33 +71,3 @@ task:
     - export PATH="$PATH":"$HOME/.pub-cache/bin"
     - melos bootstrap
     - melos run build:example_macos
-
-task:
-  name: Run integration tests (Android)
-  osx_instance:
-    image: monterey-xcode
-  env:
-    EMULATOR_API_LEVEL: 28
-    ANDROID_ABI: "default;x86"
-  pub_cache:
-    folder: ~/.pub-cache
-  install_maestro_script:
-    - brew tap mobile-dev-inc/tap
-    - brew install maestro
-  install_melos_script:
-    - dart pub global activate melos
-  build_script:
-    - export PATH="$PATH":"$HOME/.pub-cache/bin"
-    - melos bootstrap
-    - melos run build:example_android
-  install_images_script: sdkmanager "system-images;android-$EMULATOR_API_LEVEL;$ANDROID_ABI"
-  create_device_script:
-    echo no | avdmanager create avd --force -n test -k "system-images;android-$EMULATOR_API_LEVEL;$ANDROID_ABI"
-  start_emulator_background_script:
-    $ANDROID_HOME/emulator/emulator -no-window -verbose -avd test -no-audio -no-window
-  wait_for_emulator_script:
-    android-wait-for-emulator
-  install_app_script:
-    adb install flutter_appauth/flutter_appauth/example/build/app/outputs/flutter-apk/app-release.apk
-  test_script:
-    maestro test .mobiledev/signin_endsession.yaml
