@@ -11,8 +11,14 @@ task:
 
 task:
   name: Build Android example app and run integration tests
+  env:
+    EMULATOR_API_LEVEL: 28
+    ANDROID_ABI: "default;x86"
   container:
     image: cirrusci/flutter:stable
+    cpu: 4
+    memory: 10G
+    kvm: true
   pub_cache:
     folder: ~/.pub-cache
   install_homebrew_script:
