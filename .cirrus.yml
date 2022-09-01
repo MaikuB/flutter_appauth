@@ -57,7 +57,7 @@ task:
     - melos run build:example_macos
 
 task:
-  name: UI test - Sign in with autocode exchange and end session
+  name: Example app UI tests
   osx_instance:
     image: monterey-xcode
   setup_script:
