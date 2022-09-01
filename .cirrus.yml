@@ -16,12 +16,9 @@ task:
   pub_cache:
     folder: ~/.pub-cache
   install_homebrew_script:
-    - /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    - echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /root/.profile
-    - eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
   install_maestro_script:
-    - brew tap mobile-dev-inc/tap
-    - brew install maestro
+    - wget https://github.com/mobile-dev-inc/maestro/releases/download/cli-1.4.0/maestro-1.4.0.zip
+    - unzip maestro-1.4.0.zip -d $HOME
   install_melos_script:
     - dart pub global activate melos
   build_script:
@@ -38,7 +35,8 @@ task:
   install_app_script:
     adb install flutter_appauth/flutter_appauth/example/build/app/outputs/flutter-apk/app-release.apk
   test_script:
-    maestro test .mobiledev/signin_endsession.yaml
+    - export PATH="$PATH":"$HOME/maestro-1.4.0/bin"
+    - maestro test .mobiledev/signin_endsession.yaml
 
 task:
   name: Build iOS example app
