@@ -41,7 +41,8 @@ task:
   wait_for_emulator_script:
     android-wait-for-emulator
   install_app_script:
-    adb install flutter_appauth/example/build/app/outputs/flutter-apk/app-release.apk
+    - pwd
+    - adb install flutter_appauth/example/build/app/outputs/flutter-apk/app-release.apk
   test_script:
     - export PATH="$PATH":"$HOME/maestro-1.4.0/bin"
     - maestro test .mobiledev/signin_endsession.yaml
