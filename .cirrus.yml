@@ -22,9 +22,11 @@ task:
   pub_cache:
     folder: ~/.pub-cache
   install_homebrew_script:
-  install_maestro_script:
-    - wget https://github.com/mobile-dev-inc/maestro/releases/download/cli-1.4.0/maestro-1.4.0.zip
-    - unzip maestro-1.4.0.zip -d $HOME
+  maestro_cache:
+    folder: $HOME/maestro-1.4.0/bin
+    install_maestro_script:
+      - wget https://github.com/mobile-dev-inc/maestro/releases/download/cli-1.4.0/maestro-1.4.0.zip
+      - unzip maestro-1.4.0.zip -d $HOME
   install_melos_script:
     - dart pub global activate melos
   build_script:
@@ -39,7 +41,7 @@ task:
   wait_for_emulator_script:
     android-wait-for-emulator
   install_app_script:
-    adb install flutter_appauth/flutter_appauth/example/build/app/outputs/flutter-apk/app-release.apk
+    adb install flutter_appauth/example/build/app/outputs/flutter-apk/app-release.apk
   test_script:
     - export PATH="$PATH":"$HOME/maestro-1.4.0/bin"
     - maestro test .mobiledev/signin_endsession.yaml
