@@ -629,7 +629,7 @@ public class FlutterAppauthPlugin
                             finishWithSuccess(tokenResponseToMap(resp, authResponse));
                         } else {
                             finishWithError(ex, AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE,
-                                    AUTHORIZE_AND_EXCHANGE_CODE_ERROR_MESSAGE_FORMAT);
+                                    AUTHORIZE_ERROR_MESSAGE_FORMAT);
                         }
                     }
                 };
