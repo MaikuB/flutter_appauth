@@ -25,7 +25,7 @@ task:
 task:
   name: Build iOS example app
   macos_instance:
-    image: ghcr.io/cirruslabs/macos-ventura-xcode:latest
+    image: ghcr.io/cirruslabs/macos-ventura-xcode:14.2
   pub_cache:
     folder: ~/.pub-cache
   upgrade_script:
@@ -41,7 +41,7 @@ task:
 task:
   name: Build macOS example app
   macos_instance:
-    image: ghcr.io/cirruslabs/macos-ventura-xcode:latest
+    image: ghcr.io/cirruslabs/macos-ventura-xcode:14.2
   pub_cache:
     folder: ~/.pub-cache
   upgrade_script:
