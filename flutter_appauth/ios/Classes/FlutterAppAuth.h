@@ -30,6 +30,7 @@ static NSString *const DISCOVERY_ERROR_MESSAGE_FORMAT = @"Error retrieving disco
 static NSString *const TOKEN_ERROR_MESSAGE_FORMAT = @"Failed to get token: %@";
 static NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
 static NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end session: %@";
+static NSString *const CANCEL_AUTHORIZATION_METHOD = @"cancelAuthorization";
 
 @interface EndSessionRequestParameters : NSObject
 @property(nonatomic, strong) NSString *idTokenHint;
@@ -45,7 +46,7 @@ static NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end sessio
 @interface AppAuthAuthorization : NSObject
 
 - (id<OIDExternalUserAgentSession>)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferEphemeralSession:(BOOL)preferEphemeralSession result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce;
-
+- (id<OIDExternalUserAgentSession>)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferEphemeralSession:(BOOL)preferEphemeralSession result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce setGlobal:(void(*)(NSObject<OIDExternalUserAgent>* agent, FlutterResult result))setGlobal;
 - (id<OIDExternalUserAgentSession>)performEndSessionRequest:(OIDServiceConfiguration *)serviceConfiguration requestParameters:(EndSessionRequestParameters *)requestParameters result:(FlutterResult)result;
 
 @end

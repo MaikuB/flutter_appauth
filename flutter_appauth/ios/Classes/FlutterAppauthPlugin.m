@@ -91,6 +91,8 @@
 
 FlutterMethodChannel* channel;
 AppAuthAuthorization* authorization;
+NSObject<OIDExternalUserAgent> *globalAgent = NULL;
+FlutterResult globalResult = NULL;
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     channel = [FlutterMethodChannel
@@ -123,6 +125,8 @@ AppAuthAuthorization* authorization;
         [self handleTokenMethodCall:[call arguments] result:result];
     } else if([END_SESSION_METHOD isEqualToString:call.method]) {
         [self handleEndSessionMethodCall:[call arguments] result:result];
+    } else if ([CANCEL_AUTHORIZATION_METHOD isEqualToString:call.method]) {
+        [self cancelAuthorizationWithResult: result];
     } else {
         result(FlutterMethodNotImplemented);
     }
@@ -132,6 +136,24 @@ AppAuthAuthorization* authorization;
     if(!requestParameters.additionalParameters) {
         requestParameters.additionalParameters = [[NSMutableDictionary alloc] init];
     }
+}
+
+- (void) cancelAuthorizationWithResult:(FlutterResult)result {
+    if (globalAgent != NULL) {
+        [globalAgent dismissExternalUserAgentAnimated:YES completion:^{
+            if (globalResult != NULL) {
+                globalResult([FlutterError errorWithCode:CANCEL_AUTHORIZATION_METHOD message:CANCEL_AUTHORIZATION_METHOD details:nil]);
+            }
+                result(@{@"success": @YES});
+            }];
+    } else {
+        result(@{@"success": @NO});
+    }
+}
+
+void setGlobal(NSObject<OIDExternalUserAgent>* agent, FlutterResult result) {
+    globalAgent = agent;
+    globalResult = result;
 }
 
 -(void)handleAuthorizeMethodCall:(NSDictionary*)arguments result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode {
@@ -149,7 +171,7 @@ AppAuthAuthorization* authorization;
 
     if(requestParameters.serviceConfigurationParameters != nil) {
         OIDServiceConfiguration *serviceConfiguration = [self processServiceConfigurationParameters:requestParameters.serviceConfigurationParameters];
-        _currentAuthorizationFlow = [authorization performAuthorization:serviceConfiguration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:requestParameters.nonce];
+        _currentAuthorizationFlow = [authorization performAuthorization:serviceConfiguration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:requestParameters.nonce setGlobal:setGlobal];
     } else if (requestParameters.discoveryUrl) {
         NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
         [OIDAuthorizationService discoverServiceConfigurationForDiscoveryURL:discoveryUrl
@@ -161,7 +183,7 @@ AppAuthAuthorization* authorization;
                 return;
             }
 
-            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:requestParameters.nonce];
+            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:requestParameters.nonce setGlobal:setGlobal];
         }];
     } else {
         NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -174,7 +196,7 @@ AppAuthAuthorization* authorization;
                 return;
             }
 
-            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:requestParameters.nonce];
+            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferEphemeralSession:requestParameters.preferEphemeralSession result:result exchangeCode:exchangeCode nonce:requestParameters.nonce setGlobal:setGlobal];
         }];
     }
 }

@@ -22,4 +22,9 @@ class FlutterAppAuth {
   Future<EndSessionResponse?> endSession(EndSessionRequest request) {
     return FlutterAppAuthPlatform.instance.endSession(request);
   }
+
+  /// New method to close auth browser window
+  Future<bool> cancelAuthorization() {
+    return FlutterAppAuthPlatformIos.instance.cancelAuthorization();
+  }
 }
