@@ -25,6 +25,6 @@ class FlutterAppAuth {
 
   /// New method to close auth browser window
   Future<bool> cancelAuthorization() {
-    return FlutterAppAuthPlatformIos.instance.cancelAuthorization();
+    return FlutterAppAuthPlatform.instance.cancelAuthorization();
   }
 }
