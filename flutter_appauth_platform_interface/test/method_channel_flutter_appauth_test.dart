@@ -1,10 +1,7 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_appauth_platform_interface/flutter_appauth_platform_interface.dart';
 import 'package:flutter_appauth_platform_interface/src/method_channel_flutter_appauth.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:flutter_appauth_platform_interface/flutter_appauth_platform_interface.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +16,9 @@ void main() {
     log.clear();
   });
 
-  MethodChannelFlutterAppAuth flutterAppAuth = MethodChannelFlutterAppAuth();
+  final MethodChannelFlutterAppAuth flutterAppAuth =
+      MethodChannelFlutterAppAuth();
+
   test('authorize', () async {
     await flutterAppAuth.authorize(AuthorizationRequest(
         'someClientId', 'someRedirectUrl',
@@ -188,12 +187,3 @@ void main() {
     ]);
   });
 }
-
-class FlutterAppAuthPlatformMock extends Mock
-    with MockPlatformInterfaceMixin
-    implements FlutterAppAuthPlatform {}
-
-class ImplementsFlutterAppAuthPlatform extends Mock
-    implements FlutterAppAuthPlatform {}
-
-class ExtendsFlutterAppAuthPlatform extends FlutterAppAuthPlatform {}

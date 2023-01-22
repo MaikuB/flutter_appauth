@@ -1,5 +1,5 @@
 class EndSessionResponse {
-  final String? state;
-
   EndSessionResponse(this.state);
+
+  final String? state;
 }

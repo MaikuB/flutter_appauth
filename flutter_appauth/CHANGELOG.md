@@ -1,3 +1,7 @@
+## 4.2.1
+
+* [iOS][macOS] bumped AppAuth dependency to 1.6.0
+
 ## 4.2.0
 
 * Added `preferEphemeralSession` to `EndSessionRequest` Thanks to the PR from [Daniel Ziegler](https://github.com/ziegler-daniel)

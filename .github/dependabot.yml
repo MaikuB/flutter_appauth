@@ -1,0 +1,8 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/flutter_appauth/android"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "com.android.tools.build:gradle"

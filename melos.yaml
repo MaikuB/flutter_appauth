@@ -1,5 +1,10 @@
 name: flutter_appauth
 repository: https://github.com/MaikuB/flutter_appauth
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
+
 packages:
   - flutter_appauth/*
   - flutter_appauth_platform_interface/*
