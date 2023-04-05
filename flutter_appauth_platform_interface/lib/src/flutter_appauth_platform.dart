@@ -10,7 +10,8 @@ import 'method_channel_flutter_appauth.dart';
 import 'token_request.dart';
 import 'token_response.dart';
 
-/// The platform interface that all implementations of flutter_appauth must implement.
+/// The platform interface that all implementations of flutter_appauth must
+/// implement.
 abstract class FlutterAppAuthPlatform extends PlatformInterface {
   FlutterAppAuthPlatform() : super(token: _token);
 

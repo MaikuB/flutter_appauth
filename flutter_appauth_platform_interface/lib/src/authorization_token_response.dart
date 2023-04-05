@@ -1,6 +1,7 @@
 import 'token_response.dart';
 
-/// The details from making a successful combined authorization and token exchange request.
+/// The details from making a successful combined authorization and token
+/// exchange request.
 class AuthorizationTokenResponse extends TokenResponse {
   AuthorizationTokenResponse(
     String? accessToken,
@@ -14,6 +15,7 @@ class AuthorizationTokenResponse extends TokenResponse {
   ) : super(accessToken, refreshToken, accessTokenExpirationDateTime, idToken,
             tokenType, scopes, tokenAdditionalParameters);
 
-  /// Contains additional parameters returned by the authorization server from making the authorization request.
+  /// Contains additional parameters returned by the authorization server from
+  /// making the authorization request.
   final Map<String, dynamic>? authorizationAdditionalParameters;
 }
