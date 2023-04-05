@@ -214,11 +214,11 @@ class _MyAppState extends State<MyApp> {
         The discovery endpoint (_discoveryUrl) is used to find the
         configuration. The code challenge generation can be checked here 
         > https://github.com/MaikuB/flutter_appauth/search?q=challenge.
-        The code challenge is generated from the code verifier and only th
+        The code challenge is generated from the code verifier and only the
         code verifier is included in the result. This because to get the token
         in the method _exchangeCode (see above) we need only the code verifier
         and the authorization code.
-        Code challenge is not used according to the spe
+        Code challenge is not used according to the spec
         https://www.rfc-editor.org/rfc/rfc7636 page 9 section 4.5.
       */
       final AuthorizationResponse? result = await _appAuth.authorize(
