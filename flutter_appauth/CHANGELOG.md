@@ -1,3 +1,8 @@
+## 4.2.1+1
+
+* Added comments to example app to explain how code challenge takes place per PKCE. Thanks to PR from [Davide Ravasi](https://github.com/davideravasi)
+* Updated code for API docs to avoid lines longer than 80 characters
+
 ## 4.2.1
 
 * [iOS][macOS] bumped AppAuth dependency to 1.6.0
