@@ -3,7 +3,7 @@ task:
   container:
     image: cirrusci/flutter:stable
   install_melos_script:
-    - dart pub global activate melos
+    - dart pub global activate melos 2.9.0
   test_script:
     - export PATH="$PATH":"$HOME/.pub-cache/bin"
     - melos bootstrap
@@ -16,7 +16,7 @@ task:
   pub_cache:
     folder: ~/.pub-cache
   install_melos_script:
-    - dart pub global activate melos
+    - dart pub global activate melos 2.9.0
   build_script:
     - export PATH="$PATH":"$HOME/.pub-cache/bin"
     - melos bootstrap
@@ -32,7 +32,7 @@ task:
     - flutter channel stable
     - flutter upgrade
   install_melos_script:
-    - dart pub global activate melos
+    - dart pub global activate melos 2.9.0
   build_script:
     - export PATH="$PATH":"$HOME/.pub-cache/bin"
     - melos bootstrap
@@ -50,7 +50,7 @@ task:
   setup_script:
     - flutter config --enable-macos-desktop
   install_melos_script:
-    - dart pub global activate melos
+    - dart pub global activate melos 2.9.0
   build_script:
     - export PATH="$PATH":"$HOME/.pub-cache/bin"
     - melos bootstrap
