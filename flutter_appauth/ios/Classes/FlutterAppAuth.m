@@ -33,17 +33,37 @@
     if (tokenResponse.scope) {
         [processedResponses setObject:[tokenResponse.scope componentsSeparatedByString: @" "] forKey:@"scopes"];
     }
-    
+
     return processedResponses;
 }
 
-+ (void)finishWithError:(NSString *)errorCode message:(NSString *)message  result:(FlutterResult)result {
++ (void)finishWithError:(NSString *)errorCode
+                message:(NSString *)message
+                 result:(FlutterResult)result {
     result([FlutterError errorWithCode:errorCode message:message details:nil]);
 }
 
-+ (NSString *) formatMessageWithError:(NSString *)messageFormat error:(NSError * _Nullable)error {
++ (NSString *) formatMessageWithError:(NSString *)messageFormat
+                                error:(NSError * _Nullable)error {
     NSString *formattedMessage = [NSString stringWithFormat:messageFormat, [error localizedDescription]];
     return formattedMessage;
+}
+
++ (NSString *) formatErrorCodeWithError:(NSString *)baseCode
+                                  error: (NSError * _Nullable)error {
+    if(error == nil) {
+        return baseCode;
+    }
+    return [NSString stringWithFormat:@"%@:%@:%ld", baseCode, error.domain, (long)error.code];
+}
+
++ (void)finishWithError:(NSError * _Nullable)error
+              errorCode:(NSString *)baseCode
+          messageFormat:(NSString *)messageFormat
+                 result:(FlutterResult)result {
+    NSString * code = [self formatErrorCodeWithError:baseCode error:error];
+    NSString * message = [self formatMessageWithError:messageFormat error:error];
+    [self finishWithError:code message:message result:result];
 }
 
 @end

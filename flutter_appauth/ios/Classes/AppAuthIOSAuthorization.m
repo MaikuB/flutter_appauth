@@ -27,9 +27,9 @@
                                                                                                                                                   NSError *_Nullable error) {
           if(authState) {
               result([FlutterAppAuth processResponses:authState.lastTokenResponse authResponse:authState.lastAuthorizationResponse]);
-              
+
           } else {
-              [FlutterAppAuth finishWithError:AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE message:[FlutterAppAuth formatMessageWithError:AUTHORIZE_ERROR_MESSAGE_FORMAT error:error] result:result];
+              [FlutterAppAuth finishWithError:error errorCode:AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE messageFormat:AUTHORIZE_ERROR_MESSAGE_FORMAT result:result];
           }
       }];
   } else {
@@ -43,7 +43,7 @@
               [processedResponse setObject:authorizationResponse.request.nonce forKey:@"nonce"];
               result(processedResponse);
           } else {
-              [FlutterAppAuth finishWithError:AUTHORIZE_ERROR_CODE message:[FlutterAppAuth formatMessageWithError:AUTHORIZE_ERROR_MESSAGE_FORMAT error:error] result:result];
+              [FlutterAppAuth finishWithError:error errorCode:AUTHORIZE_ERROR_CODE messageFormat:AUTHORIZE_ERROR_MESSAGE_FORMAT result:result];
           }
       }];
   }
@@ -51,7 +51,7 @@
 
 - (id<OIDExternalUserAgentSession>)performEndSessionRequest:(OIDServiceConfiguration *)serviceConfiguration requestParameters:(EndSessionRequestParameters *)requestParameters result:(FlutterResult)result {
   NSURL *postLogoutRedirectURL = requestParameters.postLogoutRedirectUrl ? [NSURL URLWithString:requestParameters.postLogoutRedirectUrl] : nil;
-  
+
   OIDEndSessionRequest *endSessionRequest = requestParameters.state ? [[OIDEndSessionRequest alloc] initWithConfiguration:serviceConfiguration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:postLogoutRedirectURL
                                                                                                                     state:requestParameters.state additionalParameters:requestParameters.additionalParameters] :[[OIDEndSessionRequest alloc] initWithConfiguration:serviceConfiguration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:postLogoutRedirectURL
                                                                                                                                                                                                                                                additionalParameters:requestParameters.additionalParameters];
@@ -60,11 +60,10 @@
   [UIApplication sharedApplication].delegate.window.rootViewController;
   id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithViewController:rootViewController useEphemeralSession:requestParameters.preferEphemeralSession];
 
-  
+
   return [OIDAuthorizationService presentEndSessionRequest:endSessionRequest externalUserAgent:externalUserAgent callback:^(OIDEndSessionResponse * _Nullable endSessionResponse, NSError * _Nullable error) {
       if(!endSessionResponse) {
-          NSString *message = [NSString stringWithFormat:END_SESSION_ERROR_MESSAGE_FORMAT, [error localizedDescription]];
-          [FlutterAppAuth finishWithError:END_SESSION_ERROR_CODE message:message result:result];
+          [FlutterAppAuth finishWithError:error errorCode:END_SESSION_ERROR_CODE messageFormat:END_SESSION_ERROR_MESSAGE_FORMAT result:result];
           return;
       }
       NSMutableDictionary *processedResponse = [[NSMutableDictionary alloc] init];

@@ -11,10 +11,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FlutterAppAuth : NSObject
 
-+ (NSMutableDictionary *)processResponses:(OIDTokenResponse*) tokenResponse authResponse:(OIDAuthorizationResponse* _Nullable) authResponse;
-+ (void)finishWithError:(NSString *)errorCode message:(NSString *)message  result:(FlutterResult)result;
-+ (NSString *) formatMessageWithError:(NSString *)messageFormat error:(NSError * _Nullable)error;
-
++ (NSMutableDictionary *)processResponses:(OIDTokenResponse*) tokenResponse
+                             authResponse:(OIDAuthorizationResponse* _Nullable) authResponse;
++ (void)finishWithError:(NSError * _Nullable)error
+              errorCode:(NSString *)baseCode
+          messageFormat:(NSString *)messageFormat
+                 result:(FlutterResult)result;
 @end
 
 static NSString *const AUTHORIZE_METHOD = @"authorize";
@@ -44,10 +46,20 @@ static NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end sessio
 
 @interface AppAuthAuthorization : NSObject
 
-- (id<OIDExternalUserAgentSession>)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferEphemeralSession:(BOOL)preferEphemeralSession result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce;
+- (id<OIDExternalUserAgentSession>)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration
+                                               clientId:(NSString*)clientId
+                                           clientSecret:(NSString*)clientSecret
+                                                 scopes:(NSArray *)scopes
+                                            redirectUrl:(NSString*)redirectUrl
+                                   additionalParameters:(NSDictionary *)additionalParameters
+                                 preferEphemeralSession:(BOOL)preferEphemeralSession
+                                                 result:(FlutterResult)result
+                                           exchangeCode:(BOOL)exchangeCode
+                                                  nonce:(NSString*)nonce;
 
-- (id<OIDExternalUserAgentSession>)performEndSessionRequest:(OIDServiceConfiguration *)serviceConfiguration requestParameters:(EndSessionRequestParameters *)requestParameters result:(FlutterResult)result;
-
+- (id<OIDExternalUserAgentSession>)performEndSessionRequest:(OIDServiceConfiguration *)serviceConfiguration
+                                          requestParameters:(EndSessionRequestParameters *)requestParameters
+                                                     result:(FlutterResult)result;
 @end
 
 NS_ASSUME_NONNULL_END

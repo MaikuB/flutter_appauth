@@ -98,10 +98,10 @@ AppAuthAuthorization* authorization;
                binaryMessenger:[registrar messenger]];
     FlutterAppauthPlugin* instance = [[FlutterAppauthPlugin alloc] init];
     [registrar addMethodCallDelegate:instance channel:channel];
-    
+
 #if TARGET_OS_OSX
     authorization = [[AppAuthMacOSAuthorization alloc] init];
-    
+
     NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
     [appleEventManager setEventHandler:instance
                            andSelector:@selector(handleGetURLEvent:withReplyEvent:)
@@ -109,7 +109,7 @@ AppAuthAuthorization* authorization;
                             andEventID:kAEGetURL];
 #else
     authorization = [[AppAuthIOSAuthorization alloc] init];
-    
+
     [registrar addApplicationDelegate:instance];
 #endif
 }
@@ -180,8 +180,7 @@ AppAuthAuthorization* authorization;
 }
 
 - (void)finishWithDiscoveryError:(NSError * _Nullable)error result:(FlutterResult)result {
-    NSString *message = [NSString stringWithFormat:DISCOVERY_ERROR_MESSAGE_FORMAT, [error localizedDescription]];
-    [FlutterAppAuth finishWithError:DISCOVERY_ERROR_CODE message:message result:result];
+    [FlutterAppAuth finishWithError:error errorCode:DISCOVERY_ERROR_CODE messageFormat:DISCOVERY_ERROR_MESSAGE_FORMAT result:result];
 }
 
 
@@ -201,7 +200,7 @@ AppAuthAuthorization* authorization;
         [self performTokenRequest:serviceConfiguration requestParameters:requestParameters result:result];
     } else if (requestParameters.discoveryUrl) {
         NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
-        
+
         [OIDAuthorizationService discoverServiceConfigurationForDiscoveryURL:discoveryUrl
                                                                   completion:^(OIDServiceConfiguration *_Nullable configuration,
                                                                                NSError *_Nullable error) {
@@ -209,7 +208,7 @@ AppAuthAuthorization* authorization;
                 [self finishWithDiscoveryError:error result:result];
                 return;
             }
-            
+
             [self performTokenRequest:configuration requestParameters:requestParameters result:result];
         }];
     } else {
@@ -221,7 +220,7 @@ AppAuthAuthorization* authorization;
                 [self finishWithDiscoveryError:error result:result];
                 return;
             }
-            
+
             [self performTokenRequest:configuration requestParameters:requestParameters result:result];
         }];
     }
@@ -234,7 +233,7 @@ AppAuthAuthorization* authorization;
         _currentAuthorizationFlow = [authorization performEndSessionRequest:serviceConfiguration requestParameters:requestParameters result:result];
     } else if (requestParameters.discoveryUrl) {
         NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
-        
+
         [OIDAuthorizationService discoverServiceConfigurationForDiscoveryURL:discoveryUrl
                                                                   completion:^(OIDServiceConfiguration *_Nullable configuration,
                                                                                NSError *_Nullable error) {
@@ -242,7 +241,7 @@ AppAuthAuthorization* authorization;
                 [self finishWithDiscoveryError:error result:result];
                 return;
             }
-            
+
             self->_currentAuthorizationFlow = [authorization performEndSessionRequest:configuration requestParameters:requestParameters result:result];
         }];
     } else {
@@ -254,7 +253,7 @@ AppAuthAuthorization* authorization;
                 [self finishWithDiscoveryError:error result:result];
                 return;
             }
-            
+
             self->_currentAuthorizationFlow = [authorization performEndSessionRequest:configuration requestParameters:requestParameters result:result];
         }];
     }
@@ -276,10 +275,10 @@ AppAuthAuthorization* authorization;
                                         callback:^(OIDTokenResponse *_Nullable response,
                                                    NSError *_Nullable error) {
         if (response) {
-            result([FlutterAppAuth processResponses:response authResponse:nil]);                                           } else {
-                NSString *message = [NSString stringWithFormat:TOKEN_ERROR_MESSAGE_FORMAT, [error localizedDescription]];
-                [FlutterAppAuth finishWithError:TOKEN_ERROR_CODE message:message result:result];
-            }
+            result([FlutterAppAuth processResponses:response authResponse:nil]);
+        } else {
+            [FlutterAppAuth finishWithError:error errorCode:TOKEN_ERROR_CODE messageFormat:TOKEN_ERROR_MESSAGE_FORMAT result:result];
+        }
     }];
 }
 
@@ -291,7 +290,7 @@ AppAuthAuthorization* authorization;
         _currentAuthorizationFlow = nil;
         return YES;
     }
-    
+
     return NO;
 }
 
