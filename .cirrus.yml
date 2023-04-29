@@ -10,7 +10,7 @@ task:
     - melos run test:unit --no-select
 
 task:
-  name: Build Android example app
+  name: Build Android example app (stable channel)
   container:
     image: cirrusci/flutter:stable
   pub_cache:
@@ -23,7 +23,20 @@ task:
     - melos run build:example_android
 
 task:
-  name: Build iOS example app
+  name: Build Android example app (3.0.0)
+  container:
+    image: cirrusci/flutter:3.0.0
+  pub_cache:
+    folder: ~/.pub-cache
+  install_melos_script:
+    - dart pub global activate melos 2.9.0
+  build_script:
+    - export PATH="$PATH":"$HOME/.pub-cache/bin"
+    - melos bootstrap
+    - melos run build:example_android
+
+task:
+  name: Build iOS example app (stable channel)
   macos_instance:
     image: ghcr.io/cirruslabs/macos-ventura-xcode:14.2
   pub_cache:
@@ -39,7 +52,7 @@ task:
     - melos run build:example_ios
 
 task:
-  name: Build macOS example app
+  name: Build macOS example app (stable channel)
   macos_instance:
     image: ghcr.io/cirruslabs/macos-ventura-xcode:14.2
   pub_cache:

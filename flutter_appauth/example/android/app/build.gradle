@@ -26,11 +26,7 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 
 android {
-    compileSdkVersion 30
-
-    lintOptions {
-        disable 'InvalidPackage'
-    }
+    compileSdkVersion 31
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
@@ -51,6 +47,10 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
         }
+    }
+    namespace 'io.crossingthestreams.flutterappauthexample'
+    lint {
+        disable 'InvalidPackage'
     }
 }
 
