@@ -1,13 +1,14 @@
 ## 5.0.0
 
 * **Breaking change** Bumped minimum Flutter SDK version to 3.0.0 and Dart SDK version to 2.17
+* [Android] removed references to v1 embedding
 * [Android] updated `compileSdkVersion` to 31 (Android 12)
 * [Android] bumped AGP (Android Gradle plugin) to 7.4.2
 * [Android] conditionally adds a namespace for compatibility with AGP 8.0
     * Note: it's quite likely that the AppAuth Android SDK itself requires this change going forward but this change will ensure that the `flutter_appauth` plugin has done this change ahead of time
 * Applied following updates to the example app on the Android side
     * Bumped AGP to 7.4.2 and Gradle 7.5
-    * Used namespace instead of package identifier since the latter has been deprecated (reference: https://developer.android.com/build/releases/past-releases/agp-7-3-0-release-notes#package-deprecated). Note that this result in an error that says "package identifier or launch activity not found" when running the example app via the `flutter run` command on Flutter versions lower than 3.7 due to gap/issue in the tooling and will still allow APKs or app bundles to be built
+    * Used namespace instead of package identifier since the latter has been deprecated (reference: https://developer.android.com/build/releases/past-releases/agp-7-3-0-release-notes#package-deprecated). Note that as of this writing, using the `flutter run` command on the stable channel (i.e. Flutter version 3.7.1) to debug/run the app will in an error that says "package identifier or launch activity not found". However, an APK or app bundle can still be built and will run on a device. The Flutter team have already addressed this issue on the master channel that is currently on version 3.10.0-17.0.pre.21 so would expect the next stable release to contain the fix. Alternatively developers can manually restore the package identifier though this change was done to avoid issues from happening in the future
 
 ## 4.2.1+1
 
