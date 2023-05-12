@@ -1,3 +1,9 @@
+## [6.0.0]
+
+* **Breaking change** Aligned minimum Flutter and Dart SDK constraints to 3.0.0 and 2.17 respectively
+* Bumped maximum Dart SDK constraint
+
+
 ## [5.2.0+1]
 
 * Updated code for API docs to avoid lines longer than 80 characters

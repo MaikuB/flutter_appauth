@@ -1,3 +1,10 @@
+# 6.0.0
+
+* **Potentially breaking change** [iOS][macOS] bumped AppAuth dependency to 1.6.2 where fixes were done to allow SDK to compile in Xcode 14 by bumping the minimum OS versions
+* Bumped maximum Dart SDK constraint
+* Recreated iOS and macOS side of example app so it would work with new Flutter 3.10 stable release
+
+
 ## 5.0.0
 
 * **Breaking change** Bumped minimum Flutter SDK version to 3.0.0 and Dart SDK version to 2.17
