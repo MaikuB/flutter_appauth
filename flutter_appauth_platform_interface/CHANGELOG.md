@@ -1,3 +1,7 @@
+## [5.2.0+2]
+
+* Bumped maximum Dart SDK constraint
+
 ## [5.2.0+1]
 
 * Updated code for API docs to avoid lines longer than 80 characters

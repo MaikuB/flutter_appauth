@@ -1,3 +1,7 @@
+## 5.0.0+1
+
+* Bumped maximum Dart SDK constraint
+
 ## 5.0.0
 
 * **Breaking change** Bumped minimum Flutter SDK version to 3.0.0 and Dart SDK version to 2.17
