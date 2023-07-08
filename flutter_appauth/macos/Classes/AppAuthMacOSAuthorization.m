@@ -73,7 +73,7 @@
     if (useEphemeralSession) {
         return [[OIDExternalUserAgentMacNoSSO alloc] initWithPresentingWindow:presentingWindow];
     }
-    return [[OIDExternalUserAgentMac alloc] init];
+    return [[OIDExternalUserAgentMac alloc] initWithPresentingWindow:presentingWindow];
 }
 
 @end
