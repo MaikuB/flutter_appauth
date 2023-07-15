@@ -24,7 +24,8 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
   /// Used to indicate the identity of the user requesting to be logged out.
   final String? idTokenHint;
 
-  /// Represents the URL to redirect to after the logout operation has been completed.
+  /// Represents the URL to redirect to after the logout operation has been
+  /// completed.
   ///
   /// When specified, the [idTokenHint] must also be provided.
   final String? postLogoutRedirectUrl;
@@ -36,11 +37,13 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
   /// This property is only applicable to Android.
   bool allowInsecureConnections;
 
-  /// Whether to use an ephemeral session that prevents cookies and other browser data being shared with the user's normal browser session.
+  /// Whether to use an ephemeral session that prevents cookies and other
+  /// browser data being shared with the user's normal browser session.
   ///
   /// This property is only applicable to iOS (versions 13 and above) and macOS.
   ///
-  /// preferEphemeralSession = true must only be used here, if it is also used for the sign in call.
+  /// preferEphemeralSession = true must only be used here, if it is also used
+  /// for the sign in call.
   bool preferEphemeralSession;
 
   final Map<String, String>? additionalParameters;

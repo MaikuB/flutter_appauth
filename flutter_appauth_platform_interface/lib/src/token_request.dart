@@ -39,12 +39,14 @@ class TokenRequest extends CommonRequestDetails {
 
   /// The grant type.
   ///
-  /// If this is not specified then it will be inferred based on if [refreshToken] or [authorizationCode] has been specified.
+  /// If this is not specified then it will be inferred based on if
+  /// [refreshToken] or [authorizationCode] has been specified.
   final String? grantType;
 
   /// The authorization code.
   final String? authorizationCode;
 
-  /// The code verifier to be sent with the authorization code. This should match the code verifier used when performing the authorization request
+  /// The code verifier to be sent with the authorization code. This should
+  /// match the code verifier used when performing the authorization request
   final String? codeVerifier;
 }

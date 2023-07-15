@@ -96,7 +96,8 @@ class _MyAppState extends State<MyApp> {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       child: const Text(
-                        'Sign in with auto code exchange using ephemeral session',
+                        'Sign in with auto code exchange using ephemeral '
+                        'session',
                         textAlign: TextAlign.center,
                       ),
                       onPressed: () => _signInWithAutoCodeExchange(
@@ -209,21 +210,34 @@ class _MyAppState extends State<MyApp> {
   Future<void> _signInWithNoCodeExchange() async {
     try {
       _setBusyState();
-      // use the discovery endpoint to find the configuration
+      /* 
+        The discovery endpoint (_discoveryUrl) is used to find the
+        configuration. The code challenge generation can be checked here 
+        > https://github.com/MaikuB/flutter_appauth/search?q=challenge.
+        The code challenge is generated from the code verifier and only the
+        code verifier is included in the result. This because to get the token
+        in the method _exchangeCode (see above) we need only the code verifier
+        and the authorization code.
+        Code challenge is not used according to the spec
+        https://www.rfc-editor.org/rfc/rfc7636 page 9 section 4.5.
+      */
       final AuthorizationResponse? result = await _appAuth.authorize(
         AuthorizationRequest(_clientId, _redirectUrl,
             discoveryUrl: _discoveryUrl, scopes: _scopes, loginHint: 'bob'),
       );
 
-      // or just use the issuer
-      // var result = await _appAuth.authorize(
-      //   AuthorizationRequest(
-      //     _clientId,
-      //     _redirectUrl,
-      //     issuer: _issuer,
-      //     scopes: _scopes,
-      //   ),
-      // );
+      /* 
+        or just use the issuer
+        var result = await _appAuth.authorize(
+          AuthorizationRequest(
+            _clientId,
+            _redirectUrl,
+            issuer: _issuer,
+            scopes: _scopes,
+          ),
+        );
+      */
+
       if (result != null) {
         _processAuthResponse(result);
       }
@@ -260,7 +274,10 @@ class _MyAppState extends State<MyApp> {
     try {
       _setBusyState();
 
-      // show that we can also explicitly specify the endpoints rather than getting from the details from the discovery document
+      /*
+        This shows that we can also explicitly specify the endpoints rather than
+        getting from the details from the discovery document.
+      */
       final AuthorizationTokenResponse? result =
           await _appAuth.authorizeAndExchangeCode(
         AuthorizationTokenRequest(
@@ -272,13 +289,22 @@ class _MyAppState extends State<MyApp> {
         ),
       );
 
-      // this code block demonstrates passing in values for the prompt parameter. in this case it prompts the user login even if they have already signed in. the list of supported values depends on the identity provider
-      // final AuthorizationTokenResponse result = await _appAuth.authorizeAndExchangeCode(
-      //   AuthorizationTokenRequest(_clientId, _redirectUrl,
-      //       serviceConfiguration: _serviceConfiguration,
-      //       scopes: _scopes,
-      //       promptValues: ['login']),
-      // );
+      /* 
+        This code block demonstrates passing in values for the prompt
+        parameter. In this case it prompts the user login even if they have
+        already signed in. the list of supported values depends on the
+        identity provider
+
+        ```dart
+        final AuthorizationTokenResponse result = await _appAuth
+        .authorizeAndExchangeCode(
+          AuthorizationTokenRequest(_clientId, _redirectUrl,
+              serviceConfiguration: _serviceConfiguration,
+              scopes: _scopes,
+              promptValues: ['login']),
+        );
+        ```
+      */
 
       if (result != null) {
         _processAuthTokenResponse(result);
@@ -313,7 +339,10 @@ class _MyAppState extends State<MyApp> {
 
   void _processAuthResponse(AuthorizationResponse response) {
     setState(() {
-      // save the code verifier and nonce as it must be used when exchanging the token
+      /*
+        Save the code verifier and nonce as it must be used when exchanging the
+        token.
+      */
       _codeVerifier = response.codeVerifier;
       _nonce = response.nonce;
       _authorizationCode =
