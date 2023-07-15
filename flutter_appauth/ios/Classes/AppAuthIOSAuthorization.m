@@ -19,8 +19,7 @@
                                            codeChallenge:codeChallenge
                                      codeChallengeMethod:OIDOAuthorizationRequestCodeChallengeMethodS256
                                     additionalParameters:additionalParameters];
-  UIViewController *rootViewController =
-  [UIApplication sharedApplication].delegate.window.rootViewController;
+  UIViewController *rootViewController = [self rootViewController];
   if(exchangeCode) {
       id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithViewController:rootViewController useEphemeralSession:preferEphemeralSession];
       return [OIDAuthState authStateByPresentingAuthorizationRequest:request externalUserAgent:externalUserAgent callback:^(OIDAuthState *_Nullable authState,
@@ -56,8 +55,7 @@
                                                                                                                     state:requestParameters.state additionalParameters:requestParameters.additionalParameters] :[[OIDEndSessionRequest alloc] initWithConfiguration:serviceConfiguration idTokenHint:requestParameters.idTokenHint postLogoutRedirectURL:postLogoutRedirectURL
                                                                                                                                                                                                                                                additionalParameters:requestParameters.additionalParameters];
 
-  UIViewController *rootViewController =
-  [UIApplication sharedApplication].delegate.window.rootViewController;
+  UIViewController *rootViewController = [self rootViewController];
   id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithViewController:rootViewController useEphemeralSession:requestParameters.preferEphemeralSession];
 
   
@@ -80,6 +78,16 @@
     }
     return [[OIDExternalUserAgentIOS alloc]
             initWithPresentingViewController:rootViewController];
+}
+
+- (UIViewController *)rootViewController {
+    if (@available(iOS 13, *)) {
+      return [[UIApplication sharedApplication].windows filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id window, NSDictionary *bindings) {
+        return [window isKeyWindow];
+      }]].firstObject.rootViewController;
+    }
+    return [UIApplication sharedApplication].delegate.window.rootViewController;
+    
 }
 
 @end
