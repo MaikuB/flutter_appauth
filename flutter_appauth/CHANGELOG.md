@@ -1,3 +1,8 @@
+# 6.0.1
+
+* [iOS] updated plugin so it supports apps that leverage the multiple window capability that Apple added to iOS 13. Thanks to the PR from [Jerold Albertson](https://github.com/jeroldalbertson-wf)
+* Added a link to the tutorials section of the readme that walks through how to use this plugin with Asgardeo. Thanks to the PR from [Achintha Isuru](https://github.com/Achintha444)
+
 # 6.0.0
 
 * **Potentially breaking change** [iOS][macOS] bumped AppAuth dependency to 1.6.2 where fixes were done to allow SDK to compile in Xcode 14 by bumping the minimum OS versions
