@@ -11,6 +11,7 @@ A Flutter bridge for AppAuth (https://appauth.io) used authenticating and author
 
 ## Tutorials from identity providers
 
+* [Asgardeo](https://wso2.com/asgardeo/docs/tutorials/auth-users-into-flutter-apps/)
 * [Auth0](https://auth0.com/blog/get-started-with-flutter-authentication/)
 * [FusionAuth](https://fusionauth.io/blog/2020/11/23/securing-flutter-oauth/)
 
