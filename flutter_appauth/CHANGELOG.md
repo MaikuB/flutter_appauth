@@ -1,3 +1,7 @@
+# 6.0.2
+
+* [macOS] fixed deprecation warning around using `init` and to use `initWithPresentingWindow` via the AppAuth iOS/macOS SDK instead. Thanks to the PR from [Ivan Tivonenko](https://github.com/darkdarkdragon)
+
 # 6.0.1
 
 * [iOS] updated plugin so it supports apps that leverage the multiple window capability that Apple added to iOS 13. Thanks to the PR from [Jerold Albertson](https://github.com/jeroldalbertson-wf)
