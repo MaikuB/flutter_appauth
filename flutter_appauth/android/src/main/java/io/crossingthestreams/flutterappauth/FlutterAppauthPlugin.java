@@ -348,8 +348,13 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         }
 
         AuthorizationService authorizationService = allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
-        Intent authIntent = authorizationService.getAuthorizationRequestIntent(authRequestBuilder.build());
-        mainActivity.startActivityForResult(authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
+
+        try {
+            Intent authIntent = authorizationService.getAuthorizationRequestIntent(authRequestBuilder.build());
+            mainActivity.startActivityForResult(authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
+        } catch (Exception ex) {
+            finishWithError(exchangeCode ? AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE : AUTHORIZE_ERROR_CODE, ex.toString(), getCauseFromException(ex));
+        }
     }
 
     private void performTokenRequest(AuthorizationServiceConfiguration serviceConfiguration, TokenRequestParameters tokenRequestParameters) {
