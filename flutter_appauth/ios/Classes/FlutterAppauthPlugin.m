@@ -257,7 +257,9 @@ NSString *const AUTHORIZE_ERROR_MESSAGE_FORMAT = @"Failed to authorize: %@";
             if(authorizationResponse) {
                 NSMutableDictionary *processedResponse = [[NSMutableDictionary alloc] init];
                 [processedResponse setObject:authorizationResponse.additionalParameters forKey:@"authorizationAdditionalParameters"];
-                [processedResponse setObject:authorizationResponse.authorizationCode forKey:@"authorizationCode"];
+                if(authorizationResponse.authorizationCode) {
+                    [processedResponse setObject:authorizationResponse.authorizationCode forKey:@"authorizationCode"];
+                }
                 [processedResponse setObject:authorizationResponse.request.codeVerifier forKey:@"codeVerifier"];
                 result(processedResponse);
             } else {
