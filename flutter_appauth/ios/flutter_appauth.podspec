@@ -17,5 +17,6 @@ A new flutter plugin project.
   s.dependency 'Flutter'
   s.dependency 'AppAuth', '1.6.2'
   s.ios.deployment_target = '9.0'
+  s.resource_bundles = {'flutter_appauth_privacy' => ['Resources/PrivacyInfo.xcprivacy']}
 end
 
