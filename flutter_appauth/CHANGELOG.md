@@ -1,3 +1,7 @@
+# 6.0.2+1
+
+* [iOS] added privacy manifest
+
 # 6.0.2
 
 * [macOS] fixed deprecation warning around using `init` and to use `initWithPresentingWindow` via the AppAuth iOS/macOS SDK instead. Thanks to the PR from [Ivan Tivonenko](https://github.com/darkdarkdragon)
