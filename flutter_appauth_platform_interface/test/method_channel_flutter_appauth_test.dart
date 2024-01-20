@@ -8,8 +8,10 @@ void main() {
   const MethodChannel channel =
       MethodChannel('crossingthestreams.io/flutter_appauth');
   final List<MethodCall> log = <MethodCall>[];
-  channel.setMockMethodCallHandler((MethodCall methodCall) async {
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
     log.add(methodCall);
+    return null;
   });
 
   tearDown(() {
