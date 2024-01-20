@@ -493,15 +493,20 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             return true;
         }
         if (requestCode == RC_END_SESSION) {
-            final EndSessionResponse endSessionResponse = EndSessionResponse.fromIntent(intent);
-            AuthorizationException ex = AuthorizationException.fromIntent(intent);
-            if (ex != null) {
-                finishWithEndSessionError(ex);
+            if (intent == null) {
+                finishWithError(NULL_INTENT_ERROR_CODE, NULL_INTENT_ERROR_FORMAT, null);
             } else {
-                Map<String, Object> responseMap = new HashMap<>();
-                responseMap.put("state", endSessionResponse.state);
-                finishWithSuccess(responseMap);
+                final EndSessionResponse endSessionResponse = EndSessionResponse.fromIntent(intent);
+                AuthorizationException ex = AuthorizationException.fromIntent(intent);
+                if (ex != null) {
+                    finishWithEndSessionError(ex);
+                } else {
+                    Map<String, Object> responseMap = new HashMap<>();
+                    responseMap.put("state", endSessionResponse.state);
+                    finishWithSuccess(responseMap);
+                }
             }
+            return true;
         }
         return false;
     }
