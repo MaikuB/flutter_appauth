@@ -1,7 +1,9 @@
 /*! @file OIDExternalUserAgentMacNoSSO.h
-    @brief  OIDExternalUserAgentMacNoSSO is custom user agent based on the default user agent in the AppAuth iOS SDK found here:
+    @brief  OIDExternalUserAgentMacNoSSO is custom user agent based on the
+   default user agent in the AppAuth iOS SDK found here:
             https://github.com/openid/AppAuth-iOS/blob/master/Source/AppAuth/macOS/OIDExternalUserAgentMac.h
-            Ths user agent allows setting `prefersEphemeralSession` flag on macOS 10.15 or newer to avoid cookies being shared across the device
+            Ths user agent allows setting `prefersEphemeralSession` flag on
+   macOS 10.15 or newer to avoid cookies being shared across the device
     @copydetails
         Licensed under the Apache License, Version 2.0 (the "License");
         you may not use this file except in compliance with the License.
@@ -16,22 +18,25 @@
         limitations under the License.
  */
 
-#import <AppKit/AppKit.h>
 #import <AppAuth/AppAuth.h>
+#import <AppKit/AppKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*! @brief A Mac-specific external user-agent UI Coordinator that uses the default browser to
-        present an external user-agent request.
+/*! @brief A Mac-specific external user-agent UI Coordinator that uses the
+   default browser to present an external user-agent request.
  */
 @interface OIDExternalUserAgentMacNoSSO : NSObject <OIDExternalUserAgent>
 
 /*! @brief The designated initializer.
-    @param presentingWindow The window from which to present the ASWebAuthenticationSession.
+    @param presentingWindow The window from which to present the
+   ASWebAuthenticationSession.
  */
-- (instancetype)initWithPresentingWindow:(NSWindow *)presentingWindow NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithPresentingWindow:(NSWindow *)presentingWindow
+    NS_DESIGNATED_INITIALIZER;
 
-- (instancetype)init __deprecated_msg("Use initWithPresentingWindow for macOS 10.15 and above.");
+- (instancetype)init __deprecated_msg(
+    "Use initWithPresentingWindow for macOS 10.15 and above.");
 
 @end
 

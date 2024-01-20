@@ -1,7 +1,7 @@
+#import "FlutterAppAuth.h"
+#import "OIDExternalUserAgentIOSNoSSO.h"
 #import <AppAuth/AppAuth.h>
 #import <Flutter/Flutter.h>
-#import "OIDExternalUserAgentIOSNoSSO.h"
-#import "FlutterAppAuth.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
