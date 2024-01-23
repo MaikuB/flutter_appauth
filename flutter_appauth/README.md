@@ -185,6 +185,8 @@ Go to the `Info.plist` for your iOS/macOS app to specify the custom scheme so th
 </array>
 ```
 
+Note: iOS apps generate a file called `cache.db` which contains the table `cfurl_cache_receiver_data`. This table will contain the access token obtained after the login is completed. If the potential data leak represents a threat for your application then you can disable the information caching for the entire iOS app (ex. https://kunalgupta1508.medium.com/data-leakage-with-cache-db-2d311582cf23).
+
 ## FAQs
 
 **When connecting to Azure B2C or Azure AD, the login request redirects properly on Android but not on iOS. What's going on?**
