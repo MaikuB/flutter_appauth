@@ -1,5 +1,6 @@
-# [vNext]
+# 6.0.4
 
+* [Android] when no suitable browser is found when calling either `authorize()` or `authorizeAndExchange()`, rather than crashing the plugin will now throw a `PlatformException` with an error code of `no_browser_available`. Thanks to the PR from [NikHomann](https://github.com/NikHomann)
 * Removed duplicate asterisk from the 6.0.3 changelog entry around how the example app got updated
 
 # 6.0.3
