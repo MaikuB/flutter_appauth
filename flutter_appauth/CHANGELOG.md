@@ -1,3 +1,7 @@
+# 6.0.5
+
+* [iOS] bumped AppAuth iOS dependency to 1.7.2
+
 # 6.0.4
 
 * [Android] when no suitable browser is found when calling either `authorize()` or `authorizeAndExchange()`, rather than crashing the plugin will now throw a `PlatformException` with an error code of `no_browser_available`. Thanks to the PR from [NikHomann](https://github.com/NikHomann)
