@@ -82,4 +82,14 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
     }
     return EndSessionResponse(result['state']);
   }
+
+  @override
+  Future<bool> cancelAuthorization() async {
+    final Map<dynamic, dynamic>? result =
+        await _channel.invokeMethod('cancelAuthorization');
+    if (result == null) {
+      return false;
+    }
+    return result['success'] ?? true;
+  }
 }
