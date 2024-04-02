@@ -22,4 +22,8 @@ class FlutterAppAuth {
   Future<EndSessionResponse?> endSession(EndSessionRequest request) {
     return FlutterAppAuthPlatform.instance.endSession(request);
   }
+
+  Future<void> closeBrowser(){
+    return FlutterAppAuthPlatform.instance.closeBrowser();
+  }
 }
