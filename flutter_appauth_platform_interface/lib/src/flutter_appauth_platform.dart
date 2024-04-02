@@ -52,4 +52,8 @@ abstract class FlutterAppAuthPlatform extends PlatformInterface {
   Future<EndSessionResponse?> endSession(EndSessionRequest request) {
     throw UnimplementedError('endSession() has not been implemented');
   }
+
+  Future<void> closeBrowser() {
+    throw UnimplementedError('endSession() has not been implemented');
+  }
 }
