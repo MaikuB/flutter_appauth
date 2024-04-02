@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 static NSString *const AUTHORIZE_METHOD = @"authorize";
 static NSString *const AUTHORIZE_AND_EXCHANGE_CODE_METHOD = @"authorizeAndExchangeCode";
 static NSString *const TOKEN_METHOD = @"token";
+static NSString *const CLOSE_BROWSER_METHOD = @"closeBrowser";
 static NSString *const END_SESSION_METHOD = @"endSession";
 static NSString *const AUTHORIZE_ERROR_CODE = @"authorize_failed";
 static NSString *const AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE = @"authorize_and_exchange_code_failed";
