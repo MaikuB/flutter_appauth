@@ -1,3 +1,7 @@
+# 6.0.6
+
+* [iOS][macOS] bumped AppAuth iOS dependency to 1.7.4
+
 # 6.0.5
 
 * [iOS] bumped AppAuth iOS dependency to 1.7.2

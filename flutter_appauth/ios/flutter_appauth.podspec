@@ -15,7 +15,7 @@ A new flutter plugin project.
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
-  s.dependency 'AppAuth', '1.7.2'
+  s.dependency 'AppAuth', '1.7.4'
   s.ios.deployment_target = '9.0'
   s.resource_bundles = {'flutter_appauth_privacy' => ['Resources/PrivacyInfo.xcprivacy']}
 end
