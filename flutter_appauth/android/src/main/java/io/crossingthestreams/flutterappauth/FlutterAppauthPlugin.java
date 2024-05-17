@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -73,15 +74,19 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
     private Context applicationContext;
     private Activity mainActivity;
-    private PendingOperation pendingOperation;
+    private static PendingOperation pendingOperation;
     private String clientSecret;
     private boolean allowInsecureConnections;
     private AuthorizationService defaultAuthorizationService;
     private AuthorizationService insecureAuthorizationService;
-    
+
     private void setActivity(Activity flutterActivity) {
         this.mainActivity = flutterActivity;
     }
+
+    private final String methodChannelId = "crossingthestreams.io/flutter_appauth";
+
+    private MethodChannel channel;
 
     private void onAttachedToEngine(Context context, BinaryMessenger binaryMessenger) {
         this.applicationContext = context;
@@ -90,7 +95,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
         authConfigBuilder.setSkipIssuerHttpsCheck(true);
         insecureAuthorizationService = new AuthorizationService(applicationContext, authConfigBuilder.build());
-        final MethodChannel channel = new MethodChannel(binaryMessenger, "crossingthestreams.io/flutter_appauth");
+        channel = new MethodChannel(binaryMessenger, methodChannelId);
         channel.setMethodCallHandler(this);
     }
 
@@ -133,7 +138,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         insecureAuthorizationService = null;
     }
 
-    private void checkAndSetPendingOperation(String method, Result result) {
+    private synchronized void checkAndSetPendingOperation(String method, Result result) {
         if (pendingOperation != null) {
             throw new IllegalStateException(
                     "Concurrent operations detected: " + pendingOperation.method + ", " + method);
@@ -460,6 +465,8 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private void finishWithSuccess(Object data) {
         if (pendingOperation != null) {
             pendingOperation.result.success(data);
+            channel.invokeMethod(pendingOperation.method, data);
+
             pendingOperation = null;
         }
     }
@@ -486,7 +493,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
 
     @Override
-    public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
+    public synchronized boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (pendingOperation == null) {
             return false;
         }
