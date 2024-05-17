@@ -467,7 +467,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             pendingOperation.result.success(data);
             pendingOperation = null;
         } else {
-            channel.invokeMethod(HAS_PENDING_OPERATION, null);
+            channel.invokeMethod(HAS_PENDING_OPERATION, data);
         }
     }
 
@@ -476,7 +476,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             pendingOperation.result.error(errorCode, errorMessage, errorDetails);
             pendingOperation = null;
         } else {
-            channel.invokeMethod(HAS_PENDING_OPERATION, null);
+            channel.invokeMethod(HAS_PENDING_OPERATION, errorCode);
         }
     }
 
