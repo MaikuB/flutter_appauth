@@ -80,7 +80,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private AuthorizationService defaultAuthorizationService;
     private AuthorizationService insecureAuthorizationService;
 
-    private String methodChannelName = "crossingthestreams.io/flutter_appauth";
+    private final String methodChannelName = "crossingthestreams.io/flutter_appauth";
 
     private MethodChannel channel;
     
