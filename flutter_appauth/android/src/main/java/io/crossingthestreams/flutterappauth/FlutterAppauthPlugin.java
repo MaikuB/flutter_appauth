@@ -46,6 +46,7 @@ import io.flutter.plugin.common.PluginRegistry;
  */
 public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityResultListener, ActivityAware {
     private static final String AUTHORIZE_AND_EXCHANGE_CODE_METHOD = "authorizeAndExchangeCode";
+    private static final String HAS_PENDING_OPERATION = "hasPendingOperation";
     private static final String AUTHORIZE_METHOD = "authorize";
     private static final String TOKEN_METHOD = "token";
     private static final String END_SESSION_METHOD = "endSession";
@@ -78,6 +79,10 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private boolean allowInsecureConnections;
     private AuthorizationService defaultAuthorizationService;
     private AuthorizationService insecureAuthorizationService;
+
+    private final String methodChannelName = "crossingthestreams.io/flutter_appauth";
+
+    private MethodChannel channel;
     
     private void setActivity(Activity flutterActivity) {
         this.mainActivity = flutterActivity;
@@ -90,7 +95,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
         authConfigBuilder.setSkipIssuerHttpsCheck(true);
         insecureAuthorizationService = new AuthorizationService(applicationContext, authConfigBuilder.build());
-        final MethodChannel channel = new MethodChannel(binaryMessenger, "crossingthestreams.io/flutter_appauth");
+        channel = new MethodChannel(binaryMessenger, methodChannelName);
         channel.setMethodCallHandler(this);
     }
 
@@ -461,6 +466,8 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         if (pendingOperation != null) {
             pendingOperation.result.success(data);
             pendingOperation = null;
+        } else {
+            channel.invokeMethod(HAS_PENDING_OPERATION, data);
         }
     }
 
@@ -468,6 +475,8 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         if (pendingOperation != null) {
             pendingOperation.result.error(errorCode, errorMessage, errorDetails);
             pendingOperation = null;
+        } else {
+            channel.invokeMethod(HAS_PENDING_OPERATION, errorCode);
         }
     }
 
@@ -487,9 +496,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (pendingOperation == null) {
-            return false;
-        }
         if (requestCode == RC_AUTH_EXCHANGE_CODE || requestCode == RC_AUTH) {
             if (intent == null) {
                 finishWithError(NULL_INTENT_ERROR_CODE, NULL_INTENT_ERROR_FORMAT, null);
