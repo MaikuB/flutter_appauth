@@ -5,7 +5,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,6 +46,7 @@ import io.flutter.plugin.common.PluginRegistry;
  */
 public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityResultListener, ActivityAware {
     private static final String AUTHORIZE_AND_EXCHANGE_CODE_METHOD = "authorizeAndExchangeCode";
+    private static final String HAS_PENDING_OPERATION = "hasPendingOperation";
     private static final String AUTHORIZE_METHOD = "authorize";
     private static final String TOKEN_METHOD = "token";
     private static final String END_SESSION_METHOD = "endSession";
@@ -74,19 +74,19 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
     private Context applicationContext;
     private Activity mainActivity;
-    private static PendingOperation pendingOperation;
+    private PendingOperation pendingOperation;
     private String clientSecret;
     private boolean allowInsecureConnections;
     private AuthorizationService defaultAuthorizationService;
     private AuthorizationService insecureAuthorizationService;
 
+    private String methodChannelName = "crossingthestreams.io/flutter_appauth";
+
+    private MethodChannel channel;
+    
     private void setActivity(Activity flutterActivity) {
         this.mainActivity = flutterActivity;
     }
-
-    private final String methodChannelId = "crossingthestreams.io/flutter_appauth";
-
-    private MethodChannel channel;
 
     private void onAttachedToEngine(Context context, BinaryMessenger binaryMessenger) {
         this.applicationContext = context;
@@ -95,7 +95,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
         authConfigBuilder.setSkipIssuerHttpsCheck(true);
         insecureAuthorizationService = new AuthorizationService(applicationContext, authConfigBuilder.build());
-        channel = new MethodChannel(binaryMessenger, methodChannelId);
+        channel = new MethodChannel(binaryMessenger, methodChannelName);
         channel.setMethodCallHandler(this);
     }
 
@@ -138,7 +138,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         insecureAuthorizationService = null;
     }
 
-    private synchronized void checkAndSetPendingOperation(String method, Result result) {
+    private void checkAndSetPendingOperation(String method, Result result) {
         if (pendingOperation != null) {
             throw new IllegalStateException(
                     "Concurrent operations detected: " + pendingOperation.method + ", " + method);
@@ -465,9 +465,9 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private void finishWithSuccess(Object data) {
         if (pendingOperation != null) {
             pendingOperation.result.success(data);
-            channel.invokeMethod(pendingOperation.method, data);
-
             pendingOperation = null;
+        } else {
+            channel.invokeMethod(HAS_PENDING_OPERATION, null);
         }
     }
 
@@ -475,6 +475,8 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         if (pendingOperation != null) {
             pendingOperation.result.error(errorCode, errorMessage, errorDetails);
             pendingOperation = null;
+        } else {
+            channel.invokeMethod(HAS_PENDING_OPERATION, null);
         }
     }
 
@@ -493,10 +495,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
 
     @Override
-    public synchronized boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (pendingOperation == null) {
-            return false;
-        }
+    public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == RC_AUTH_EXCHANGE_CODE || requestCode == RC_AUTH) {
             if (intent == null) {
                 finishWithError(NULL_INTENT_ERROR_CODE, NULL_INTENT_ERROR_FORMAT, null);
