@@ -28,7 +28,7 @@
               result([FlutterAppAuth processResponses:authState.lastTokenResponse authResponse:authState.lastAuthorizationResponse]);
               
           } else {
-              [FlutterAppAuth finishWithError:AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE message:[FlutterAppAuth formatMessageWithError:AUTHORIZE_ERROR_MESSAGE_FORMAT error:error] result:result];
+              [FlutterAppAuth finishWithError:AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE message:[FlutterAppAuth formatMessageWithError:AUTHORIZE_ERROR_MESSAGE_FORMAT error:error] result:result error:error];
           }
       }];
   } else {
@@ -42,7 +42,7 @@
               [processedResponse setObject:authorizationResponse.request.nonce forKey:@"nonce"];
               result(processedResponse);
           } else {
-              [FlutterAppAuth finishWithError:AUTHORIZE_ERROR_CODE message:[FlutterAppAuth formatMessageWithError:AUTHORIZE_ERROR_MESSAGE_FORMAT error:error] result:result];
+              [FlutterAppAuth finishWithError:AUTHORIZE_ERROR_CODE message:[FlutterAppAuth formatMessageWithError:AUTHORIZE_ERROR_MESSAGE_FORMAT error:error] result:result error:error];
           }
       }];
   }
@@ -62,7 +62,7 @@
   return [OIDAuthorizationService presentEndSessionRequest:endSessionRequest externalUserAgent:externalUserAgent callback:^(OIDEndSessionResponse * _Nullable endSessionResponse, NSError * _Nullable error) {
       if(!endSessionResponse) {
           NSString *message = [NSString stringWithFormat:END_SESSION_ERROR_MESSAGE_FORMAT, [error localizedDescription]];
-          [FlutterAppAuth finishWithError:END_SESSION_ERROR_CODE message:message result:result];
+          [FlutterAppAuth finishWithError:END_SESSION_ERROR_CODE message:message result:result error:error];
           return;
       }
       NSMutableDictionary *processedResponse = [[NSMutableDictionary alloc] init];

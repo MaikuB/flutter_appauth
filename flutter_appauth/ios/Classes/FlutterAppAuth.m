@@ -37,8 +37,41 @@
     return processedResponses;
 }
 
-+ (void)finishWithError:(NSString *)errorCode message:(NSString *)message  result:(FlutterResult)result {
-    result([FlutterError errorWithCode:errorCode message:message details:nil]);
++ (void)finishWithError:(NSString *)errorCode message:(NSString *)message result:(FlutterResult)result error:(NSError * _Nullable)error {
+
+    NSMutableDictionary<NSString *, id> *details = [NSMutableDictionary dictionary];
+    NSLog(@"Error %@", error);
+    if (error) {
+        id authError = error.userInfo[OIDOAuthErrorResponseErrorKey];
+        NSDictionary<NSString *, id> *authErrorMap = [authError isKindOfClass:[NSDictionary class]] ? authError : nil;
+        
+        if (authErrorMap) {
+            if ([authErrorMap objectForKey:@"error"]) {
+                [details setObject:authErrorMap[@"error"] forKey:@"error"];
+            }
+            if ([authErrorMap objectForKey:@"error_description"]) {
+                [details setObject:authErrorMap[@"error_description"] forKey:@"error_description"];
+            }
+        }
+        if (error.domain) {
+            [details setObject:error.domain forKey:@"type"];
+        }
+        if (error.code) {
+            [details setObject:[@(error.code) stringValue] forKey:@"code"];
+        }
+        
+        
+        id underlyingErr = [error.userInfo objectForKey:NSUnderlyingErrorKey];
+        NSError *underlyingError = [underlyingErr isKindOfClass:[NSError class]] ? underlyingErr : nil;
+        if (underlyingError) {
+            [details setObject:underlyingError.domain forKey:@"error_uri"];
+            [details setObject:underlyingError.debugDescription forKey:@"root_cause_error"];
+        } else if (error.debugDescription) {
+            [details setObject:error.debugDescription forKey:@"root_cause_error"];
+        }
+        
+    }
+    result([FlutterError errorWithCode:errorCode message:message details:details]);
 }
 
 + (NSString *) formatMessageWithError:(NSString *)messageFormat error:(NSError * _Nullable)error {

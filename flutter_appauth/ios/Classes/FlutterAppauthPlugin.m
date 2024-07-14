@@ -181,7 +181,7 @@ AppAuthAuthorization* authorization;
 
 - (void)finishWithDiscoveryError:(NSError * _Nullable)error result:(FlutterResult)result {
     NSString *message = [NSString stringWithFormat:DISCOVERY_ERROR_MESSAGE_FORMAT, [error localizedDescription]];
-    [FlutterAppAuth finishWithError:DISCOVERY_ERROR_CODE message:message result:result];
+    [FlutterAppAuth finishWithError:DISCOVERY_ERROR_CODE message:message result:result error:error];
 }
 
 
@@ -278,7 +278,7 @@ AppAuthAuthorization* authorization;
         if (response) {
             result([FlutterAppAuth processResponses:response authResponse:nil]);                                           } else {
                 NSString *message = [NSString stringWithFormat:TOKEN_ERROR_MESSAGE_FORMAT, [error localizedDescription]];
-                [FlutterAppAuth finishWithError:TOKEN_ERROR_CODE message:message result:result];
+                [FlutterAppAuth finishWithError:TOKEN_ERROR_CODE message:message result:result error:error];
             }
     }];
 }

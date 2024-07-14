@@ -78,7 +78,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private boolean allowInsecureConnections;
     private AuthorizationService defaultAuthorizationService;
     private AuthorizationService insecureAuthorizationService;
-    
+
     private void setActivity(Activity flutterActivity) {
         this.mainActivity = flutterActivity;
     }
@@ -151,7 +151,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                     checkAndSetPendingOperation(call.method, result);
                     handleAuthorizeMethodCall(arguments, true);
                 } catch (Exception ex) {
-                    finishWithError(AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE, ex.getLocalizedMessage(), getCauseFromException(ex));
+                    finishWithError(AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE, ex.getLocalizedMessage(), ex);
                 }
                 break;
             case AUTHORIZE_METHOD:
@@ -159,7 +159,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                     checkAndSetPendingOperation(call.method, result);
                     handleAuthorizeMethodCall(arguments, false);
                 } catch (Exception ex) {
-                    finishWithError(AUTHORIZE_ERROR_CODE, ex.getLocalizedMessage(), getCauseFromException(ex));
+                    finishWithError(AUTHORIZE_ERROR_CODE, ex.getLocalizedMessage(), ex);
                 }
                 break;
             case TOKEN_METHOD:
@@ -167,7 +167,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                     checkAndSetPendingOperation(call.method, result);
                     handleTokenMethodCall(arguments);
                 } catch (Exception ex) {
-                    finishWithError(TOKEN_ERROR_CODE, ex.getLocalizedMessage(), getCauseFromException(ex));
+                    finishWithError(TOKEN_ERROR_CODE, ex.getLocalizedMessage(), ex);
                 }
                 break;
             case END_SESSION_METHOD:
@@ -175,7 +175,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                     checkAndSetPendingOperation(call.method, result);
                     handleEndSessionMethodCall(arguments);
                 } catch (Exception ex) {
-                    finishWithError(END_SESSION_ERROR_CODE, ex.getLocalizedMessage(), getCauseFromException(ex));
+                    finishWithError(END_SESSION_ERROR_CODE, ex.getLocalizedMessage(), ex);
                 }
                 break;
             default:
@@ -330,19 +330,18 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
         if (additionalParameters != null && !additionalParameters.isEmpty()) {
 
-            if(additionalParameters.containsKey("ui_locales")){
+            if (additionalParameters.containsKey("ui_locales")) {
                 authRequestBuilder.setUiLocales(additionalParameters.get("ui_locales"));
                 additionalParameters.remove("ui_locales");
             }
 
-            if(additionalParameters.containsKey("claims")){
+            if (additionalParameters.containsKey("claims")) {
                 try {
                     final JSONObject claimsAsJson = new JSONObject(additionalParameters.get("claims"));
                     authRequestBuilder.setClaims(claimsAsJson);
                     additionalParameters.remove("claims");
-                }
-                catch (JSONException ex) {
-                    finishWithError(INVALID_CLAIMS_ERROR_CODE, ex.getLocalizedMessage(), getCauseFromException(ex));
+                } catch (JSONException ex) {
+                    finishWithError(INVALID_CLAIMS_ERROR_CODE, ex.getLocalizedMessage(), ex);
                     return;
                 }
             }
@@ -356,7 +355,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             Intent authIntent = authorizationService.getAuthorizationRequestIntent(authRequestBuilder.build());
             mainActivity.startActivityForResult(authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
         } catch (ActivityNotFoundException ex) {
-            finishWithError(NO_BROWSER_AVAILABLE_ERROR_CODE, NO_BROWSER_AVAILABLE_ERROR_FORMAT, getCauseFromException(ex));
+            finishWithError(NO_BROWSER_AVAILABLE_ERROR_CODE, NO_BROWSER_AVAILABLE_ERROR_FORMAT, ex);
         }
     }
 
@@ -453,7 +452,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     }
 
     private void finishWithTokenError(AuthorizationException ex) {
-        finishWithError(TOKEN_ERROR_CODE, String.format(TOKEN_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription), getCauseFromException(ex));
+        finishWithError(TOKEN_ERROR_CODE, String.format(TOKEN_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription), ex);
     }
 
 
@@ -464,22 +463,42 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         }
     }
 
-    private void finishWithError(String errorCode, String errorMessage, String errorDetails) {
+    private void finishWithError(String errorCode, String errorMessage, @Nullable Exception cause) {
         if (pendingOperation != null) {
-            pendingOperation.result.error(errorCode, errorMessage, errorDetails);
+            System.out.println("Error " + cause.toString());
+            pendingOperation.result.error(errorCode, errorMessage, createErrorMap(cause));
             pendingOperation = null;
         }
     }
 
     private void finishWithDiscoveryError(AuthorizationException ex) {
-        finishWithError(DISCOVERY_ERROR_CODE, String.format(DISCOVERY_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription), getCauseFromException(ex));
+        finishWithError(DISCOVERY_ERROR_CODE, String.format(DISCOVERY_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription), ex);
     }
 
     private void finishWithEndSessionError(AuthorizationException ex) {
-        finishWithError(END_SESSION_ERROR_CODE, String.format(END_SESSION_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription), getCauseFromException(ex));
+        finishWithError(END_SESSION_ERROR_CODE, String.format(END_SESSION_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription), ex);
     }
 
-    private String getCauseFromException(Exception ex) {
+    private Map<String, Object> createErrorMap(@Nullable Exception cause) {
+        @Nullable AuthorizationException authException = cause instanceof AuthorizationException ? (AuthorizationException) cause : null;
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("legacy_error_details", getCauseFromException(cause));
+
+        if (authException != null) {
+            responseMap.put("type", authException.type);
+            responseMap.put("code", authException.code);
+            responseMap.put("error", authException.error);
+            responseMap.put("error_description", authException.errorDescription);
+            responseMap.put("error_uri", authException.errorUri == null ? null : authException.errorUri.toString());
+            responseMap.put("root_cause_error", authException.getCause() == null ? "" : authException.getCause().toString());
+        }
+        return responseMap;
+    }
+
+    private String getCauseFromException(@Nullable Exception ex) {
+        if (ex == null) {
+            return "";
+        }
         final Throwable cause = ex.getCause();
         return cause != null ? cause.getMessage() : null;
     }
@@ -536,7 +555,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                         if (resp != null) {
                             finishWithSuccess(tokenResponseToMap(resp, authResponse));
                         } else {
-                            finishWithError(AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE, String.format(AUTHORIZE_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription), getCauseFromException(ex));
+                            finishWithError(AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE, String.format(AUTHORIZE_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription), ex);
                         }
                     }
                 };
@@ -549,7 +568,7 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
                 finishWithSuccess(authorizationResponseToMap(authResponse));
             }
         } else {
-            finishWithError(exchangeCode ? AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE : AUTHORIZE_ERROR_CODE, String.format(AUTHORIZE_ERROR_MESSAGE_FORMAT, authException.error, authException.errorDescription), getCauseFromException(authException));
+            finishWithError(exchangeCode ? AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE : AUTHORIZE_ERROR_CODE, String.format(AUTHORIZE_ERROR_MESSAGE_FORMAT, authException.error, authException.errorDescription), authException);
         }
     }
 
