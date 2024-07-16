@@ -328,7 +328,7 @@ class _MyAppState extends State<MyApp> {
       });
     } else if (e is FlutterAppAuthPlatformException) {
       setState(() {
-        _error = e.platformErrorDetails?.toString();
+        _error = e.platformErrorDetails.toString();
       });
     } else if (e is PlatformException) {
       setState(() {
