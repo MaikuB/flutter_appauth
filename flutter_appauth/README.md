@@ -107,6 +107,25 @@ await appAuth.endSession(EndSessionRequest(
 
 The above code passes an `AuthorizationServiceConfiguration` with all the endpoints defined but alternatives are to specify an `issuer` or `discoveryUrl` like you would with the other APIs in the plugin (e.g. `authorizeAndExchangeCode()`).
 
+### Handling errors
+
+Each of these methods will throw exceptions if anything goes wrong. For example:
+
+```dart
+
+try {
+  await appAuth.authorize(...);
+} on FlutterAppAuthUserCancelledException catch (e) {
+  // Handle user cancelling the flow (only applies to authorize and authorizeAndExchangeCode)
+} on FlutterAppAuthPlatformException catch (e) {
+  final FlutterAppAuthPlatformErrorDetails details = e.details;
+  // Handle exceptions based on errors from AppAuth.
+} catch (e) {
+  // Handle unexpected errors.
+}
+
+```
+
 ### Ephemeral Sessions (iOS and macOS only)
 On iOS (versions 13 and above) and macOS you can use the option `preferEphemeralSession = true` to start an 
 [ephemeral browser session](https://developer.apple.com/documentation/foundation/urlsessionconfiguration/1410529-ephemeral)

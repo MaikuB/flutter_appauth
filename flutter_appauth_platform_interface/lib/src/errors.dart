@@ -78,5 +78,5 @@ class FlutterAppAuthPlatformException extends PlatformException {
     stacktrace: stacktrace,
   );
 
-  final FlutterAppAuthPlatformErrorDetails? platformErrorDetails;
+  final FlutterAppAuthPlatformErrorDetails platformErrorDetails;
 }

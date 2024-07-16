@@ -465,7 +465,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
 
     private void finishWithError(String errorCode, String errorMessage, @Nullable Exception cause) {
         if (pendingOperation != null) {
-            System.out.println("Error " + cause.toString());
             pendingOperation.result.error(errorCode, errorMessage, createErrorMap(cause));
             pendingOperation = null;
         }

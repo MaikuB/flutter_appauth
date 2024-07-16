@@ -322,8 +322,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _clearBusyState(Object e) {
-    print(e);
-    print(e is FlutterAppAuthUserCancelledException);
     if (e is FlutterAppAuthUserCancelledException) {
       setState(() {
         _error = 'The user cancelled the flow!';
