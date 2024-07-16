@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:http/http.dart' as http;
 
@@ -21,6 +22,7 @@ class _MyAppState extends State<MyApp> {
   String? _refreshToken;
   String? _accessToken;
   String? _idToken;
+  String? _error;
 
   final TextEditingController _authorizationCodeTextController =
       TextEditingController();
@@ -118,6 +120,9 @@ class _MyAppState extends State<MyApp> {
                       : null,
                 ),
                 const SizedBox(height: 8),
+                if (_error != null)
+                  Text(_error ?? ''),
+                const SizedBox(height: 8),
                 const Text('authorization code'),
                 TextField(
                   controller: _authorizationCodeTextController,
@@ -156,8 +161,9 @@ class _MyAppState extends State<MyApp> {
           postLogoutRedirectUrl: _postLogoutRedirectUrl,
           serviceConfiguration: _serviceConfiguration));
       _clearSessionInfo();
-    } catch (_) {}
-    _clearBusyState();
+    } catch (e) {
+      _clearBusyState(e);
+    }
   }
 
   void _clearSessionInfo() {
@@ -182,11 +188,11 @@ class _MyAppState extends State<MyApp> {
       _setBusyState();
       final TokenResponse? result = await _appAuth.token(TokenRequest(
           _clientId, _redirectUrl,
-          refreshToken: _refreshToken, issuer: _issuer, scopes: _scopes));
+          refreshToken: _refreshToken! + "a", issuer: _issuer, scopes: _scopes));
       _processTokenResponse(result);
       await _testApi(result);
-    } catch (_) {
-      _clearBusyState();
+    } catch (e) {
+      _clearBusyState(e);
     }
   }
 
@@ -202,8 +208,8 @@ class _MyAppState extends State<MyApp> {
           scopes: _scopes));
       _processTokenResponse(result);
       await _testApi(result);
-    } catch (_) {
-      _clearBusyState();
+    } catch (e) {
+      _clearBusyState(e);
     }
   }
 
@@ -241,8 +247,8 @@ class _MyAppState extends State<MyApp> {
       if (result != null) {
         _processAuthResponse(result);
       }
-    } catch (_) {
-      _clearBusyState();
+    } catch (e) {
+      _clearBusyState(e);
     }
   }
 
@@ -264,8 +270,8 @@ class _MyAppState extends State<MyApp> {
       if (result != null) {
         _processAuthResponse(result);
       }
-    } catch (_) {
-      _clearBusyState();
+    } catch (e) {
+      _clearBusyState(e);
     }
   }
 
@@ -310,12 +316,27 @@ class _MyAppState extends State<MyApp> {
         _processAuthTokenResponse(result);
         await _testApi(result);
       }
-    } catch (_) {
-      _clearBusyState();
+    } catch (e) {
+      _clearBusyState(e);
     }
   }
 
-  void _clearBusyState() {
+  void _clearBusyState(Object e) {
+    print(e);
+    print(e is FlutterAppAuthUserCancelledException);
+    if (e is FlutterAppAuthUserCancelledException) {
+      setState(() {
+        _error = 'The user cancelled the flow!';
+      });
+    } else if (e is FlutterAppAuthPlatformException) {
+      setState(() {
+        _error = e.platformErrorDetails?.toString();
+      });
+    } else if (e is PlatformException) {
+      setState(() {
+        _error = 'Error\n\nCode: ${e.code}\nMessage: ${e.message}\nDetails: ${e.details}';
+      });
+    }
     setState(() {
       _isBusy = false;
     });
@@ -323,6 +344,7 @@ class _MyAppState extends State<MyApp> {
 
   void _setBusyState() {
     setState(() {
+      _error = '';
       _isBusy = true;
     });
   }
