@@ -83,6 +83,18 @@ final TokenResponse result = await appAuth.token(TokenRequest('<client_id>', '<r
 
 Reusing the nonce and code verifier is particularly important as the AppAuth SDKs (especially on Android) may return an error (e.g. ID token validation error due to nonce mismatch) if this isn't done
 
+### Detecting user cancellation
+
+Both the `authorize` and `authorizeAndExchangeCode` launch the user into a browser which they can cancel. This shouldn't be considered an error and should be handled gracefully.
+
+```dart
+try {
+  await appAuth.authorize(...); // Or authorizeAndExchangeCode(...)
+} on FlutterAppAuthUserCancelledException catch (e) {
+  // Handle user cancellation
+}
+```
+
 ### Refreshing tokens
 
 Some providers may return a refresh token that could be used to refresh short-lived access tokens. A request to get a new access token before it expires could be made that would like similar to the following code
@@ -115,14 +127,14 @@ Each of these methods will throw exceptions if anything goes wrong. For example:
 
 try {
   await appAuth.authorize(...);
-} on FlutterAppAuthUserCancelledException catch (e) {
-  // Handle user cancelling the flow (only applies to authorize and authorizeAndExchangeCode)
 } on FlutterAppAuthPlatformException catch (e) {
   final FlutterAppAuthPlatformErrorDetails details = e.details;
   // Handle exceptions based on errors from AppAuth.
 } catch (e) {
-  // Handle unexpected errors.
+  // Handle other errors.
 }
+
+The `FlutterAppAuthPlatformErrorDetails` object contains all the error information from the underlying platforms, including what's speficied in the [RFC](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2).
 
 ```
 
