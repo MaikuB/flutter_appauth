@@ -63,8 +63,13 @@
         id underlyingErr = [error.userInfo objectForKey:NSUnderlyingErrorKey];
         NSError *underlyingError = [underlyingErr isKindOfClass:[NSError class]] ? underlyingErr : nil;
         if (underlyingError) {
-            [details setObject:underlyingError.domain forKey:@"error_uri"];
-            [details setObject:underlyingError.debugDescription forKey:@"root_cause_error"];
+            if (underlyingError.domain) {
+                [details setObject:underlyingError.domain forKey:@"error_uri"];
+            }
+
+            if (underlyingError.debugDescription) {
+                [details setObject:underlyingError.debugDescription forKey:@"root_cause_error"];
+            }
         } else if (error.debugDescription) {
             [details setObject:error.debugDescription forKey:@"root_cause_error"];
         }

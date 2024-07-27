@@ -484,13 +484,14 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         responseMap.put("legacy_error_details", getCauseFromException(cause));
 
         if (authException != null) {
-            responseMap.put("type", authException.type);
-            responseMap.put("code", authException.code);
+            boolean userDidCancel = authException.equals(AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW);
+            responseMap.put("type", String.valueOf(authException.type));
+            responseMap.put("code", String.valueOf(authException.code));
             responseMap.put("error", authException.error);
             responseMap.put("error_description", authException.errorDescription);
             responseMap.put("error_uri", authException.errorUri == null ? null : authException.errorUri.toString());
             responseMap.put("root_cause_error", authException.getCause() == null ? "" : authException.getCause().toString());
-            responseMap.put("user_did_cancel", authException.equals(AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW));
+            responseMap.put("user_did_cancel", String.valueOf(userDidCancel));
         }
         return responseMap;
     }

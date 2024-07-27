@@ -188,7 +188,7 @@ class _MyAppState extends State<MyApp> {
       _setBusyState();
       final TokenResponse? result = await _appAuth.token(TokenRequest(
           _clientId, _redirectUrl,
-          refreshToken: _refreshToken! + "a", issuer: _issuer, scopes: _scopes));
+          refreshToken: _refreshToken, issuer: _issuer, scopes: _scopes));
       _processTokenResponse(result);
       await _testApi(result);
     } catch (e) {
@@ -333,6 +333,10 @@ class _MyAppState extends State<MyApp> {
     } else if (e is PlatformException) {
       setState(() {
         _error = 'Error\n\nCode: ${e.code}\nMessage: ${e.message}\nDetails: ${e.details}';
+      });
+    } else {
+      setState(() {
+        _error = 'Error: $e';
       });
     }
     setState(() {
