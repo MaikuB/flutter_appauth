@@ -134,7 +134,9 @@ try {
   // Handle other errors.
 }
 
-The `FlutterAppAuthPlatformErrorDetails` object contains all the error information from the underlying platforms, including what's speficied in the [RFC](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2).
+The `FlutterAppAuthPlatformErrorDetails` object contains all the error information from the underlying platform's AppAuth SDK.
+
+This includes the error codes specified in the [RFC](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2).
 
 ```
 

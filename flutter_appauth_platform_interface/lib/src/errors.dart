@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
 /// The details of an error thrown from the underlying
-/// platform AppAuth libraries.
+/// platform's AppAuth SDK
 class FlutterAppAuthPlatformErrorDetails {
 
   FlutterAppAuthPlatformErrorDetails({
@@ -33,16 +33,17 @@ class FlutterAppAuthPlatformErrorDetails {
   /// Otherwise a short error describing what happened.
   final String? error;
 
-  /// Short, human readible error description.
+  /// Short, human readable error description.
   final String? errorDescription;
 
-  /// The error Uri or domain from the underlying platform.
+  /// The error URI or domain from the underlying platform's AppAuth SDK
   final String? errorUri;
 
-  /// The underlying raw error as a String debugging.
+  /// The underlying raw error from the platform's AppAuth SDK
+  /// as a String intended only for debugging.
   final String? rootCauseError;
 
-  /// True if the user cancelled the authorization flow by closing the browser prematurely
+  /// True if the user cancelled the authorization flow by closing the browser prematurely,
   /// False otherwise (for all actual errors).
   final bool userDidCancel;
 
@@ -66,9 +67,10 @@ class FlutterAppAuthPlatformErrorDetails {
   }
 }
 
-/// Exception that can be thrown by methods that launch a browser session
-/// if the user cancels their authorization and closes the browser.
+/// Thrown by methods that launch a browser session when the user cancels and closes the browser.
 class FlutterAppAuthUserCancelledException extends PlatformException {
+
+  final FlutterAppAuthPlatformErrorDetails platformErrorDetails;
 
   FlutterAppAuthUserCancelledException({
     required String code,
@@ -87,13 +89,13 @@ class FlutterAppAuthUserCancelledException extends PlatformException {
   String toString() {
     return 'FlutterAppAuthUserCancelledException{platformErrorDetails: $platformErrorDetails}';
   }
-
-  final FlutterAppAuthPlatformErrorDetails platformErrorDetails;
 }
 
 /// Exception thrown containing details of the underlying error
 /// that occurred within the iOS/Android libraries.
 class FlutterAppAuthPlatformException extends PlatformException {
+
+  final FlutterAppAuthPlatformErrorDetails platformErrorDetails;
 
   FlutterAppAuthPlatformException({
     required String code,
@@ -107,6 +109,4 @@ class FlutterAppAuthPlatformException extends PlatformException {
     details: legacyDetails,
     stacktrace: stacktrace,
   );
-
-  final FlutterAppAuthPlatformErrorDetails platformErrorDetails;
 }
