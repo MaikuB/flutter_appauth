@@ -478,10 +478,10 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
         finishWithError(END_SESSION_ERROR_CODE, String.format(END_SESSION_ERROR_MESSAGE_FORMAT, ex.error, ex.errorDescription), ex);
     }
 
-    private Map<String, Object> createErrorMap(@Nullable Exception cause) {
-        @Nullable AuthorizationException authException = cause instanceof AuthorizationException ? (AuthorizationException) cause : null;
+    private Map<String, Object> createErrorMap(@Nullable Exception exception) {
+        @Nullable AuthorizationException authException = exception instanceof AuthorizationException ? (AuthorizationException) exception : null;
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("legacy_error_details", getCauseFromException(cause));
+        responseMap.put("legacy_error_details", getCauseFromException(exception));
 
         if (authException != null) {
             boolean userDidCancel = authException.equals(AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW);
@@ -490,7 +490,8 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
             responseMap.put("error", authException.error);
             responseMap.put("error_description", authException.errorDescription);
             responseMap.put("error_uri", authException.errorUri == null ? null : authException.errorUri.toString());
-            responseMap.put("root_cause_error", authException.getCause() == null ? "" : authException.getCause().toString());
+            responseMap.put("root_cause_debug_description", authException.getCause() == null ? null : authException.getCause().toString());
+            responseMap.put("error_debug_description", authException.toString());
             responseMap.put("user_did_cancel", String.valueOf(userDidCancel));
         }
         return responseMap;

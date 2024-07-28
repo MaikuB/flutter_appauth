@@ -64,14 +64,16 @@
         NSError *underlyingError = [underlyingErr isKindOfClass:[NSError class]] ? underlyingErr : nil;
         if (underlyingError) {
             if (underlyingError.domain) {
-                [details setObject:underlyingError.domain forKey:@"error_uri"];
+                [details setObject:underlyingError.domain forKey:@"domain"];
             }
 
             if (underlyingError.debugDescription) {
-                [details setObject:underlyingError.debugDescription forKey:@"root_cause_error"];
+                [details setObject:underlyingError.debugDescription forKey:@"root_cause_debug_description"];
             }
-        } else if (error.debugDescription) {
-            [details setObject:error.debugDescription forKey:@"root_cause_error"];
+        }
+        
+        if (error.debugDescription) {
+            [details setObject:error.debugDescription forKey:@"error_debug_description"];
         }
         
         bool userDidCancel = [error.domain  isEqual: @"org.openid.appauth.general"] 
