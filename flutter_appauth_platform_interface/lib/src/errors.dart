@@ -16,7 +16,7 @@ class FlutterAppAuthPlatformErrorDetails {
 
   /// The type of error.
   ///
-  /// On iOS: one of the domain values from [here](https://github.com/openid/AppAuth-iOS/blob/c89ed571ae140f8eb1142735e6e23d7bb8c34cb2/Sources/AppAuthCore/OIDError.m#L31).
+  /// On iOS/macOS: one of the domain values from [here](https://github.com/openid/AppAuth-iOS/blob/c89ed571ae140f8eb1142735e6e23d7bb8c34cb2/Sources/AppAuthCore/OIDError.m#L31).
   /// On Android: one of the type codes from [here](https://github.com/openid/AppAuth-Android/blob/c6137b7db306d9c097c0d5763f3fb944cd0122d2/library/java/net/openid/appauth/AuthorizationException.java).
   ///
   /// It's recommended to not use this unless needed. In most cases, errors
@@ -55,9 +55,9 @@ class FlutterAppAuthPlatformErrorDetails {
   /// Only populated on Android.
   final String? errorUri;
 
-  /// Error domain from the iOS AppAuth SDK.
+  /// Error domain from the AppAuth iOS SDK.
   ///
-  /// Only populated on iOS.
+  /// Only populated on iOS/macOS.
   final String? domain;
 
   /// A debug description of the error from the platform's AppAuth SDK
