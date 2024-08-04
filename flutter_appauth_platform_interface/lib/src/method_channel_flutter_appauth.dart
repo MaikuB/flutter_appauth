@@ -104,20 +104,20 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
       if (e.details == null) {
         rethrow;
       }
-      final Map<String?, String?>? rawDetails = _fromPlatformExceptionDetails(
+      final Map<String?, String?>? errorDetails = _extractErrorDetails(
         e.details,
       );
-      if (rawDetails == null) {
+      if (errorDetails == null) {
         rethrow;
       }
 
       // Ensures that the PlatformException remains the same as before the
-      // introductionof custom exception handling so as to not break existing
+      // introduction of custom exception handling so as to not break existing
       // usages.
       final dynamic legacyErrorDetails =
-          rawDetails['legacy_error_details'] ?? rawDetails;
+          errorDetails['legacy_error_details'] ?? errorDetails;
       final FlutterAppAuthPlatformErrorDetails parsedDetails =
-          FlutterAppAuthPlatformErrorDetails.fromMap(rawDetails);
+          FlutterAppAuthPlatformErrorDetails.fromMap(errorDetails);
 
       if (parsedDetails.userDidCancel) {
         throw FlutterAppAuthUserCancelledException(
@@ -139,7 +139,7 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
     }
   }
 
-  Map<String?, String?>? _fromPlatformExceptionDetails(dynamic details) {
+  Map<String?, String?>? _extractErrorDetails(dynamic details) {
     try {
       return details is Map ? details.cast<String?, String?>() : null;
     } catch (_) {
