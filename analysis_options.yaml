@@ -31,7 +31,6 @@ analyzer:
     # Ignore analyzer hints for updating pubspecs when using Future or
     # Stream and not importing dart:async
     # Please see https://github.com/flutter/flutter/pull/24528 for details.
-    sdk_version_async_exported_from_core: ignore
   exclude:
     - "bin/cache/**"
     # the following two are relative to the stocks example and the flutter package respectively
@@ -47,7 +46,6 @@ linter:
     - always_declare_return_types
     - always_put_control_body_on_new_line
     # - always_put_required_named_parameters_first # we prefer having parameters in the same order as fields https://github.com/flutter/flutter/issues/10219
-    - always_require_non_null_named_parameters
     - always_specify_types
     - annotate_overrides
     # - avoid_annotating_with_dynamic # conflicts with always_specify_types
@@ -99,12 +97,10 @@ linter:
     - hash_and_equals
     - implementation_imports
     # - invariant_booleans # too many false positives: https://github.com/dart-lang/linter/issues/811
-    - iterable_contains_unrelated_type
     # - join_return_with_assignment # not yet tested
     - library_names
     - library_prefixes
     - lines_longer_than_80_chars
-    - list_remove_unrelated_type
     # - literal_only_boolean_expressions # too many false positives: https://github.com/dart-lang/sdk/issues/34181
     - no_adjacent_strings_in_list
     - no_duplicate_case_values
@@ -130,7 +126,6 @@ linter:
     # - prefer_constructors_over_static_methods # not yet tested
     - prefer_contains
     # - prefer_double_quotes # opposite of prefer_single_quotes
-    - prefer_equal_for_default_values
     # - prefer_expression_function_bodies # conflicts with https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#consider-using--for-short-functions-and-methods
     - prefer_final_fields
     # - prefer_final_in_for_each # not yet tested
