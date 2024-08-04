@@ -37,8 +37,51 @@
     return processedResponses;
 }
 
-+ (void)finishWithError:(NSString *)errorCode message:(NSString *)message  result:(FlutterResult)result {
-    result([FlutterError errorWithCode:errorCode message:message details:nil]);
++ (void)finishWithError:(NSString *)errorCode message:(NSString *)message result:(FlutterResult)result error:(NSError * _Nullable)error {
+
+    NSMutableDictionary<NSString *, id> *details = [NSMutableDictionary dictionary];
+
+    if (error) {
+        id authError = error.userInfo[OIDOAuthErrorResponseErrorKey];
+        NSDictionary<NSString *, id> *authErrorMap = [authError isKindOfClass:[NSDictionary class]] ? authError : nil;
+        
+        if (authErrorMap) {
+            if ([authErrorMap objectForKey:@"error"]) {
+                [details setObject:authErrorMap[@"error"] forKey:@"error"];
+            }
+            if ([authErrorMap objectForKey:@"error_description"]) {
+                [details setObject:authErrorMap[@"error_description"] forKey:@"error_description"];
+            }
+        }
+        if (error.domain) {
+            [details setObject:error.domain forKey:@"type"];
+        }
+        if (error.code) {
+            [details setObject:[@(error.code) stringValue] forKey:@"code"];
+        }
+        
+        id underlyingErr = [error.userInfo objectForKey:NSUnderlyingErrorKey];
+        NSError *underlyingError = [underlyingErr isKindOfClass:[NSError class]] ? underlyingErr : nil;
+        if (underlyingError) {
+            if (underlyingError.domain) {
+                [details setObject:underlyingError.domain forKey:@"domain"];
+            }
+
+            if (underlyingError.debugDescription) {
+                [details setObject:underlyingError.debugDescription forKey:@"root_cause_debug_description"];
+            }
+        }
+        
+        if (error.debugDescription) {
+            [details setObject:error.debugDescription forKey:@"error_debug_description"];
+        }
+        
+        bool userDidCancel = [error.domain  isEqual: @"org.openid.appauth.general"] 
+                             && error.code == OIDErrorCodeUserCanceledAuthorizationFlow;
+        [details setObject:(userDidCancel ? @"true" : @"false") forKey:@"user_did_cancel"];
+
+    }
+    result([FlutterError errorWithCode:errorCode message:message details:details]);
 }
 
 + (NSString *) formatMessageWithError:(NSString *)messageFormat error:(NSError * _Nullable)error {

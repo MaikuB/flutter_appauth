@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface FlutterAppAuth : NSObject
 
 + (NSMutableDictionary *)processResponses:(OIDTokenResponse*) tokenResponse authResponse:(OIDAuthorizationResponse* _Nullable) authResponse;
-+ (void)finishWithError:(NSString *)errorCode message:(NSString *)message  result:(FlutterResult)result;
++ (void)finishWithError:(NSString *)errorCode message:(NSString *)message  result:(FlutterResult)result error:(NSError * _Nullable)error;
 + (NSString *) formatMessageWithError:(NSString *)messageFormat error:(NSError * _Nullable)error;
 
 @end

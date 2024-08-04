@@ -83,6 +83,18 @@ final TokenResponse result = await appAuth.token(TokenRequest('<client_id>', '<r
 
 Reusing the nonce and code verifier is particularly important as the AppAuth SDKs (especially on Android) may return an error (e.g. ID token validation error due to nonce mismatch) if this isn't done
 
+### Detecting user cancellation
+
+Both the `authorize` and `authorizeAndExchangeCode` launch the user into a browser which they can cancel. This shouldn't be considered an error and should be handled gracefully.
+
+```dart
+try {
+  await appAuth.authorize(...); // Or authorizeAndExchangeCode(...)
+} on FlutterAppAuthUserCancelledException catch (e) {
+  // Handle user cancellation
+}
+```
+
 ### Refreshing tokens
 
 Some providers may return a refresh token that could be used to refresh short-lived access tokens. A request to get a new access token before it expires could be made that would like similar to the following code
@@ -106,6 +118,27 @@ await appAuth.endSession(EndSessionRequest(
 ```
 
 The above code passes an `AuthorizationServiceConfiguration` with all the endpoints defined but alternatives are to specify an `issuer` or `discoveryUrl` like you would with the other APIs in the plugin (e.g. `authorizeAndExchangeCode()`).
+
+### Handling errors
+
+Each of these methods will throw exceptions if anything goes wrong. For example:
+
+```dart
+
+try {
+  await appAuth.authorize(...);
+} on FlutterAppAuthPlatformException catch (e) {
+  final FlutterAppAuthPlatformErrorDetails details = e.details;
+  // Handle exceptions based on errors from AppAuth.
+} catch (e) {
+  // Handle other errors.
+}
+
+The `FlutterAppAuthPlatformErrorDetails` object contains all the error information from the underlying platform's AppAuth SDK.
+
+This includes the error codes specified in the [RFC](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2).
+
+```
 
 ### Ephemeral Sessions (iOS and macOS only)
 On iOS (versions 13 and above) and macOS you can use the option `preferEphemeralSession = true` to start an 
