@@ -6,9 +6,9 @@ command:
     usePubspecOverrides: true
 
 packages:
-  - flutter_appauth/*
-  - flutter_appauth_platform_interface/*
-  - "**/example/*"
+  - flutter_appauth
+  - flutter_appauth_platform_interface
+  - flutter_appauth/example/
 
 ide:
   intellij: false
@@ -20,16 +20,16 @@ scripts:
   test:unit:
     description: Run unit tests in a specific package.
     run: melos exec --concurrency=1 -- "flutter test"
-    select-package:
-      dir-exists:
+    packageFilters:
+      dirExists:
         - test
   build:example_android:
     run: |
       melos exec -c 1 -- \
         "flutter build apk"
     description: Build a specific example app for Android.
-    select-package:
-      dir-exists:
+    packageFilters:
+      dirExists:
         - android
       scope: "*example*"
   build:example_ios:
@@ -37,8 +37,8 @@ scripts:
       melos exec -c 1 -- \
         "flutter build ios --no-codesign"
     description: Build a specific example app for iOS.
-    select-package:
-      dir-exists:
+    packageFilters:
+      dirExists:
         - ios
       scope: "*example*"
   build:example_macos:
@@ -46,8 +46,8 @@ scripts:
       melos exec -c 1 -- \
         "flutter build macos"
     description: Build a specific example app for macOS.
-    select-package:
-      dir-exists:
+    packageFilters:
+      dirExists:
         - macos
       scope: "*example*"
   clean:
