@@ -90,8 +90,8 @@ class FlutterAppAuthPlatformErrorDetails {
   }
 }
 
-/// Thrown by methods that launch a browser session when the user cancels and
-/// closes the browser.
+/// Thrown when an authorization request has been cancelled as a result of a
+/// user closing the browser.
 class FlutterAppAuthUserCancelledException extends PlatformException {
   FlutterAppAuthUserCancelledException({
     required String code,
