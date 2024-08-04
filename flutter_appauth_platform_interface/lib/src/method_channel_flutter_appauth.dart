@@ -111,8 +111,9 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
         rethrow;
       }
 
-      // Ensures that the PlatformException remains the same as before the introduction
-      // of custom exception handling so as to not break existing usages.
+      // Ensures that the PlatformException remains the same as before the
+      // introductionof custom exception handling so as to not break existing
+      // usages.
       final dynamic legacyErrorDetails =
           rawDetails['legacy_error_details'] ?? rawDetails;
       final FlutterAppAuthPlatformErrorDetails parsedDetails =
@@ -122,6 +123,7 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
         throw FlutterAppAuthUserCancelledException(
           code: e.code,
           message: e.message,
+          stacktrace: e.stacktrace,
           legacyDetails: legacyErrorDetails,
           platformErrorDetails: parsedDetails,
         );
@@ -129,6 +131,7 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
         throw FlutterAppAuthPlatformException(
           code: e.code,
           message: e.message,
+          stacktrace: e.stacktrace,
           legacyDetails: legacyErrorDetails,
           platformErrorDetails: parsedDetails,
         );

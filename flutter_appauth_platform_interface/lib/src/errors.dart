@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 /// The details of an error thrown from the underlying
 /// platform's AppAuth SDK
 class FlutterAppAuthPlatformErrorDetails {
-
   FlutterAppAuthPlatformErrorDetails({
     required this.type,
     required this.code,
@@ -16,68 +15,73 @@ class FlutterAppAuthPlatformErrorDetails {
     required this.userDidCancel,
   });
 
-  /// Type of the error
+  /// The type of error.
   ///
-  /// On iOS: One of the domain values here: 
-  ///         https://github.com/openid/AppAuth-iOS/blob/c89ed571ae140f8eb1142735e6e23d7bb8c34cb2/Sources/AppAuthCore/OIDError.m#L31
-  /// On Android: One of the type codes here: 
-  ///         https://github.com/openid/AppAuth-Android/blob/c6137b7db306d9c097c0d5763f3fb944cd0122d2/library/java/net/openid/appauth/AuthorizationException.java
-  /// Recommend not using this field unless you really have to, see `error` field below.
+  /// On iOS: one of the domain values from [here](https://github.com/openid/AppAuth-iOS/blob/c89ed571ae140f8eb1142735e6e23d7bb8c34cb2/Sources/AppAuthCore/OIDError.m#L31).
+  /// On Android: one of the type codes from [here](https://github.com/openid/AppAuth-Android/blob/c6137b7db306d9c097c0d5763f3fb944cd0122d2/library/java/net/openid/appauth/AuthorizationException.java).
+  ///
+  /// It's recommended to not use this unless needed. In most cases, errors
+  /// can be handled using the [error] property.
   final String? type;
 
-  /// Error code
+  /// An error code from the platform's AppAuth SDK.
   ///
-  /// On iOS: One of the enum values defined here depending on the error type
-  ///         https://github.com/openid/AppAuth-iOS/blob/c89ed571ae140f8eb1142735e6e23d7bb8c34cb2/Sources/AppAuthCore/OIDError.h
-  /// On Android: One of the codes defined here:
-  ///          https://github.com/openid/AppAuth-Android/blob/c6137b7db306d9c097c0d5763f3fb944cd0122d2/library/java/net/openid/appauth/AuthorizationException.java#L158
-  /// Recommend not using this field unless you really have to, see `error` field below.
+  /// On iOS/macOS: depending on the error type, it will be values from [here](https://github.com/openid/AppAuth-iOS/blob/c89ed571ae140f8eb1142735e6e23d7bb8c34cb2/Sources/AppAuthCore/OIDError.h).
+  /// On Android: one of the codes defined [here](https://github.com/openid/AppAuth-Android/blob/c6137b7db306d9c097c0d5763f3fb944cd0122d2/library/java/net/openid/appauth/AuthorizationException.java#L158).
+  ///
+  /// It's recommended to not use this unless needed. In most cases, errors
+  /// can be handled using the [error] property.
   final String? code;
 
-  /// Error from the Authorization server
+  /// Error from the authorization server.
   ///
-  /// For 400 errors from the Authorization server, this is error defined here: https://datatracker.ietf.org/doc/html/rfc6749#section-5.2
-  /// e.g "invalid_grant"
+  /// For 400 errors from the authorization server, this is corresponds to the
+  /// `error` parameter as defined in the OAuth 2.0 framework [here](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2).
   /// Otherwise a short error describing what happened.
   final String? error;
 
-  /// Error description from the Authorization server
-  ///
   /// Short, human readable error description.
+  ///
+  /// This may come from the authhorization server that it correspond to the
+  /// `error_description` parameter as defined in the OAuth
+  /// 2.0 [here](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2).
+  /// Otherwise, this is populated by the underlying platform's AppAuth SDK.
   final String? errorDescription;
 
-  /// Error uri from the Authorization server
+  /// Error URI from the authorization server.
   ///
-  /// The error URI from the https://datatracker.ietf.org/doc/html/rfc6749#section-5.2
-  /// This is currently *only* populated on Android.
+  /// Corresponds to the `error_uri` parameter defined in the OAuth 2.0
+  /// framework [here](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2)
+  ///
+  /// Only populated on Android.
   final String? errorUri;
 
-  /// Error domain from the iOS AppAuth SDk
+  /// Error domain from the iOS AppAuth SDK.
   ///
   /// Only populated on iOS.
   final String? domain;
 
-  /// Debug description for the error itself
-  ///
   /// A debug description of the error from the platform's AppAuth SDK
   final String? errorDebugDescription;
 
-  /// Debug description of the cause of the thrown error
-  ///
-  /// A debug description of the underlying cause of the error from the platform's AppAuth SDK
+  /// A debug description of the underlying cause of the error from the
+  /// platform's AppAuth SDK
   final String? rootCauseDebugDescription;
 
   /// Whether or not this error is caused by user cancellation
   ///
-  /// True if the user cancelled the authorization flow by closing the browser prematurely,
-  /// False otherwise (for all actual errors).
+  /// Will only be `true` if the user cancelled the authorization flow by
+  /// closing the browser prematurely.
   final bool userDidCancel;
 
   @override
   String toString() {
     return 'FlutterAppAuthPlatformErrorDetails(type: $type,\n code: $code,\n '
-        'error: $error,\n errorDescription: $errorDescription,\n errorUri: $errorUri,\n domain $domain,\n'
-        'rootCauseDebugDescription: $rootCauseDebugDescription,\n errorDebugDescription: $errorDebugDescription,\n userDidCancel: $userDidCancel\n)';
+        'error: $error,\n errorDescription: $errorDescription,\n '
+        'errorUri: $errorUri,\n domain $domain,\n'
+        'rootCauseDebugDescription: $rootCauseDebugDescription,\n '
+        'errorDebugDescription: $errorDebugDescription,\n '
+        'userDidCancel: $userDidCancel\n)';
   }
 
   static FlutterAppAuthPlatformErrorDetails fromMap(Map<String?, String?> map) {
@@ -95,11 +99,9 @@ class FlutterAppAuthPlatformErrorDetails {
   }
 }
 
-/// Thrown by methods that launch a browser session when the user cancels and closes the browser.
+/// Thrown by methods that launch a browser session when the user cancels and
+/// closes the browser.
 class FlutterAppAuthUserCancelledException extends PlatformException {
-
-  final FlutterAppAuthPlatformErrorDetails platformErrorDetails;
-
   FlutterAppAuthUserCancelledException({
     required String code,
     String? message,
@@ -107,25 +109,25 @@ class FlutterAppAuthUserCancelledException extends PlatformException {
     String? stacktrace,
     required this.platformErrorDetails,
   }) : super(
-    code: code,
-    message: message,
-    details: legacyDetails,
-    stacktrace: stacktrace,
-  );
+          code: code,
+          message: message,
+          details: legacyDetails,
+          stacktrace: stacktrace,
+        );
+
+  /// Details of the error from the underlying platform's AppAuth SDK.
+  final FlutterAppAuthPlatformErrorDetails platformErrorDetails;
 
   @override
   String toString() {
-    return 'FlutterAppAuthUserCancelledException{platformErrorDetails: $platformErrorDetails}';
+    return 'FlutterAppAuthUserCancelledException{platformErrorDetails: '
+        '$platformErrorDetails}';
   }
 }
 
-/// Exception thrown containing details of the error.
-///
-/// Details of the error occurred from the platform's AppAuth SDKs.
+/// Thrown to indicate an interaction failed in the `package:flutter_appauth`
+/// plugin.
 class FlutterAppAuthPlatformException extends PlatformException {
-
-  final FlutterAppAuthPlatformErrorDetails platformErrorDetails;
-
   FlutterAppAuthPlatformException({
     required String code,
     String? message,
@@ -133,9 +135,12 @@ class FlutterAppAuthPlatformException extends PlatformException {
     String? stacktrace,
     required this.platformErrorDetails,
   }) : super(
-    code: code,
-    message: message,
-    details: legacyDetails,
-    stacktrace: stacktrace,
-  );
+          code: code,
+          message: message,
+          details: legacyDetails,
+          stacktrace: stacktrace,
+        );
+
+  /// Details of the error from the underlying platform's AppAuth SDK.
+  final FlutterAppAuthPlatformErrorDetails platformErrorDetails;
 }
