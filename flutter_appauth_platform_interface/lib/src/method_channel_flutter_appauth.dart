@@ -119,7 +119,7 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
       final FlutterAppAuthPlatformErrorDetails parsedDetails =
           FlutterAppAuthPlatformErrorDetails.fromMap(errorDetails);
 
-      if (parsedDetails.userDidCancel) {
+      if (errorDetails['user_did_cancel']?.toLowerCase().trim() == 'true') {
         throw FlutterAppAuthUserCancelledException(
           code: e.code,
           message: e.message,

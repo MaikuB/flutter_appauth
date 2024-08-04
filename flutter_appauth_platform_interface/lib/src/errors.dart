@@ -12,7 +12,6 @@ class FlutterAppAuthPlatformErrorDetails {
     required this.domain,
     required this.rootCauseDebugDescription,
     required this.errorDebugDescription,
-    required this.userDidCancel,
   });
 
   /// The type of error.
@@ -68,20 +67,13 @@ class FlutterAppAuthPlatformErrorDetails {
   /// platform's AppAuth SDK
   final String? rootCauseDebugDescription;
 
-  /// Whether or not this error is caused by user cancellation
-  ///
-  /// Will only be `true` if the user cancelled the authorization flow by
-  /// closing the browser prematurely.
-  final bool userDidCancel;
-
   @override
   String toString() {
     return 'FlutterAppAuthPlatformErrorDetails(type: $type,\n code: $code,\n '
         'error: $error,\n errorDescription: $errorDescription,\n '
         'errorUri: $errorUri,\n domain $domain,\n'
         'rootCauseDebugDescription: $rootCauseDebugDescription,\n '
-        'errorDebugDescription: $errorDebugDescription,\n '
-        'userDidCancel: $userDidCancel\n)';
+        'errorDebugDescription: $errorDebugDescription)';
   }
 
   static FlutterAppAuthPlatformErrorDetails fromMap(Map<String?, String?> map) {
@@ -94,7 +86,6 @@ class FlutterAppAuthPlatformErrorDetails {
       domain: map['domain'],
       rootCauseDebugDescription: map['root_cause_debug_description'],
       errorDebugDescription: map['error_debug_description'],
-      userDidCancel: map['user_did_cancel']?.toLowerCase().trim() == 'true',
     );
   }
 }
