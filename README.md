@@ -3,3 +3,7 @@ A Flutter plugin that provides a wrapper for native AppAuth SDKs (https://appaut
 
 - [flutter_appauth](https://github.com/MaikuB/flutter_appauth/tree/master/flutter_appauth): code for the plugin
 - [flutter_appauth_platform_interface](https://github.com/MaikuB/flutter_appauth/tree/master/flutter_appauth_platform_interface): the code for common platform interface
+
+## Contributing
+
+If you are interested in contributing, please review the [contribution guide](https://github.com/MaikuB/flutter_appauth/blob/master/CONTRIBUTING.md)
