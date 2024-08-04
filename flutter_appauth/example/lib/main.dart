@@ -120,8 +120,7 @@ class _MyAppState extends State<MyApp> {
                       : null,
                 ),
                 const SizedBox(height: 8),
-                if (_error != null)
-                  Text(_error ?? ''),
+                if (_error != null) Text(_error ?? ''),
                 const SizedBox(height: 8),
                 const Text('authorization code'),
                 TextField(
@@ -332,7 +331,8 @@ class _MyAppState extends State<MyApp> {
       });
     } else if (e is PlatformException) {
       setState(() {
-        _error = 'Error\n\nCode: ${e.code}\nMessage: ${e.message}\nDetails: ${e.details}';
+        _error = 'Error\n\nCode: ${e.code}\nMessage: ${e.message}\n'
+            'Details: ${e.details}';
       });
     } else {
       setState(() {
