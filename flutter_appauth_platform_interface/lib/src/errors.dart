@@ -51,8 +51,6 @@ class FlutterAppAuthPlatformErrorDetails {
   ///
   /// Corresponds to the `error_uri` parameter defined in the OAuth 2.0
   /// framework [here](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2)
-  ///
-  /// Only populated on Android.
   final String? errorUri;
 
   /// Error domain from the AppAuth iOS SDK.

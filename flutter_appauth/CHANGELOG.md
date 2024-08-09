@@ -1,3 +1,7 @@
+# 7.0.0-dev.2
+
+* The `errorUri` property of the `FlutterAppAuthPlatformErrorDetails` class will now be populated on iOS/maCOS if available
+
 # 7.0.0-dev.1
 
 * **Breaking change** Bumped minimum Flutter and Dart SDK constraints to 3.13.0 and 3.1.0 respectively

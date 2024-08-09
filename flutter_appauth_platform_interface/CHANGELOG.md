@@ -1,3 +1,7 @@
+## [7.0.0-dev.2]
+
+*  Updated API docs for `FlutterAppAuthPlatformErrorDetails`'s `errorUri` property as this can now be returned on iOS/macOS
+
 ## [7.0.0-dev.1]
 
 * **Breaking change** Bumped minimum Flutter and Dart SDK constraints to 3.13.0 and 3.1.0 respectively
