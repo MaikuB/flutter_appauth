@@ -46,11 +46,14 @@
         NSDictionary<NSString *, id> *authErrorMap = [authError isKindOfClass:[NSDictionary class]] ? authError : nil;
         
         if (authErrorMap) {
-            if ([authErrorMap objectForKey:@"error"]) {
-                [details setObject:authErrorMap[@"error"] forKey:@"error"];
+            if ([authErrorMap objectForKey:OIDOAuthErrorFieldError]) {
+                [details setObject:authErrorMap[OIDOAuthErrorFieldError] forKey:OIDOAuthErrorFieldError];
             }
-            if ([authErrorMap objectForKey:@"error_description"]) {
-                [details setObject:authErrorMap[@"error_description"] forKey:@"error_description"];
+            if ([authErrorMap objectForKey:OIDOAuthErrorFieldErrorDescription]) {
+                [details setObject:authErrorMap[OIDOAuthErrorFieldErrorDescription] forKey:OIDOAuthErrorFieldErrorDescription];
+            }
+            if ([authErrorMap objectForKey:OIDOAuthErrorFieldErrorURI]) {
+                [details setObject:authErrorMap[OIDOAuthErrorFieldErrorURI] forKey:OIDOAuthErrorFieldErrorURI];
             }
         }
         if (error.domain) {
