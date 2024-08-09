@@ -78,6 +78,7 @@ class _MyAppState extends State<MyApp> {
                   child: const Text('Sign in with no code exchange'),
                   onPressed: () => _signInWithNoCodeExchange(),
                 ),
+                const SizedBox(height: 8),
                 ElevatedButton(
                   child: const Text(
                       'Sign in with no code exchange and generated nonce'),
@@ -161,7 +162,9 @@ class _MyAppState extends State<MyApp> {
           serviceConfiguration: _serviceConfiguration));
       _clearSessionInfo();
     } catch (e) {
-      _clearBusyState(e);
+      _handleError(e);
+    } finally {
+      _clearBusyState();
     }
   }
 
@@ -191,7 +194,9 @@ class _MyAppState extends State<MyApp> {
       _processTokenResponse(result);
       await _testApi(result);
     } catch (e) {
-      _clearBusyState(e);
+      _handleError(e);
+    } finally {
+      _clearBusyState();
     }
   }
 
@@ -208,7 +213,9 @@ class _MyAppState extends State<MyApp> {
       _processTokenResponse(result);
       await _testApi(result);
     } catch (e) {
-      _clearBusyState(e);
+      _handleError(e);
+    } finally {
+      _clearBusyState();
     }
   }
 
@@ -247,7 +254,9 @@ class _MyAppState extends State<MyApp> {
         _processAuthResponse(result);
       }
     } catch (e) {
-      _clearBusyState(e);
+      _handleError(e);
+    } finally {
+      _clearBusyState();
     }
   }
 
@@ -270,7 +279,9 @@ class _MyAppState extends State<MyApp> {
         _processAuthResponse(result);
       }
     } catch (e) {
-      _clearBusyState(e);
+      _handleError(e);
+    } finally {
+      _clearBusyState();
     }
   }
 
@@ -316,11 +327,13 @@ class _MyAppState extends State<MyApp> {
         await _testApi(result);
       }
     } catch (e) {
-      _clearBusyState(e);
+      _handleError(e);
+    } finally {
+      _clearBusyState();
     }
   }
 
-  void _clearBusyState(Object e) {
+  void _handleError(Object e) {
     if (e is FlutterAppAuthUserCancelledException) {
       setState(() {
         _error = 'The user cancelled the flow!';
@@ -339,6 +352,9 @@ class _MyAppState extends State<MyApp> {
         _error = 'Error: $e';
       });
     }
+  }
+
+  void _clearBusyState() {
     setState(() {
       _isBusy = false;
     });
