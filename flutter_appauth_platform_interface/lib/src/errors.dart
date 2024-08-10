@@ -37,6 +37,13 @@ class FlutterAppAuthPlatformErrorDetails {
   /// For 400 errors from the authorization server, this is corresponds to the
   /// `error` parameter as defined in the OAuth 2.0 framework [here](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2).
   /// Otherwise a short error describing what happened.
+  ///
+  /// The [FlutterAppAuthOAuthError] class contains string constants for
+  /// the standard error codes that could used by applications to determine the
+  /// nature of the error.
+  ///
+  /// Note that authorization servers may return custom error codes that are not
+  /// defined in the OAuth 2.0 framework.
   final String? error;
 
   /// Short, human readable error description.
@@ -132,4 +139,18 @@ class FlutterAppAuthPlatformException extends PlatformException {
 
   /// Details of the error from the underlying platform's AppAuth SDK.
   final FlutterAppAuthPlatformErrorDetails platformErrorDetails;
+}
+
+/// Represents OAuth error codes that can be returned by the authorization
+/// server.
+///
+/// These are the standard error codes defined in the OAuth 2.0 framework
+/// [here](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2).
+class FlutterAppAuthOAuthError {
+  static const String invalidRequest = 'invalid_request';
+  static const String invalidClient = 'invalid_client';
+  static const String invalidGrant = 'invalid_grant';
+  static const String unauthorizedClient = 'unauthorized_client';
+  static const String unsupportedGrantType = 'unsupported_grant_type';
+  static const String invalidScope = 'invalid_scope';
 }
