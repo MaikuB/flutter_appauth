@@ -1,6 +1,7 @@
 ## [7.0.0-dev.3]
 
 * **Breaking change** all methods have now been made to return non-nullable types
+* [iOS][macOS] bumped AppAuth iOS dependency to 1.7.5
 
 # 7.0.0-dev.2
 
