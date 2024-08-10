@@ -1,7 +1,6 @@
 ## [7.0.0-dev.3]
 
 * **Breaking change** all methods have now been made to return non-nullable types
-* [Android] updated plugin to specify `Theme.AppCompat.Translucent.NoTitleBar` as the theme for the `RedirectUriReceiverActivity` from the AppAuth Android SDK. This is to fix a crash raised with issues [#362](https://github.com/MaikuB/flutter_appauth/issues/362) and [#515](https://github.com/MaikuB/flutter_appauth/issues/515)
 * [iOS][macOS] bumped AppAuth iOS dependency to 1.7.5
 * Added `FlutterAppAuthOAuthError` class that contains string constants representing OAuth 2.0 error codes defined by the [specification](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2).
 * Updated API docs with more details
@@ -15,6 +14,10 @@
 
 * **Breaking change** Bumped minimum Flutter and Dart SDK constraints to 3.13.0 and 3.1.0 respectively
 * Updated error handling to expose more details for each platform. Plugin will now throw `FlutterAppAuthUserCancelledException` when an authorization request has been cancelled as a result of the user closing the browser. For other scenarios the plugin will throw `FlutterAppAuthPlatformException`. See the API docs for both classes for more details on the available details. Both exception classes inherit from `PlatformException` so the changes should be backwards compatible.
+
+# 6.0.7
+
+* [Android] updated plugin to specify `Theme.AppCompat.Translucent.NoTitleBar` as the theme for the `RedirectUriReceiverActivity` from the AppAuth Android SDK. This is to fix a crash raised with issues [#362](https://github.com/MaikuB/flutter_appauth/issues/362) and [#515](https://github.com/MaikuB/flutter_appauth/issues/515)
 
 # 6.0.6
 
