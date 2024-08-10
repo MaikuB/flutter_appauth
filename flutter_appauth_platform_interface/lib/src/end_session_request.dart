@@ -1,6 +1,7 @@
 import 'package:flutter_appauth_platform_interface/flutter_appauth_platform_interface.dart';
 import 'package:flutter_appauth_platform_interface/src/accepted_authorization_service_configuration_details.dart';
 
+/// Represents an end session request.
 class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
   EndSessionRequest({
     this.idTokenHint,

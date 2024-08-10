@@ -1,6 +1,7 @@
 ## [7.0.0-dev.3]
 
 * **Breaking change** all methods have now been made to return non-nullable types
+* Updated API docs with more details
 
 ## [7.0.0-dev.2]
 
