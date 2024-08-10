@@ -17,15 +17,12 @@ const MethodChannel _channel =
 
 class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
   @override
-  Future<AuthorizationResponse?> authorize(AuthorizationRequest request) async {
-    final Map<dynamic, dynamic>? result = await invokeMethod(
+  Future<AuthorizationResponse> authorize(AuthorizationRequest request) async {
+    final Map<dynamic, dynamic> result = await invokeMethod(
       'authorize',
       request.toMap(),
     );
 
-    if (result == null) {
-      return null;
-    }
     return AuthorizationResponse(
       authorizationCode: result['authorizationCode'],
       codeVerifier: result['codeVerifier'],
@@ -36,16 +33,13 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
   }
 
   @override
-  Future<AuthorizationTokenResponse?> authorizeAndExchangeCode(
+  Future<AuthorizationTokenResponse> authorizeAndExchangeCode(
       AuthorizationTokenRequest request) async {
-    final Map<dynamic, dynamic>? result = await invokeMethod(
+    final Map<dynamic, dynamic> result = await invokeMethod(
       'authorizeAndExchangeCode',
       request.toMap(),
     );
 
-    if (result == null) {
-      return null;
-    }
     return AuthorizationTokenResponse(
         result['accessToken'],
         result['refreshToken'],
@@ -61,15 +55,12 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
   }
 
   @override
-  Future<TokenResponse?> token(TokenRequest request) async {
-    final Map<dynamic, dynamic>? result = await invokeMethod(
+  Future<TokenResponse> token(TokenRequest request) async {
+    final Map<dynamic, dynamic> result = await invokeMethod(
       'token',
       request.toMap(),
     );
 
-    if (result == null) {
-      return null;
-    }
     return TokenResponse(
         result['accessToken'],
         result['refreshToken'],
@@ -84,22 +75,20 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
   }
 
   @override
-  Future<EndSessionResponse?> endSession(EndSessionRequest request) async {
-    final Map<dynamic, dynamic>? result = await invokeMethod(
+  Future<EndSessionResponse> endSession(EndSessionRequest request) async {
+    final Map<dynamic, dynamic> result = await invokeMethod(
       'endSession',
       request.toMap(),
     );
 
-    if (result == null) {
-      return null;
-    }
     return EndSessionResponse(result['state']);
   }
 
-  Future<Map<dynamic, dynamic>?> invokeMethod(
+  Future<Map<dynamic, dynamic>> invokeMethod(
       String method, dynamic arguments) async {
     try {
-      return await _channel.invokeMethod(method, arguments);
+      return (await _channel.invokeMethod<Map<dynamic, dynamic>>(
+          method, arguments))!;
     } on PlatformException catch (e) {
       if (e.details == null) {
         rethrow;

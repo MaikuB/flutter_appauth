@@ -1,3 +1,7 @@
+## [7.0.0-dev.3]
+
+* **Breaking change** all methods have now been made to return non-nullable types
+
 # 7.0.0-dev.2
 
 * The `errorUri` property of the `FlutterAppAuthPlatformErrorDetails` class will now be populated on iOS/maCOS if available
