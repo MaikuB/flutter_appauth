@@ -145,6 +145,7 @@ AndroidManifest.xml:
 ...
 <activity
         android:name="net.openid.appauth.RedirectUriReceiverActivity"
+        android:theme="@style/Theme.AppCompat.Translucent.NoTitleBar"
         android:exported="true"
         tools:node="replace">
     <intent-filter>
