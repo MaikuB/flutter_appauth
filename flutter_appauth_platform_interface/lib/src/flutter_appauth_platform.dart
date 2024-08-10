@@ -40,15 +40,25 @@ abstract class FlutterAppAuthPlatform extends PlatformInterface {
   }
 
   /// Sends an authorization request.
+  ///
+  /// This is done by sending a request to the authorization server's
+  /// [authorization endpoint](https://datatracker.ietf.org/doc/html/rfc6749#section-3.1).
   Future<AuthorizationResponse> authorize(AuthorizationRequest request) {
     throw UnimplementedError('authorize() has not been implemented');
   }
 
   /// For exchanging tokens.
+  ///
+  /// This is done by sending a request to the authorization server's
+  /// [token endpoint](https://datatracker.ietf.org/doc/html/rfc6749#section-3.2).
   Future<TokenResponse> token(TokenRequest request) {
     throw UnimplementedError('token() has not been implemented');
   }
 
+  /// Performs an end session/logout request.
+  ///
+  /// This is done by sending a request to the authorization server's
+  /// end session endpoint per the [RP-initiated logout spec](https://openid.net/specs/openid-connect-rpinitiated-1_0.html).
   Future<EndSessionResponse> endSession(EndSessionRequest request) {
     throw UnimplementedError('endSession() has not been implemented');
   }

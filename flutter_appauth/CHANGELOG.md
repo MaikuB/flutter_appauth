@@ -2,6 +2,8 @@
 
 * **Breaking change** all methods have now been made to return non-nullable types
 * [iOS][macOS] bumped AppAuth iOS dependency to 1.7.5
+* Updated API docs with more details
+* Updated readme with more details on essential knowledge and links to OAuth 2.0 specifications
 
 # 7.0.0-dev.2
 

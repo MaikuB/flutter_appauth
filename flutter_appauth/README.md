@@ -18,8 +18,7 @@ A Flutter bridge for AppAuth (https://appauth.io) used authenticating and author
 
 ## Getting Started
 
-Please see the example that demonstrates how to sign into the demo IdentityServer instance (https://demo.duendesoftware.com). It has also been tested with Azure B2C and Google Sign-in. It is suggested that developers check the documentation of the identity provider they are using to see what capabilities it supports e.g. how to logout, what values of the `prompt` parameter it supports etc. API docs can be found [here](https://pub.dartlang.org/documentation/flutter_appauth/latest/)
-
+Please see the example that demonstrates how to sign into the demo IdentityServer instance (https://demo.duendesoftware.com). It has also been tested with Azure B2C, Auth0, FusionAuth and Google Sign-in. Developers should check the documentation of the identity provider they are using to see what capabilities it supports (e.g. how to logout, what values of the `prompt` parameter it supports etc) and how to configure/register their application with the identity provider. Understanding [OAuth 2.0](https://datatracker.ietf.org/doc/html/rfc6749) is also essential, especially when it comes to [best practices for native mobile apps](https://datatracker.ietf.org/doc/html/rfc8252).
 
 The first step is to create an instance of the plugin
 
@@ -219,6 +218,11 @@ Go to the `Info.plist` for your iOS/macOS app to specify the custom scheme so th
 ```
 
 Note: iOS apps generate a file called `cache.db` which contains the table `cfurl_cache_receiver_data`. This table will contain the access token obtained after the login is completed. If the potential data leak represents a threat for your application then you can disable the information caching for the entire iOS app (ex. https://kunalgupta1508.medium.com/data-leakage-with-cache-db-2d311582cf23).
+
+
+## API docs
+
+API docs can be found [here](https://pub.dartlang.org/documentation/flutter_appauth/latest/)
 
 ## FAQs
 
