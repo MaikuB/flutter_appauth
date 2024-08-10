@@ -2,6 +2,7 @@
 
 * **Breaking change** all methods have now been made to return non-nullable types
 * Updated API docs with more details
+* Added `FlutterAppAuthOAuthError` class that contains string constants representing OAuth 2.0 error codes defined by the [specification](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2).
 
 ## [7.0.0-dev.2]
 
