@@ -1,3 +1,7 @@
+# 6.0.7
+
+* [Android] updated plugin to specify `Theme.AppCompat.Translucent.NoTitleBar` as the theme for the `RedirectUriReceiverActivity` from the AppAuth Android SDK. This is to fix a crash raised with issues [#362](https://github.com/MaikuB/flutter_appauth/issues/362) and [#515](https://github.com/MaikuB/flutter_appauth/issues/515)
+
 # 6.0.6
 
 * [iOS][macOS] bumped AppAuth iOS dependency to 1.7.4
