@@ -1,3 +1,7 @@
+## [7.0.0-dev.4]
+
+* Fixed visibility of `FlutterAppAuthOAuthError` class so that it's exported by the plugin
+
 ## [7.0.0-dev.3]
 
 * **Breaking change** all methods have now been made to return non-nullable types
