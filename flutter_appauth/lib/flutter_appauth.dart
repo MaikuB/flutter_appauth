@@ -7,6 +7,7 @@ export 'package:flutter_appauth_platform_interface/flutter_appauth_platform_inte
         AuthorizationTokenResponse,
         EndSessionRequest,
         EndSessionResponse,
+        FlutterAppAuthOAuthError,
         FlutterAppAuthPlatformErrorDetails,
         FlutterAppAuthUserCancelledException,
         FlutterAppAuthPlatformException,
