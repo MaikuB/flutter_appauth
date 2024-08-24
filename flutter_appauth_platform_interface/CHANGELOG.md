@@ -1,17 +1,8 @@
-## [7.0.0-dev.3]
-
-* **Breaking change** all methods have now been made to return non-nullable types
-* Updated API docs with more details
-* Added `FlutterAppAuthOAuthError` class that contains string constants representing OAuth 2.0 error codes defined by the [specification](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2).
-
-## [7.0.0-dev.2]
-
-*  Updated API docs for `FlutterAppAuthPlatformErrorDetails`'s `errorUri` property as this can now be returned on iOS/macOS
-
-## [7.0.0-dev.1]
+## [7.0.0]
 
 * **Breaking change** Bumped minimum Flutter and Dart SDK constraints to 3.13.0 and 3.1.0 respectively
-* Updated error handling to expose more details for each platform. Plugin will now throw `FlutterAppAuthUserCancelledException` when an authorization request has been cancelled as a result of the user closing the browser. For other scenarios the plugin will throw `FlutterAppAuthPlatformException`. See the API docs for both classes for more details on the available details. Both exception classes inherit from `PlatformException` so the changes should be backwards compatible.
+* **Breaking change** all methods have now been made to return non-nullable types
+* Updated error handling to expose more details for each platform. Plugin will now throw `FlutterAppAuthUserCancelledException` when an authorization request has been cancelled as a result of the user closing the browser. For other scenarios the plugin will throw `FlutterAppAuthPlatformException`. See the API docs for both classes for more details on the available details. Both exception classes inherit from `PlatformException` so the changes should be backwards compatible
 
 ## [6.0.0]
 
