@@ -6,16 +6,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:http/http.dart' as http;
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
-  _MyAppState createState() => _MyAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   bool _isBusy = false;
   final FlutterAppAuth _appAuth = const FlutterAppAuth();
+
   String? _codeVerifier;
   String? _nonce;
   String? _authorizationCode;
@@ -86,8 +89,8 @@ class _MyAppState extends State<MyApp> {
                 ),
                 const SizedBox(height: 8),
                 ElevatedButton(
-                  child: const Text('Exchange code'),
                   onPressed: _authorizationCode != null ? _exchangeCode : null,
+                  child: const Text('Exchange code'),
                 ),
                 const SizedBox(height: 8),
                 ElevatedButton(
@@ -108,17 +111,17 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ),
                 ElevatedButton(
-                  child: const Text('Refresh token'),
                   onPressed: _refreshToken != null ? _refresh : null,
+                  child: const Text('Refresh token'),
                 ),
                 const SizedBox(height: 8),
                 ElevatedButton(
-                  child: const Text('End session'),
                   onPressed: _idToken != null
                       ? () async {
                           await _endSession();
                         }
                       : null,
+                  child: const Text('End session'),
                 ),
                 const SizedBox(height: 8),
                 if (_error != null) Text(_error ?? ''),
