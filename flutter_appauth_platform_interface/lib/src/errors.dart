@@ -99,16 +99,13 @@ class FlutterAppAuthPlatformErrorDetails {
 /// user closing the browser.
 class FlutterAppAuthUserCancelledException extends PlatformException {
   FlutterAppAuthUserCancelledException({
-    required String code,
-    String? message,
+    required super.code,
+    super.message,
     dynamic legacyDetails,
-    String? stacktrace,
+    super.stacktrace,
     required this.platformErrorDetails,
   }) : super(
-          code: code,
-          message: message,
           details: legacyDetails,
-          stacktrace: stacktrace,
         );
 
   /// Details of the error from the underlying platform's AppAuth SDK.
@@ -125,16 +122,13 @@ class FlutterAppAuthUserCancelledException extends PlatformException {
 /// plugin.
 class FlutterAppAuthPlatformException extends PlatformException {
   FlutterAppAuthPlatformException({
-    required String code,
-    String? message,
+    required super.code,
+    super.message,
     dynamic legacyDetails,
-    String? stacktrace,
+    super.stacktrace,
     required this.platformErrorDetails,
   }) : super(
-          code: code,
-          message: message,
           details: legacyDetails,
-          stacktrace: stacktrace,
         );
 
   /// Details of the error from the underlying platform's AppAuth SDK.
