@@ -3,7 +3,8 @@ import 'grant_types.dart';
 import 'token_request.dart';
 
 /// Details required for a combined authorization and code exchange request
-class AuthorizationTokenRequest extends TokenRequest with AuthorizationParameters {
+class AuthorizationTokenRequest extends TokenRequest
+    with AuthorizationParameters {
   AuthorizationTokenRequest(
     super.clientId,
     super.redirectUrl, {
