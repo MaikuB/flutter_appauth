@@ -4,14 +4,14 @@ import 'package:flutter/services.dart';
 /// platform's AppAuth SDK
 class FlutterAppAuthPlatformErrorDetails {
   FlutterAppAuthPlatformErrorDetails({
-    required this.type,
-    required this.code,
-    required this.error,
-    required this.errorDescription,
-    required this.errorUri,
-    required this.domain,
-    required this.rootCauseDebugDescription,
-    required this.errorDebugDescription,
+    this.type,
+    this.code,
+    this.error,
+    this.errorDescription,
+    this.errorUri,
+    this.domain,
+    this.rootCauseDebugDescription,
+    this.errorDebugDescription,
   });
 
   /// The type of error.
