@@ -1,3 +1,7 @@
+## [7.0.1]
+
+* Updated `FlutterAppAuthPlatformErrorDetails` so all the constructor parameters are optional instead of being mandatory through the `required` keyword. This should be a non-breaking change since all the parameters were nullable. Change was done to make code using the class easier to use e.g. when writing tests
+
 ## [7.0.0]
 
 * **Breaking change** Bumped minimum Flutter and Dart SDK constraints to 3.13.0 and 3.1.0 respectively
