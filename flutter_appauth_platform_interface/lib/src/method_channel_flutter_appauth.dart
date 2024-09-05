@@ -82,4 +82,9 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
     }
     return EndSessionResponse(result['state']);
   }
+
+  @override
+  Future<void> closeBrowser() async {
+    return _channel.invokeMethod('closeBrowser');
+  }
 }
