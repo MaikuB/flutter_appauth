@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
@@ -107,7 +108,22 @@ class _MyAppState extends State<MyApp> {
                         textAlign: TextAlign.center,
                       ),
                       onPressed: () => _signInWithAutoCodeExchange(
-                          preferEphemeralSession: true),
+                          preferredExternalAgent: ExternalAgentType
+                              .ephemeralAsWebAuthenticationSession),
+                    ),
+                  ),
+                if (Platform.isIOS)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: const Text(
+                        'Sign in with auto code exchange using '
+                        'SFSafariViewController',
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () => _signInWithAutoCodeExchange(
+                          preferredExternalAgent:
+                              ExternalAgentType.sfSafariViewController),
                     ),
                   ),
                 ElevatedButton(
@@ -123,6 +139,34 @@ class _MyAppState extends State<MyApp> {
                       : null,
                   child: const Text('End session'),
                 ),
+                if (Platform.isIOS || Platform.isMacOS)
+                  Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: _idToken != null
+                            ? () async {
+                                await _endSession(
+                                    preferredExternalAgent: ExternalAgentType
+                                        .ephemeralAsWebAuthenticationSession);
+                              }
+                            : null,
+                        child:
+                            const Text('End session using ephemeral session'),
+                      )),
+                if (Platform.isIOS)
+                  Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: _idToken != null
+                            ? () async {
+                                await _endSession(
+                                    preferredExternalAgent: ExternalAgentType
+                                        .sfSafariViewController);
+                              }
+                            : null,
+                        child: const Text(
+                            'End session using SFSafariViewController'),
+                      )),
                 const SizedBox(height: 8),
                 if (_error != null) Text(_error ?? ''),
                 const SizedBox(height: 8),
@@ -156,13 +200,16 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Future<void> _endSession() async {
+  Future<void> _endSession(
+      {ExternalAgentType preferredExternalAgent =
+          ExternalAgentType.asWebAuthenticationSession}) async {
     try {
       _setBusyState();
       await _appAuth.endSession(EndSessionRequest(
           idTokenHint: _idToken,
           postLogoutRedirectUrl: _postLogoutRedirectUrl,
-          serviceConfiguration: _serviceConfiguration));
+          serviceConfiguration: _serviceConfiguration,
+          preferredExternalAgent: preferredExternalAgent));
       _clearSessionInfo();
     } catch (e) {
       _handleError(e);
@@ -285,7 +332,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _signInWithAutoCodeExchange(
-      {bool preferEphemeralSession = false}) async {
+      {ExternalAgentType preferredExternalAgent =
+          ExternalAgentType.asWebAuthenticationSession}) async {
     try {
       _setBusyState();
 
@@ -295,13 +343,10 @@ class _MyAppState extends State<MyApp> {
       */
       final AuthorizationTokenResponse result =
           await _appAuth.authorizeAndExchangeCode(
-        AuthorizationTokenRequest(
-          _clientId,
-          _redirectUrl,
-          serviceConfiguration: _serviceConfiguration,
-          scopes: _scopes,
-          preferEphemeralSession: preferEphemeralSession,
-        ),
+        AuthorizationTokenRequest(_clientId, _redirectUrl,
+            serviceConfiguration: _serviceConfiguration,
+            scopes: _scopes,
+            preferredExternalAgent: preferredExternalAgent),
       );
 
       /* 
