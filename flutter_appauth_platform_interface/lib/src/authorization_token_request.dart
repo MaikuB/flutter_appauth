@@ -1,5 +1,5 @@
 import 'authorization_parameters.dart';
-import 'external_agent_type.dart';
+import 'external_user_agent.dart';
 import 'grant_type.dart';
 import 'token_request.dart';
 
@@ -18,8 +18,8 @@ class AuthorizationTokenRequest extends TokenRequest
     super.discoveryUrl,
     List<String>? promptValues,
     super.allowInsecureConnections,
-    ExternalAgentType preferredExternalAgent =
-        ExternalAgentType.asWebAuthenticationSession,
+    ExternalUserAgent preferredExternalAgent =
+        ExternalUserAgent.asWebAuthenticationSession,
     super.nonce,
     String? responseMode,
   }) : super(

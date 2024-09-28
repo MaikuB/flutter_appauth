@@ -1,4 +1,4 @@
-import 'external_agent_type.dart';
+import 'external_user_agent.dart';
 
 mixin AuthorizationParameters {
   /// Hint to the Authorization Server about the login identifier the End-User
@@ -17,7 +17,7 @@ mixin AuthorizationParameters {
   /// with the user's normal browser session but keeping the cache.
   /// This property is only applicable to iOS versions 13 and above.
   /// ExternalAgentType? preferredExternalAgent;
-  ExternalAgentType? preferredExternalAgent;
+  ExternalUserAgent? preferredExternalAgent;
 
   String? responseMode;
 }

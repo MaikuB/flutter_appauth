@@ -8,7 +8,7 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
     this.postLogoutRedirectUrl,
     this.state,
     this.allowInsecureConnections = false,
-    this.preferredExternalAgent = ExternalAgentType.asWebAuthenticationSession,
+    this.preferredExternalAgent = ExternalUserAgent.asWebAuthenticationSession,
     this.additionalParameters,
     String? issuer,
     String? discoveryUrl,
@@ -48,7 +48,7 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
   /// ExternalAgentType? preferredExternalAgent;
   ///
   /// Sign in and out must have the same type.
-  ExternalAgentType? preferredExternalAgent;
+  ExternalUserAgent? preferredExternalAgent;
 
   final Map<String, String>? additionalParameters;
 }

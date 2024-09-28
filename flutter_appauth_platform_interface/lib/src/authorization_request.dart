@@ -1,7 +1,7 @@
 import 'authorization_parameters.dart';
 import 'authorization_service_configuration.dart';
 import 'common_request_details.dart';
-import 'external_agent_type.dart';
+import 'external_user_agent.dart';
 
 /// The details of an authorization request to get an authorization code.
 class AuthorizationRequest extends CommonRequestDetails
@@ -17,8 +17,8 @@ class AuthorizationRequest extends CommonRequestDetails
     Map<String, String>? additionalParameters,
     List<String>? promptValues,
     bool allowInsecureConnections = false,
-    ExternalAgentType preferredExternalAgent =
-        ExternalAgentType.asWebAuthenticationSession,
+    ExternalUserAgent preferredExternalAgent =
+        ExternalUserAgent.asWebAuthenticationSession,
     String? nonce,
     String? responseMode,
   }) {
