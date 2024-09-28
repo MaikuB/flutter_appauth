@@ -16,19 +16,21 @@
 
 #import <UIKit/UIKit.h>
 
-#import "OIDExternalUserAgentIOSSafariViewController.h"
 #import "OIDExternalUserAgent.h"
 #import "OIDExternalUserAgentIOS.h"
+#import "OIDExternalUserAgentIOSSafariViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*! @brief Allows library consumers to bootstrap an @c SFSafariViewController as they see fit.
+/*! @brief Allows library consumers to bootstrap an @c SFSafariViewController as
+   they see fit.
     @remarks Useful for customizing tint colors and presentation styles.
  */
 @protocol OIDSafariViewControllerFactory
 
 /*! @brief Creates and returns a new @c SFSafariViewController.
-    @param URL The URL which the @c SFSafariViewController should load initially.
+    @param URL The URL which the @c SFSafariViewController should load
+   initially.
  */
 - (SFSafariViewController *)safariViewControllerWithURL:(NSURL *)URL;
 
@@ -40,15 +42,19 @@ NS_ASSUME_NONNULL_BEGIN
         AppAuth user-agent handling with the benefits of Single Sign-on (SSO)
         for all supported versions of iOS.
  */
-@interface OIDExternalUserAgentIOSSafariViewController : NSObject<OIDExternalUserAgent>
+@interface OIDExternalUserAgentIOSSafariViewController
+    : NSObject <OIDExternalUserAgent>
 
-/*! @brief Allows library consumers to change the @c OIDSafariViewControllerFactory used to create
-        new instances of @c SFSafariViewController.
+/*! @brief Allows library consumers to change the @c
+   OIDSafariViewControllerFactory used to create new instances of @c
+   SFSafariViewController.
     @remarks Useful for customizing tint colors and presentation styles.
-    @param factory The @c OIDSafariViewControllerFactory to use for creating new instances of
+    @param factory The @c OIDSafariViewControllerFactory to use for creating new
+   instances of
         @c SFSafariViewController.
  */
-+ (void)setSafariViewControllerFactory:(id<OIDSafariViewControllerFactory>)factory;
++ (void)setSafariViewControllerFactory:
+    (id<OIDSafariViewControllerFactory>)factory;
 
 /*! @internal
     @brief Unavailable. Please use @c initWithPresentingViewController:
@@ -56,12 +62,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (nonnull instancetype)init NS_UNAVAILABLE;
 
 /*! @brief The designated initializer.
-    @param presentingViewController The view controller from which to present the
+    @param presentingViewController The view controller from which to present
+   the
         \SFSafariViewController.
  */
 - (nullable instancetype)initWithPresentingViewController:
-    (UIViewController *)presentingViewController
-            NS_DESIGNATED_INITIALIZER;
+    (UIViewController *)presentingViewController NS_DESIGNATED_INITIALIZER;
 
 @end
 

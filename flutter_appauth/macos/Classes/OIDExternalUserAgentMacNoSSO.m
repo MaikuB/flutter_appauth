@@ -1,7 +1,9 @@
 /*! @file OIDExternalUserAgentMacNoSSO.m
-    @brief  OIDExternalUserAgentMacNoSSO is custom user agent based on the default user agent in the AppAuth iOS SDK found here:
+    @brief  OIDExternalUserAgentMacNoSSO is custom user agent based on the
+   default user agent in the AppAuth iOS SDK found here:
             https://github.com/openid/AppAuth-iOS/blob/master/Source/AppAuth/macOS/OIDExternalUserAgentMac.m
-            Ths user agent allows setting `prefersEphemeralSession` flag on macOS 10.15 or newer to avoid cookies being shared across the device
+            Ths user agent allows setting `prefersEphemeralSession` flag on
+   macOS 10.15 or newer to avoid cookies being shared across the device
     @copydetails
         Licensed under the Apache License, Version 2.0 (the "License");
         you may not use this file except in compliance with the License.
@@ -16,16 +18,15 @@
         limitations under the License.
  */
 
-
 #import "OIDExternalUserAgentMacNoSSO.h"
 
-#import <Cocoa/Cocoa.h>
 #import <AuthenticationServices/AuthenticationServices.h>
-
+#import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface OIDExternalUserAgentMacNoSSO ()<ASWebAuthenticationPresentationContextProviding>
+@interface OIDExternalUserAgentMacNoSSO () <
+    ASWebAuthenticationPresentationContextProviding>
 @end
 
 @implementation OIDExternalUserAgentMacNoSSO {
@@ -55,7 +56,8 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (BOOL)presentExternalUserAgentRequest:(id<OIDExternalUserAgentRequest>)request
-                                session:(id<OIDExternalUserAgentSession>)session {
+                                session:
+                                    (id<OIDExternalUserAgentSession>)session {
   if (_externalUserAgentFlowInProgress) {
     // TODO: Handle errors as authorization is already in progress.
     return NO;
@@ -70,25 +72,28 @@ NS_ASSUME_NONNULL_BEGIN
       __weak OIDExternalUserAgentMacNoSSO *weakSelf = self;
       NSString *redirectScheme = request.redirectScheme;
       ASWebAuthenticationSession *authenticationSession =
-        [[ASWebAuthenticationSession alloc] initWithURL:requestURL
-                                      callbackURLScheme:redirectScheme
-                                      completionHandler:^(NSURL * _Nullable callbackURL,
-                                                          NSError * _Nullable error) {
-        __strong OIDExternalUserAgentMacNoSSO *strongSelf = weakSelf;
-        if (!strongSelf) {
-            return;
-        }
-        strongSelf->_webAuthenticationSession = nil;
-        if (callbackURL) {
-          [strongSelf->_session resumeExternalUserAgentFlowWithURL:callbackURL];
-        } else {
-          NSError *safariError =
-              [OIDErrorUtilities errorWithCode:OIDErrorCodeUserCanceledAuthorizationFlow
-                               underlyingError:error
-                                   description:nil];
-          [strongSelf->_session failExternalUserAgentFlowWithError:safariError];
-        }
-      }];
+          [[ASWebAuthenticationSession alloc]
+                    initWithURL:requestURL
+              callbackURLScheme:redirectScheme
+              completionHandler:^(NSURL *_Nullable callbackURL,
+                                  NSError *_Nullable error) {
+                __strong OIDExternalUserAgentMacNoSSO *strongSelf = weakSelf;
+                if (!strongSelf) {
+                  return;
+                }
+                strongSelf->_webAuthenticationSession = nil;
+                if (callbackURL) {
+                  [strongSelf->_session
+                      resumeExternalUserAgentFlowWithURL:callbackURL];
+                } else {
+                  NSError *safariError = [OIDErrorUtilities
+                        errorWithCode:OIDErrorCodeUserCanceledAuthorizationFlow
+                      underlyingError:error
+                          description:nil];
+                  [strongSelf->_session
+                      failExternalUserAgentFlowWithError:safariError];
+                }
+              }];
 
       authenticationSession.presentationContextProvider = self;
 
@@ -101,33 +106,38 @@ NS_ASSUME_NONNULL_BEGIN
   BOOL openedBrowser = [[NSWorkspace sharedWorkspace] openURL:requestURL];
   if (!openedBrowser) {
     [self cleanUp];
-    NSError *safariError = [OIDErrorUtilities errorWithCode:OIDErrorCodeBrowserOpenError
-                                            underlyingError:nil
-                                                description:@"Unable to open the browser."];
+    NSError *safariError =
+        [OIDErrorUtilities errorWithCode:OIDErrorCodeBrowserOpenError
+                         underlyingError:nil
+                             description:@"Unable to open the browser."];
     [session failExternalUserAgentFlowWithError:safariError];
   }
   return openedBrowser;
 }
 
-- (void)dismissExternalUserAgentAnimated:(BOOL)animated completion:(void (^)(void))completion {
+- (void)dismissExternalUserAgentAnimated:(BOOL)animated
+                              completion:(void (^)(void))completion {
   if (!_externalUserAgentFlowInProgress) {
     // Ignore this call if there is no authorization flow in progress.
-    if (completion) completion();
+    if (completion)
+      completion();
     return;
   }
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
-  ASWebAuthenticationSession *webAuthenticationSession = _webAuthenticationSession;
+  ASWebAuthenticationSession *webAuthenticationSession =
+      _webAuthenticationSession;
 #pragma clang diagnostic pop
 
-  // Ideally the browser tab with the URL should be closed here, but the AppAuth library does not
-  // control the browser.
+  // Ideally the browser tab with the URL should be closed here, but the AppAuth
+  // library does not control the browser.
   [self cleanUp];
   if (webAuthenticationSession) {
     // dismiss the ASWebAuthenticationSession
     [webAuthenticationSession cancel];
-    if (completion) completion();
+    if (completion)
+      completion();
   } else if (completion) {
     completion();
   }
@@ -141,8 +151,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - ASWebAuthenticationPresentationContextProviding
 
-- (ASPresentationAnchor)presentationAnchorForWebAuthenticationSession:(ASWebAuthenticationSession *)session
-    API_AVAILABLE(macosx(10.15)) {
+- (ASPresentationAnchor)presentationAnchorForWebAuthenticationSession:
+    (ASWebAuthenticationSession *)session API_AVAILABLE(macosx(10.15)) {
   return _presentingWindow;
 }
 

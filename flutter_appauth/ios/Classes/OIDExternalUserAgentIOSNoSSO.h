@@ -1,7 +1,9 @@
 /*! @file OIDExternalUserAgentIOSNoSSO.h
-    @brief OIDExternalUserAgentIOSNoSSO is a custom user agent based on the default user agent in the AppAuth iOS SDK found here:
+    @brief OIDExternalUserAgentIOSNoSSO is a custom user agent based on the
+   default user agent in the AppAuth iOS SDK found here:
             https://github.com/openid/AppAuth-iOS/blob/master/Source/iOS/OIDExternalUserAgentIOS.h
-            Ths user agent allows setting `prefersEphemeralSession` flag on iOS 13 or newer to avoid cookies being shared across the device.
+            Ths user agent allows setting `prefersEphemeralSession` flag on iOS
+   13 or newer to avoid cookies being shared across the device.
     @copydetails
         Licensed under the Apache License, Version 2.0 (the "License");
         you may not use this file except in compliance with the License.
@@ -16,27 +18,27 @@
         limitations under the License.
  */
 
-#import <UIKit/UIKit.h>
 #import <AppAuth/AppAuth.h>
+#import <UIKit/UIKit.h>
 
 @class SFSafariViewController;
 
 NS_ASSUME_NONNULL_BEGIN
 
 API_UNAVAILABLE(macCatalyst)
-@interface OIDExternalUserAgentIOSNoSSO : NSObject<OIDExternalUserAgent>
+@interface OIDExternalUserAgentIOSNoSSO : NSObject <OIDExternalUserAgent>
 
-- (nullable instancetype)init API_AVAILABLE(ios(11))
-    __deprecated_msg("This method will not work on iOS 13, use "
-                     "initWithPresentingViewController:presentingViewController");
+- (nullable instancetype)init API_AVAILABLE(ios(11))__deprecated_msg(
+    "This method will not work on iOS 13, use "
+    "initWithPresentingViewController:presentingViewController");
 
 /*! @brief The designated initializer.
-    @param presentingViewController The view controller from which to present the
+    @param presentingViewController The view controller from which to present
+   the
         \SFSafariViewController.
  */
 - (nullable instancetype)initWithPresentingViewController:
-    (UIViewController *)presentingViewController
-    NS_DESIGNATED_INITIALIZER;
+    (UIViewController *)presentingViewController NS_DESIGNATED_INITIALIZER;
 
 @end
 
