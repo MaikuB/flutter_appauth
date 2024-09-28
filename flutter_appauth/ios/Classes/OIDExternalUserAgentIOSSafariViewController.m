@@ -94,6 +94,7 @@ static id<OIDSafariViewControllerFactory> __nullable gSafariViewControllerFactor
         [_presentingViewController presentViewController:safariVC animated:YES completion:nil];
         openedSafari = YES;
     } else {
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         openedSafari = [[UIApplication sharedApplication] openURL:requestURL];
     }
 
