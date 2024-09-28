@@ -19,154 +19,171 @@
 #import <SafariServices/SafariServices.h>
 
 #import "OIDErrorUtilities.h"
-#import "OIDExternalUserAgentSession.h"
 #import "OIDExternalUserAgentRequest.h"
+#import "OIDExternalUserAgentSession.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** @brief The global/shared Safari view controller factory. Responsible for creating all new
- instances of @c SFSafariViewController.
+/** @brief The global/shared Safari view controller factory. Responsible for
+ creating all new instances of @c SFSafariViewController.
  */
-static id<OIDSafariViewControllerFactory> __nullable gSafariViewControllerFactory;
+static id<OIDSafariViewControllerFactory> __nullable
+    gSafariViewControllerFactory;
 
-/** @brief The default @c OIDSafariViewControllerFactory which creates new instances of
+/** @brief The default @c OIDSafariViewControllerFactory which creates new
+   instances of
         @c SFSafariViewController using known best practices.
  */
-@interface OIDDefaultSafariViewControllerFactory : NSObject<OIDSafariViewControllerFactory>
+@interface OIDDefaultSafariViewControllerFactory
+    : NSObject <OIDSafariViewControllerFactory>
 @end
 
-@interface OIDExternalUserAgentIOSSafariViewController ()<SFSafariViewControllerDelegate>
+@interface OIDExternalUserAgentIOSSafariViewController () <
+    SFSafariViewControllerDelegate>
 @end
 
 @implementation OIDExternalUserAgentIOSSafariViewController {
-    UIViewController *_presentingViewController;
+  UIViewController *_presentingViewController;
 
-    BOOL _externalUserAgentFlowInProgress;
-    __weak id<OIDExternalUserAgentSession> _session;
+  BOOL _externalUserAgentFlowInProgress;
+  __weak id<OIDExternalUserAgentSession> _session;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
-    __weak SFSafariViewController *_safariVC;
+  __weak SFSafariViewController *_safariVC;
 #pragma clang diagnostic pop
 }
 
-/** @brief Obtains the current @c OIDSafariViewControllerFactory; creating a new default instance if
-        required.
+/** @brief Obtains the current @c OIDSafariViewControllerFactory; creating a new
+   default instance if required.
  */
 + (id<OIDSafariViewControllerFactory>)safariViewControllerFactory {
-    if (!gSafariViewControllerFactory) {
-        gSafariViewControllerFactory = [[OIDDefaultSafariViewControllerFactory alloc] init];
-    }
-    return gSafariViewControllerFactory;
+  if (!gSafariViewControllerFactory) {
+    gSafariViewControllerFactory =
+        [[OIDDefaultSafariViewControllerFactory alloc] init];
+  }
+  return gSafariViewControllerFactory;
 }
 
-+ (void)setSafariViewControllerFactory:(id<OIDSafariViewControllerFactory>)factory {
-    NSAssert(factory, @"Parameter: |factory| must be non-nil.");
-    gSafariViewControllerFactory = factory;
++ (void)setSafariViewControllerFactory:
+    (id<OIDSafariViewControllerFactory>)factory {
+  NSAssert(factory, @"Parameter: |factory| must be non-nil.");
+  gSafariViewControllerFactory = factory;
 }
 
 - (nullable instancetype)initWithPresentingViewController:
-        (UIViewController *)presentingViewController {
-    self = [super init];
-    if (self) {
-        _presentingViewController = presentingViewController;
-    }
-    return self;
+    (UIViewController *)presentingViewController {
+  self = [super init];
+  if (self) {
+    _presentingViewController = presentingViewController;
+  }
+  return self;
 }
 
 - (BOOL)presentExternalUserAgentRequest:(id<OIDExternalUserAgentRequest>)request
-                                session:(id<OIDExternalUserAgentSession>)session {
-    if (_externalUserAgentFlowInProgress) {
-        // TODO: Handle errors as authorization is already in progress.
-        return NO;
-    }
+                                session:
+                                    (id<OIDExternalUserAgentSession>)session {
+  if (_externalUserAgentFlowInProgress) {
+    // TODO: Handle errors as authorization is already in progress.
+    return NO;
+  }
 
-    _externalUserAgentFlowInProgress = YES;
-    _session = session;
-    BOOL openedSafari = NO;
-    NSURL *requestURL = [request externalUserAgentRequestURL];
+  _externalUserAgentFlowInProgress = YES;
+  _session = session;
+  BOOL openedSafari = NO;
+  NSURL *requestURL = [request externalUserAgentRequestURL];
 
-    if (@available(iOS 9.0, *)) {
-        SFSafariViewController *safariVC =
-                [[[self class] safariViewControllerFactory] safariViewControllerWithURL:requestURL];
-        safariVC.delegate = self;
-        safariVC.modalPresentationStyle = UIModalPresentationFormSheet;
-        _safariVC = safariVC;
-        [_presentingViewController presentViewController:safariVC animated:YES completion:nil];
-        openedSafari = YES;
-    } else {
+  if (@available(iOS 9.0, *)) {
+    SFSafariViewController *safariVC = [[[self class]
+        safariViewControllerFactory] safariViewControllerWithURL:requestURL];
+    safariVC.delegate = self;
+    safariVC.modalPresentationStyle = UIModalPresentationFormSheet;
+    _safariVC = safariVC;
+    [_presentingViewController presentViewController:safariVC
+                                            animated:YES
+                                          completion:nil];
+    openedSafari = YES;
+  } else {
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        openedSafari = [[UIApplication sharedApplication] openURL:requestURL];
-    }
+    openedSafari = [[UIApplication sharedApplication] openURL:requestURL];
+  }
 
-    if (!openedSafari) {
-        [self cleanUp];
-        NSError *safariError = [OIDErrorUtilities errorWithCode:OIDErrorCodeSafariOpenError
-                                                underlyingError:nil
-                                                    description:@"Unable to open Safari."];
-        [session failExternalUserAgentFlowWithError:safariError];
-    }
-    return openedSafari;
+  if (!openedSafari) {
+    [self cleanUp];
+    NSError *safariError =
+        [OIDErrorUtilities errorWithCode:OIDErrorCodeSafariOpenError
+                         underlyingError:nil
+                             description:@"Unable to open Safari."];
+    [session failExternalUserAgentFlowWithError:safariError];
+  }
+  return openedSafari;
 }
 
-- (void)dismissExternalUserAgentAnimated:(BOOL)animated completion:(void (^)(void))completion {
-    if (!_externalUserAgentFlowInProgress) {
-        // Ignore this call if there is no authorization flow in progress.
-        return;
-    }
+- (void)dismissExternalUserAgentAnimated:(BOOL)animated
+                              completion:(void (^)(void))completion {
+  if (!_externalUserAgentFlowInProgress) {
+    // Ignore this call if there is no authorization flow in progress.
+    return;
+  }
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
-    SFSafariViewController *safariVC = _safariVC;
+  SFSafariViewController *safariVC = _safariVC;
 #pragma clang diagnostic pop
 
-    [self cleanUp];
+  [self cleanUp];
 
-    if (@available(iOS 9.0, *)) {
-        if (safariVC) {
-            [safariVC dismissViewControllerAnimated:YES completion:completion];
-        } else {
-            if (completion) completion();
-        }
+  if (@available(iOS 9.0, *)) {
+    if (safariVC) {
+      [safariVC dismissViewControllerAnimated:YES completion:completion];
     } else {
-        if (completion) completion();
+      if (completion)
+        completion();
     }
+  } else {
+    if (completion)
+      completion();
+  }
 }
 
 - (void)cleanUp {
-    // The weak references to |_safariVC| and |_session| are set to nil to avoid accidentally using
-    // them while not in an authorization flow.
-    _safariVC = nil;
-    _session = nil;
-    _externalUserAgentFlowInProgress = NO;
+  // The weak references to |_safariVC| and |_session| are set to nil to avoid
+  // accidentally using them while not in an authorization flow.
+  _safariVC = nil;
+  _session = nil;
+  _externalUserAgentFlowInProgress = NO;
 }
 
 #pragma mark - SFSafariViewControllerDelegate
 
-- (void)safariViewControllerDidFinish:(SFSafariViewController *)controller NS_AVAILABLE_IOS(9.0) {
-    if (controller != _safariVC) {
-        // Ignore this call if the safari view controller do not match.
-        return;
-    }
-    if (!_externalUserAgentFlowInProgress) {
-        // Ignore this call if there is no authorization flow in progress.
-        return;
-    }
-    id<OIDExternalUserAgentSession> session = _session;
-    [self cleanUp];
-    NSError *error = [OIDErrorUtilities errorWithCode:OIDErrorCodeProgramCanceledAuthorizationFlow
-                                      underlyingError:nil
-                                          description:nil];
-    [session failExternalUserAgentFlowWithError:error];
+- (void)safariViewControllerDidFinish:(SFSafariViewController *)controller
+    NS_AVAILABLE_IOS(9.0) {
+  if (controller != _safariVC) {
+    // Ignore this call if the safari view controller do not match.
+    return;
+  }
+  if (!_externalUserAgentFlowInProgress) {
+    // Ignore this call if there is no authorization flow in progress.
+    return;
+  }
+  id<OIDExternalUserAgentSession> session = _session;
+  [self cleanUp];
+  NSError *error = [OIDErrorUtilities
+        errorWithCode:OIDErrorCodeProgramCanceledAuthorizationFlow
+      underlyingError:nil
+          description:nil];
+  [session failExternalUserAgentFlowWithError:error];
 }
 
 @end
 
 @implementation OIDDefaultSafariViewControllerFactory
 
-- (SFSafariViewController *)safariViewControllerWithURL:(NSURL *)URL NS_AVAILABLE_IOS(9.0) {
-    SFSafariViewController *safariViewController =
-            [[SFSafariViewController alloc] initWithURL:URL entersReaderIfAvailable:NO];
-    return safariViewController;
+- (SFSafariViewController *)safariViewControllerWithURL:(NSURL *)URL
+    NS_AVAILABLE_IOS(9.0) {
+  SFSafariViewController *safariViewController =
+      [[SFSafariViewController alloc] initWithURL:URL
+                          entersReaderIfAvailable:NO];
+  return safariViewController;
 }
 
 @end
