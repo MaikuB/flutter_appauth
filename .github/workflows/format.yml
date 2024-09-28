@@ -1,7 +1,8 @@
 name: format
 
 on:
-  push:
+  - push
+  - workflow_dispatch
 
 jobs:
   java_format:
