@@ -8,7 +8,7 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
     this.postLogoutRedirectUrl,
     this.state,
     this.allowInsecureConnections = false,
-    this.preferEphemeralSession = false,
+    this.preferredExternalAgent = ExternalAgentType.asWebAuthenticationSession,
     this.additionalParameters,
     String? issuer,
     String? discoveryUrl,
@@ -38,14 +38,17 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
   /// This property is only applicable to Android.
   bool allowInsecureConnections;
 
-  /// Whether to use an ephemeral session that prevents cookies and other
-  /// browser data being shared with the user's normal browser session.
+  /// Decides what type of external agent to use for the authorization flow.
+  /// ASWebAuthenticationSession is the default for iOS 12 and above.
+  /// EphemeralSession is not sharing browser data
+  /// with the user's normal browser session but not keeping the cache
+  /// SFSafariViewController is not sharing browser data
+  /// with the user's normal browser session but keeping the cache.
+  /// This property is only applicable to iOS versions 13 and above.
+  /// ExternalAgentType? preferredExternalAgent;
   ///
-  /// This property is only applicable to iOS (versions 13 and above) and macOS.
-  ///
-  /// preferEphemeralSession = true must only be used here, if it is also used
-  /// for the sign in call.
-  bool preferEphemeralSession;
+  /// Sign in and out must have the same type.
+  ExternalAgentType? preferredExternalAgent;
 
   final Map<String, String>? additionalParameters;
 }

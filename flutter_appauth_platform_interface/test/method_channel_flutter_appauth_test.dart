@@ -38,7 +38,8 @@ void main() {
           'serviceConfiguration': null,
           'additionalParameters': null,
           'allowInsecureConnections': false,
-          'preferEphemeralSession': false,
+          'preferredExternalAgent':
+              ExternalAgentType.asWebAuthenticationSession.toString(),
           'promptValues': null,
           'responseMode': null,
           'nonce': null,
@@ -66,7 +67,8 @@ void main() {
           'serviceConfiguration': null,
           'additionalParameters': null,
           'allowInsecureConnections': false,
-          'preferEphemeralSession': false,
+          'preferredExternalAgent':
+              ExternalAgentType.asWebAuthenticationSession.toString(),
           'promptValues': null,
           'clientSecret': null,
           'refreshToken': null,
@@ -184,7 +186,8 @@ void main() {
         'issuer': null,
         'discoveryUrl': 'someDiscoveryUrl',
         'serviceConfiguration': null,
-        'preferEphemeralSession': false,
+        'preferredExternalAgent':
+            ExternalAgentType.asWebAuthenticationSession.toString(),
       })
     ]);
   });

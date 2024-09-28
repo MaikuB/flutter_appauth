@@ -33,7 +33,7 @@ extension EndSessionRequestMapper on EndSessionRequest {
       'issuer': issuer,
       'discoveryUrl': discoveryUrl,
       'serviceConfiguration': serviceConfiguration?.toMap(),
-      'preferEphemeralSession': preferEphemeralSession,
+      'preferredExternalAgent': preferredExternalAgent.toString(),
     };
   }
 }
@@ -99,7 +99,8 @@ Map<String, Object?> _convertAuthorizationParametersToMap(
   return <String, Object?>{
     'loginHint': authorizationParameters.loginHint,
     'promptValues': authorizationParameters.promptValues,
-    'preferEphemeralSession': authorizationParameters.preferEphemeralSession,
+    'preferredExternalAgent':
+        authorizationParameters.preferredExternalAgent.toString(),
     'responseMode': authorizationParameters.responseMode,
   };
 }

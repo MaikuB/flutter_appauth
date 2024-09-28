@@ -1,4 +1,5 @@
 import 'authorization_parameters.dart';
+import 'external_agent_type.dart';
 import 'grant_types.dart';
 import 'token_request.dart';
 
@@ -17,7 +18,8 @@ class AuthorizationTokenRequest extends TokenRequest
     super.discoveryUrl,
     List<String>? promptValues,
     super.allowInsecureConnections,
-    bool preferEphemeralSession = false,
+    ExternalAgentType preferredExternalAgent =
+        ExternalAgentType.asWebAuthenticationSession,
     super.nonce,
     String? responseMode,
   }) : super(
@@ -25,7 +27,7 @@ class AuthorizationTokenRequest extends TokenRequest
         ) {
     this.loginHint = loginHint;
     this.promptValues = promptValues;
-    this.preferEphemeralSession = preferEphemeralSession;
+    this.preferredExternalAgent = preferredExternalAgent;
     this.responseMode = responseMode;
   }
 }

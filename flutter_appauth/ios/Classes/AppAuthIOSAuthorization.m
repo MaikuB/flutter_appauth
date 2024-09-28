@@ -2,7 +2,7 @@
 
 @implementation AppAuthIOSAuthorization
 
-- (id<OIDExternalUserAgentSession>) performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferEphemeralSession:(BOOL)preferEphemeralSession result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce{
+- (id<OIDExternalUserAgentSession>) performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferredExternalAgent:(NSString*)preferredExternalAgent result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce{
   NSString *codeVerifier = [OIDAuthorizationRequest generateCodeVerifier];
   NSString *codeChallenge = [OIDAuthorizationRequest codeChallengeS256ForVerifier:codeVerifier];
 
@@ -21,7 +21,7 @@
                                     additionalParameters:additionalParameters];
   UIViewController *rootViewController = [self rootViewController];
   if(exchangeCode) {
-      id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithViewController:rootViewController useEphemeralSession:preferEphemeralSession];
+      id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithViewController:rootViewController preferredExternalAgent:preferredExternalAgent];
       return [OIDAuthState authStateByPresentingAuthorizationRequest:request externalUserAgent:externalUserAgent callback:^(OIDAuthState *_Nullable authState,
                                                                                                                                                   NSError *_Nullable error) {
           if(authState) {
@@ -32,7 +32,7 @@
           }
       }];
   } else {
-      id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithViewController:rootViewController useEphemeralSession:preferEphemeralSession];
+      id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithViewController:rootViewController preferredExternalAgent:preferredExternalAgent];
       return [OIDAuthorizationService presentAuthorizationRequest:request externalUserAgent:externalUserAgent callback:^(OIDAuthorizationResponse *_Nullable authorizationResponse, NSError *_Nullable error) {
           if(authorizationResponse) {
               NSMutableDictionary *processedResponse = [[NSMutableDictionary alloc] init];
@@ -56,7 +56,7 @@
                                                                                                                                                                                                                                                additionalParameters:requestParameters.additionalParameters];
 
   UIViewController *rootViewController = [self rootViewController];
-  id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithViewController:rootViewController useEphemeralSession:requestParameters.preferEphemeralSession];
+  id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithViewController:rootViewController preferredExternalAgent:requestParameters.preferredExternalAgent];
 
   
   return [OIDAuthorizationService presentEndSessionRequest:endSessionRequest externalUserAgent:externalUserAgent callback:^(OIDEndSessionResponse * _Nullable endSessionResponse, NSError * _Nullable error) {
@@ -71,13 +71,17 @@
   }];
 }
 
-- (id<OIDExternalUserAgent>)userAgentWithViewController:(UIViewController *)rootViewController useEphemeralSession:(BOOL)useEphemeralSession {
-    if (useEphemeralSession) {
+- (id<OIDExternalUserAgent>)userAgentWithViewController:(UIViewController *)rootViewController preferredExternalAgent:(NSString*)preferredExternalAgent {
+    if ([preferredExternalAgent isEqual:@"ExternalAgentType.ephemeralAsWebAuthenticationSession"]) {
         return [[OIDExternalUserAgentIOSNoSSO alloc]
                 initWithPresentingViewController:rootViewController];
+    } else if ([preferredExternalAgent isEqual:@"ExternalAgentType.sfSafariViewController"]) {
+        return [[OIDExternalUserAgentIOSSafariViewController alloc]
+                initWithPresentingViewController:rootViewController];
+    } else {
+        return [[OIDExternalUserAgentIOS alloc]
+                initWithPresentingViewController:rootViewController];
     }
-    return [[OIDExternalUserAgentIOS alloc]
-            initWithPresentingViewController:rootViewController];
 }
 
 - (UIViewController *)rootViewController {

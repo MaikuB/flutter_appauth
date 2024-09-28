@@ -39,12 +39,12 @@ static NSString *const END_SESSION_ERROR_MESSAGE_FORMAT = @"Failed to end sessio
 @property(nonatomic, strong) NSString *discoveryUrl;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
-@property(nonatomic, readwrite) BOOL preferEphemeralSession;
+@property(nonatomic, strong) NSString *preferredExternalAgent;
 @end
 
 @interface AppAuthAuthorization : NSObject
 
-- (id<OIDExternalUserAgentSession>)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferEphemeralSession:(BOOL)preferEphemeralSession result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce;
+- (id<OIDExternalUserAgentSession>)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferredExternalAgent:(NSString*)preferredExternalAgent result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce;
 
 - (id<OIDExternalUserAgentSession>)performEndSessionRequest:(OIDServiceConfiguration *)serviceConfiguration requestParameters:(EndSessionRequestParameters *)requestParameters result:(FlutterResult)result;
 
