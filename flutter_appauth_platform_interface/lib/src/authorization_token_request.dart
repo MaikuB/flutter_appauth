@@ -1,6 +1,6 @@
 import 'authorization_parameters.dart';
 import 'external_agent_type.dart';
-import 'grant_types.dart';
+import 'grant_type.dart';
 import 'token_request.dart';
 
 /// Details required for a combined authorization and code exchange request
