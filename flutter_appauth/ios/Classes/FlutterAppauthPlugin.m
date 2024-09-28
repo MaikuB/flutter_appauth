@@ -28,7 +28,7 @@
 @property(nonatomic, strong) NSArray *scopes;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
-@property(nonatomic, strong) NSString *externalUserAgent;
+@property(nonatomic, strong) NSNumber *externalUserAgent;
 
 @end
 

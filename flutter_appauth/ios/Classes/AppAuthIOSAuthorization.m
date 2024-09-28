@@ -2,7 +2,7 @@
 
 @implementation AppAuthIOSAuthorization
 
-- (id<OIDExternalUserAgentSession>) performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters externalUserAgent:(NSString*)externalUserAgent result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce{
+- (id<OIDExternalUserAgentSession>) performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters externalUserAgent:(NSNumber*)externalUserAgent result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce{
   NSString *codeVerifier = [OIDAuthorizationRequest generateCodeVerifier];
   NSString *codeChallenge = [OIDAuthorizationRequest codeChallengeS256ForVerifier:codeVerifier];
 
@@ -71,17 +71,17 @@
   }];
 }
 
-- (id<OIDExternalUserAgent>)userAgentWithViewController:(UIViewController *)rootViewController externalUserAgent:(NSString*)externalUserAgent {
-    if ([externalUserAgent isEqual:@"ExternalUserAgent.ephemeralAsWebAuthenticationSession"]) {
+- (id<OIDExternalUserAgent>)userAgentWithViewController:(UIViewController *)rootViewController externalUserAgent:(NSNumber*)externalUserAgent {
+    if ([externalUserAgent integerValue] == EphemeralASWebAuthenticationSession) {
         return [[OIDExternalUserAgentIOSNoSSO alloc]
                 initWithPresentingViewController:rootViewController];
-    } else if ([externalUserAgent isEqual:@"ExternalUserAgent.sfSafariViewController"]) {
-        return [[OIDExternalUserAgentIOSSafariViewController alloc]
-                initWithPresentingViewController:rootViewController];
-    } else {
-        return [[OIDExternalUserAgentIOS alloc]
+    }
+    if ([externalUserAgent integerValue] == SafariViewController) {
+        return [[OIDExternalUserAgentIOSNoSSO alloc]
                 initWithPresentingViewController:rootViewController];
     }
+    return [[OIDExternalUserAgentIOS alloc]
+            initWithPresentingViewController:rootViewController];
 }
 
 - (UIViewController *)rootViewController {

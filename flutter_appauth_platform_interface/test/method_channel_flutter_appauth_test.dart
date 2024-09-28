@@ -39,7 +39,7 @@ void main() {
           'additionalParameters': null,
           'allowInsecureConnections': false,
           'externalUserAgent':
-              ExternalUserAgent.asWebAuthenticationSession.toString(),
+              ExternalUserAgent.asWebAuthenticationSession.index,
           'promptValues': null,
           'responseMode': null,
           'nonce': null,
@@ -68,7 +68,7 @@ void main() {
           'additionalParameters': null,
           'allowInsecureConnections': false,
           'externalUserAgent':
-              ExternalUserAgent.asWebAuthenticationSession.toString(),
+              ExternalUserAgent.asWebAuthenticationSession.index,
           'promptValues': null,
           'clientSecret': null,
           'refreshToken': null,
@@ -186,8 +186,7 @@ void main() {
         'issuer': null,
         'discoveryUrl': 'someDiscoveryUrl',
         'serviceConfiguration': null,
-        'externalUserAgent':
-            ExternalUserAgent.asWebAuthenticationSession.toString(),
+        'externalUserAgent': ExternalUserAgent.asWebAuthenticationSession.index,
       })
     ]);
   });

@@ -33,7 +33,7 @@ extension EndSessionRequestMapper on EndSessionRequest {
       'issuer': issuer,
       'discoveryUrl': discoveryUrl,
       'serviceConfiguration': serviceConfiguration?.toMap(),
-      'externalUserAgent': externalUserAgent.toString(),
+      'externalUserAgent': externalUserAgent?.index,
     };
   }
 }
@@ -99,7 +99,7 @@ Map<String, Object?> _convertAuthorizationParametersToMap(
   return <String, Object?>{
     'loginHint': authorizationParameters.loginHint,
     'promptValues': authorizationParameters.promptValues,
-    'externalUserAgent': authorizationParameters.externalUserAgent.toString(),
+    'externalUserAgent': authorizationParameters.externalUserAgent?.index,
     'responseMode': authorizationParameters.responseMode,
   };
 }

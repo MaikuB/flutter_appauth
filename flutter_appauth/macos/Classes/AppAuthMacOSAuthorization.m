@@ -2,7 +2,7 @@
 
 @implementation AppAuthMacOSAuthorization
 
-- (id<OIDExternalUserAgentSession>)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters externalUserAgent:(NSString*)externalUserAgent result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce {
+- (id<OIDExternalUserAgentSession>)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters externalUserAgent:(NSNumber*)externalUserAgent result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce {
     NSString *codeVerifier = [OIDAuthorizationRequest generateCodeVerifier];
     NSString *codeChallenge = [OIDAuthorizationRequest codeChallengeS256ForVerifier:codeVerifier];
 
@@ -69,8 +69,8 @@
     }];
 }
 
-- (id<OIDExternalUserAgent>)userAgentWithPresentingWindow:(NSWindow *)presentingWindow externalUserAgent:(NSString*)externalUserAgent {
-    if ([externalUserAgent isEqual:@"ExternalUserAgent.ephemeralAsWebAuthenticationSession"]) {
+- (id<OIDExternalUserAgent>)userAgentWithPresentingWindow:(NSWindow *)presentingWindow externalUserAgent:(NSNumber*)externalUserAgent {
+    if ([externalUserAgent integerValue] == EphemeralASWebAuthenticationSession) {
         return [[OIDExternalUserAgentMacNoSSO alloc] initWithPresentingWindow:presentingWindow];
     }
     return [[OIDExternalUserAgentMac alloc] initWithPresentingWindow:presentingWindow];
