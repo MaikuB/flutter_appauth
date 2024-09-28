@@ -38,7 +38,7 @@ void main() {
           'serviceConfiguration': null,
           'additionalParameters': null,
           'allowInsecureConnections': false,
-          'preferredExternalAgent':
+          'externalUserAgent':
               ExternalUserAgent.asWebAuthenticationSession.toString(),
           'promptValues': null,
           'responseMode': null,
@@ -67,7 +67,7 @@ void main() {
           'serviceConfiguration': null,
           'additionalParameters': null,
           'allowInsecureConnections': false,
-          'preferredExternalAgent':
+          'externalUserAgent':
               ExternalUserAgent.asWebAuthenticationSession.toString(),
           'promptValues': null,
           'clientSecret': null,
@@ -186,7 +186,7 @@ void main() {
         'issuer': null,
         'discoveryUrl': 'someDiscoveryUrl',
         'serviceConfiguration': null,
-        'preferredExternalAgent':
+        'externalUserAgent':
             ExternalUserAgent.asWebAuthenticationSession.toString(),
       })
     ]);

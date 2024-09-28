@@ -17,7 +17,7 @@ class AuthorizationRequest extends CommonRequestDetails
     Map<String, String>? additionalParameters,
     List<String>? promptValues,
     bool allowInsecureConnections = false,
-    ExternalUserAgent preferredExternalAgent =
+    ExternalUserAgent externalUserAgent =
         ExternalUserAgent.asWebAuthenticationSession,
     String? nonce,
     String? responseMode,
@@ -32,7 +32,7 @@ class AuthorizationRequest extends CommonRequestDetails
     this.loginHint = loginHint;
     this.promptValues = promptValues;
     this.allowInsecureConnections = allowInsecureConnections;
-    this.preferredExternalAgent = preferredExternalAgent;
+    this.externalUserAgent = externalUserAgent;
     this.nonce = nonce;
     this.responseMode = responseMode;
     assertConfigurationInfo();

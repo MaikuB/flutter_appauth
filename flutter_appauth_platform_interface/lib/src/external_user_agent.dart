@@ -1,4 +1,4 @@
-// Represents the external user-agent to use for the authorization flow.
+// The external user-agent to use on iOS and macOS.
 enum ExternalUserAgent {
   /// Uses [ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) where possible.
   ///
@@ -6,9 +6,9 @@ enum ExternalUserAgent {
   /// use [SFAuthenticationSession](https://developer.apple.com/documentation/safariservices/sfauthenticationsession)
   /// instead.
   ///
-  /// Behind the scenes, the plugin makes use of external user-agent provided
-  /// by the AppAuth iOS SDK, which will use the best user-agent available on
-  /// the device. Specifically, on iOS it will use [OIDExternalUserAgentIOS](https://openid.github.io/AppAuth-iOS/docs/latest/interface_o_i_d_external_user_agent_i_o_s.html)
+  /// Behind the scenes, the plugin makes use of the default external user-agent
+  /// provided by the AppAuth iOS SDK. This will use the best user-agent
+  /// available on the device. Specifically, on iOS it will use [OIDExternalUserAgentIOS](https://openid.github.io/AppAuth-iOS/docs/latest/interface_o_i_d_external_user_agent_i_o_s.html)
   /// and on macOS it will use [OIDExternalUserAgentMac](https://openid.github.io/AppAuth-iOS/docs/latest/interface_o_i_d_external_user_agent_mac.html).
   asWebAuthenticationSession,
 

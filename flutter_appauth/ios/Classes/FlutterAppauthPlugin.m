@@ -28,7 +28,7 @@
 @property(nonatomic, strong) NSArray *scopes;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
-@property(nonatomic, strong) NSString *preferredExternalAgent;
+@property(nonatomic, strong) NSString *externalUserAgent;
 
 @end
 
@@ -47,7 +47,7 @@
     _scopes = [ArgumentProcessor processArgumentValue:arguments withKey:@"scopes"];
     _serviceConfigurationParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"serviceConfiguration"];
     _additionalParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"additionalParameters"];
-    _preferredExternalAgent = [ArgumentProcessor processArgumentValue:arguments withKey:@"preferredExternalAgent"];
+    _externalUserAgent = [ArgumentProcessor processArgumentValue:arguments withKey:@"externalUserAgent"];
 }
 
 - (id)initWithArguments:(NSDictionary *)arguments {
@@ -82,7 +82,7 @@
     _discoveryUrl = [ArgumentProcessor processArgumentValue:arguments withKey:@"discoveryUrl"];
     _serviceConfigurationParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"serviceConfiguration"];
     _additionalParameters = [ArgumentProcessor processArgumentValue:arguments withKey:@"additionalParameters"];
-    _preferredExternalAgent = [ArgumentProcessor processArgumentValue:arguments withKey:@"preferredExternalAgent"];
+    _externalUserAgent = [ArgumentProcessor processArgumentValue:arguments withKey:@"externalUserAgent"];
     return self;
 }
 @end
@@ -149,7 +149,7 @@ AppAuthAuthorization* authorization;
 
     if(requestParameters.serviceConfigurationParameters != nil) {
         OIDServiceConfiguration *serviceConfiguration = [self processServiceConfigurationParameters:requestParameters.serviceConfigurationParameters];
-        _currentAuthorizationFlow = [authorization performAuthorization:serviceConfiguration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferredExternalAgent:requestParameters.preferredExternalAgent result:result exchangeCode:exchangeCode nonce:requestParameters.nonce];
+        _currentAuthorizationFlow = [authorization performAuthorization:serviceConfiguration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters externalUserAgent:requestParameters.externalUserAgent result:result exchangeCode:exchangeCode nonce:requestParameters.nonce];
     } else if (requestParameters.discoveryUrl) {
         NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
         [OIDAuthorizationService discoverServiceConfigurationForDiscoveryURL:discoveryUrl
@@ -161,7 +161,7 @@ AppAuthAuthorization* authorization;
                 return;
             }
 
-            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferredExternalAgent:requestParameters.preferredExternalAgent result:result exchangeCode:exchangeCode nonce:requestParameters.nonce];
+            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters externalUserAgent:requestParameters.externalUserAgent result:result exchangeCode:exchangeCode nonce:requestParameters.nonce];
         }];
     } else {
         NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -174,7 +174,7 @@ AppAuthAuthorization* authorization;
                 return;
             }
 
-            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters preferredExternalAgent:requestParameters.preferredExternalAgent result:result exchangeCode:exchangeCode nonce:requestParameters.nonce];
+            self->_currentAuthorizationFlow = [authorization performAuthorization:configuration clientId:requestParameters.clientId clientSecret:requestParameters.clientSecret scopes:requestParameters.scopes redirectUrl:requestParameters.redirectUrl additionalParameters:requestParameters.additionalParameters externalUserAgent:requestParameters.externalUserAgent result:result exchangeCode:exchangeCode nonce:requestParameters.nonce];
         }];
     }
 }

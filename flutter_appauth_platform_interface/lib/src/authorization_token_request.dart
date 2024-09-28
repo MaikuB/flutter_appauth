@@ -18,7 +18,7 @@ class AuthorizationTokenRequest extends TokenRequest
     super.discoveryUrl,
     List<String>? promptValues,
     super.allowInsecureConnections,
-    ExternalUserAgent preferredExternalAgent =
+    ExternalUserAgent externalUserAgent =
         ExternalUserAgent.asWebAuthenticationSession,
     super.nonce,
     String? responseMode,
@@ -27,7 +27,7 @@ class AuthorizationTokenRequest extends TokenRequest
         ) {
     this.loginHint = loginHint;
     this.promptValues = promptValues;
-    this.preferredExternalAgent = preferredExternalAgent;
+    this.externalUserAgent = externalUserAgent;
     this.responseMode = responseMode;
   }
 }
