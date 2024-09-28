@@ -1,4 +1,4 @@
-import 'external_agent_type.dart';
+import 'external_user_agent.dart';
 
 mixin AuthorizationParameters {
   /// Hint to the Authorization Server about the login identifier the End-User
@@ -9,15 +9,9 @@ mixin AuthorizationParameters {
   /// Server prompts the End-User for reauthentication and consent.
   List<String>? promptValues;
 
-  /// Decides what type of external agent to use for the authorization flow.
-  /// ASWebAuthenticationSession is the default for iOS 12 and above.
-  /// EphemeralSession is not sharing browser data
-  /// with the user's normal browser session but not keeping the cache
-  /// SFSafariViewController is not sharing browser data
-  /// with the user's normal browser session but keeping the cache.
-  /// This property is only applicable to iOS versions 13 and above.
-  /// ExternalAgentType? preferredExternalAgent;
-  ExternalAgentType? preferredExternalAgent;
+  /// Specifies the external user-agent to use.
+  ExternalUserAgent? externalUserAgent;
 
+  /// Specifies the response mode to use.
   String? responseMode;
 }

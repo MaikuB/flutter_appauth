@@ -16,6 +16,6 @@ A new flutter plugin project.
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'FlutterMacOS'
   s.dependency 'AppAuth', '1.7.5'
-  s.platform = :osx, '10.12'
-  s.osx.deployment_target = "10.12"
+  s.platform = :osx, '10.14'
+  s.osx.deployment_target = "10.14"
 end

@@ -4,7 +4,7 @@ import 'authorization_service_configuration.dart';
 import 'authorization_token_request.dart';
 import 'common_request_details.dart';
 import 'end_session_request.dart';
-import 'grant_types.dart';
+import 'grant_type.dart';
 import 'token_request.dart';
 
 Map<String, Object?> _convertCommonRequestDetailsToMap(
@@ -33,7 +33,7 @@ extension EndSessionRequestMapper on EndSessionRequest {
       'issuer': issuer,
       'discoveryUrl': discoveryUrl,
       'serviceConfiguration': serviceConfiguration?.toMap(),
-      'preferredExternalAgent': preferredExternalAgent.toString(),
+      'externalUserAgent': externalUserAgent?.index,
     };
   }
 }
@@ -99,8 +99,7 @@ Map<String, Object?> _convertAuthorizationParametersToMap(
   return <String, Object?>{
     'loginHint': authorizationParameters.loginHint,
     'promptValues': authorizationParameters.promptValues,
-    'preferredExternalAgent':
-        authorizationParameters.preferredExternalAgent.toString(),
+    'externalUserAgent': authorizationParameters.externalUserAgent?.index,
     'responseMode': authorizationParameters.responseMode,
   };
 }

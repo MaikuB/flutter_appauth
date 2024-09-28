@@ -108,7 +108,7 @@ class _MyAppState extends State<MyApp> {
                         textAlign: TextAlign.center,
                       ),
                       onPressed: () => _signInWithAutoCodeExchange(
-                          preferredExternalAgent: ExternalAgentType
+                          externalUserAgent: ExternalUserAgent
                               .ephemeralAsWebAuthenticationSession),
                     ),
                   ),
@@ -122,8 +122,8 @@ class _MyAppState extends State<MyApp> {
                         textAlign: TextAlign.center,
                       ),
                       onPressed: () => _signInWithAutoCodeExchange(
-                          preferredExternalAgent:
-                              ExternalAgentType.sfSafariViewController),
+                          externalUserAgent:
+                              ExternalUserAgent.sfSafariViewController),
                     ),
                   ),
                 ElevatedButton(
@@ -146,7 +146,7 @@ class _MyAppState extends State<MyApp> {
                         onPressed: _idToken != null
                             ? () async {
                                 await _endSession(
-                                    preferredExternalAgent: ExternalAgentType
+                                    externalUserAgent: ExternalUserAgent
                                         .ephemeralAsWebAuthenticationSession);
                               }
                             : null,
@@ -160,7 +160,7 @@ class _MyAppState extends State<MyApp> {
                         onPressed: _idToken != null
                             ? () async {
                                 await _endSession(
-                                    preferredExternalAgent: ExternalAgentType
+                                    externalUserAgent: ExternalUserAgent
                                         .sfSafariViewController);
                               }
                             : null,
@@ -201,15 +201,15 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _endSession(
-      {ExternalAgentType preferredExternalAgent =
-          ExternalAgentType.asWebAuthenticationSession}) async {
+      {ExternalUserAgent externalUserAgent =
+          ExternalUserAgent.asWebAuthenticationSession}) async {
     try {
       _setBusyState();
       await _appAuth.endSession(EndSessionRequest(
           idTokenHint: _idToken,
           postLogoutRedirectUrl: _postLogoutRedirectUrl,
           serviceConfiguration: _serviceConfiguration,
-          preferredExternalAgent: preferredExternalAgent));
+          externalUserAgent: externalUserAgent));
       _clearSessionInfo();
     } catch (e) {
       _handleError(e);
@@ -332,8 +332,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _signInWithAutoCodeExchange(
-      {ExternalAgentType preferredExternalAgent =
-          ExternalAgentType.asWebAuthenticationSession}) async {
+      {ExternalUserAgent externalUserAgent =
+          ExternalUserAgent.asWebAuthenticationSession}) async {
     try {
       _setBusyState();
 
@@ -346,7 +346,7 @@ class _MyAppState extends State<MyApp> {
         AuthorizationTokenRequest(_clientId, _redirectUrl,
             serviceConfiguration: _serviceConfiguration,
             scopes: _scopes,
-            preferredExternalAgent: preferredExternalAgent),
+            externalUserAgent: externalUserAgent),
       );
 
       /* 

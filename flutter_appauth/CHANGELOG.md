@@ -1,3 +1,12 @@
+## [8.0.0-dev.1]
+
+* **Breaking change** Replaced the `preferEphemeralSession` property in the `AuthorizationRequest`, `AuthorizationTokenRequest` and  `EndSessionRequest` classes with `externalUserAgent`. Thanks to the PR from [john-slow](https://github.com/john-slow). `externalUserAgent` is presented by the newly `ExternalUserAgent` enum that has the following values
+    * `asWebAuthenticationSession`: uses the [ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) APIs where possible. This is the default value and was the default behaviour behaviour that aligns with what the AppAuth iOS SDK would do in choosing the best available user-agent
+    * `ephemeralAsWebAuthenticationSession`: uses an ephemeral session via the [ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) APIs. Applications that previously used `preferEphemeralSession` and specified to be `true` can migrate by specifying this enum value
+    * `sfSafariViewController`: uses the [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) APIs
+* Updated iOS plugin details to indicate it needs a minimum iOS version of 11.0. This aligns with the minimum best supported version for Flutter 3.13.0
+* Updated macOS plugin details to indicate it needs a minimum iOS version of 10.14. This aligns with the minimum best supported version for Flutter 3.13.0
+
 # 7.0.0
 
 * **Breaking change** Bumped minimum Flutter and Dart SDK constraints to 3.13.0 and 3.1.0 respectively

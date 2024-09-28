@@ -2,7 +2,7 @@
 
 @implementation AppAuthMacOSAuthorization
 
-- (id<OIDExternalUserAgentSession>)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters preferredExternalAgent:(NSString*)preferredExternalAgent result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce {
+- (id<OIDExternalUserAgentSession>)performAuthorization:(OIDServiceConfiguration *)serviceConfiguration clientId:(NSString*)clientId clientSecret:(NSString*)clientSecret scopes:(NSArray *)scopes redirectUrl:(NSString*)redirectUrl additionalParameters:(NSDictionary *)additionalParameters externalUserAgent:(NSNumber*)externalUserAgent result:(FlutterResult)result exchangeCode:(BOOL)exchangeCode nonce:(NSString*)nonce {
     NSString *codeVerifier = [OIDAuthorizationRequest generateCodeVerifier];
     NSString *codeChallenge = [OIDAuthorizationRequest codeChallengeS256ForVerifier:codeVerifier];
 
@@ -21,7 +21,7 @@
                                       additionalParameters:additionalParameters];
     NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
     if(exchangeCode) {
-        NSObject<OIDExternalUserAgent> *agent = [self userAgentWithPresentingWindow:keyWindow preferredExternalAgent:preferredExternalAgent];
+        NSObject<OIDExternalUserAgent> *agent = [self userAgentWithPresentingWindow:keyWindow externalUserAgent:externalUserAgent];
         return [OIDAuthState authStateByPresentingAuthorizationRequest:request externalUserAgent:agent callback:^(OIDAuthState *_Nullable authState,
                                                                                                                   NSError *_Nullable error) {
             if(authState) {
@@ -32,7 +32,7 @@
             }
         }];
     } else {
-        NSObject<OIDExternalUserAgent> *agent = [self userAgentWithPresentingWindow:keyWindow preferredExternalAgent:preferredExternalAgent];
+        NSObject<OIDExternalUserAgent> *agent = [self userAgentWithPresentingWindow:keyWindow externalUserAgent:externalUserAgent];
         return [OIDAuthorizationService presentAuthorizationRequest:request externalUserAgent:agent callback:^(OIDAuthorizationResponse *_Nullable authorizationResponse, NSError *_Nullable error) {
             if(authorizationResponse) {
                 NSMutableDictionary *processedResponse = [[NSMutableDictionary alloc] init];
@@ -56,7 +56,7 @@
                                                                                                                                                                                                                                                  additionalParameters:requestParameters.additionalParameters];
     
     NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
-    id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithPresentingWindow:keyWindow preferredExternalAgent:requestParameters.preferredExternalAgent];
+    id<OIDExternalUserAgent> externalUserAgent = [self userAgentWithPresentingWindow:keyWindow externalUserAgent:requestParameters.externalUserAgent];
     return [OIDAuthorizationService presentEndSessionRequest:endSessionRequest externalUserAgent:externalUserAgent callback:^(OIDEndSessionResponse * _Nullable endSessionResponse, NSError * _Nullable error) {
         if(!endSessionResponse) {
             NSString *message = [NSString stringWithFormat:END_SESSION_ERROR_MESSAGE_FORMAT, [error localizedDescription]];
@@ -69,8 +69,8 @@
     }];
 }
 
-- (id<OIDExternalUserAgent>)userAgentWithPresentingWindow:(NSWindow *)presentingWindow preferredExternalAgent:(NSString*)preferredExternalAgent {
-    if ([preferredExternalAgent isEqual:@"ExternalAgentType.ephemeralAsWebAuthenticationSession"]) {
+- (id<OIDExternalUserAgent>)userAgentWithPresentingWindow:(NSWindow *)presentingWindow externalUserAgent:(NSNumber*)externalUserAgent {
+    if ([externalUserAgent integerValue] == EphemeralASWebAuthenticationSession) {
         return [[OIDExternalUserAgentMacNoSSO alloc] initWithPresentingWindow:presentingWindow];
     }
     return [[OIDExternalUserAgentMac alloc] initWithPresentingWindow:presentingWindow];
