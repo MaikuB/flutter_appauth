@@ -1,5 +1,4 @@
-// Enum representing the type of external agent
-// to use for the authorization flow.
+// Represents the type of external agent to use for the authorization flow.
 enum ExternalAgentType {
   /// Uses ASWebAuthenticationSession, the default for iOS 12 and above.
   asWebAuthenticationSession,
@@ -11,7 +10,7 @@ enum ExternalAgentType {
   /// Uses SFSafariViewController, which does not share browser data
   /// with the user's normal browser session but keeps the cache.
   ///
-  /// This is only applicable to iOS, on macOS it will use the same behavior as
+  /// This is only applicable to iOS. On macOS, it will use the same behavior as
   /// ASWebAuthenticationSession.
   sfSafariViewController
 }
