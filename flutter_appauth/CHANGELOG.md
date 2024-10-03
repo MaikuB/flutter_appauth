@@ -1,3 +1,7 @@
+## [8.0.0-dev.2]
+
+* [iOS] Fixed issue [547](https://github.com/MaikuB/flutter_appauth/issues/547) bug where specifying `ExternalUserAgent.sfSafariViewController` was using ephemeral session. Should now properly use the [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) APIs
+
 ## [8.0.0-dev.1]
 
 * **Breaking change** Replaced the `preferEphemeralSession` property in the `AuthorizationRequest`, `AuthorizationTokenRequest` and  `EndSessionRequest` classes with `externalUserAgent`. Thanks to the PR from [john-slow](https://github.com/john-slow). `externalUserAgent` is presented by the newly `ExternalUserAgent` enum that has the following values

@@ -170,7 +170,7 @@
         initWithPresentingViewController:rootViewController];
   }
   if ([externalUserAgent integerValue] == SafariViewController) {
-    return [[OIDExternalUserAgentIOSNoSSO alloc]
+    return [[OIDExternalUserAgentIOSSafariViewController alloc]
         initWithPresentingViewController:rootViewController];
   }
   return [[OIDExternalUserAgentIOS alloc]
