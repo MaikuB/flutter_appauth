@@ -1,3 +1,7 @@
+## [8.0.0-dev.3]
+
+* Includes changes from the 7.0.1 release
+
 ## [8.0.0-dev.2]
 
 * [iOS] Fixed issue [547](https://github.com/MaikuB/flutter_appauth/issues/547) bug where specifying `ExternalUserAgent.sfSafariViewController` was using ephemeral session. Should now properly use the [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) APIs
