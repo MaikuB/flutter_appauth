@@ -11,11 +11,15 @@
 * Updated iOS plugin details to indicate it needs a minimum iOS version of 11.0. This aligns with the minimum best supported version for Flutter 3.13.0
 * Updated macOS plugin details to indicate it needs a minimum iOS version of 10.14. This aligns with the minimum best supported version for Flutter 3.13.0
 
+# 7.0.1
+
+* [iOS] correctly bumped AppAuth iOS dependency to 1.7.5. The 7.0.0 release mistakenly only bumped the dependency for macOS
+
 # 7.0.0
 
 * **Breaking change** Bumped minimum Flutter and Dart SDK constraints to 3.13.0 and 3.1.0 respectively
 * **Breaking change** all methods have now been made to return non-nullable types
-* [iOS][macOS] bumped AppAuth iOS dependency to 1.7.5
+* [macOS] bumped AppAuth iOS dependency to 1.7.5
 * Updated error handling to expose more details for each platform. Plugin will now throw `FlutterAppAuthUserCancelledException` when an authorization request has been cancelled as a result of the user closing the browser. For other scenarios the plugin will throw `FlutterAppAuthPlatformException`. See the API docs for both classes for more details on the available details. Both exception classes inherit from `PlatformException` so the changes should be backwards compatible
 * Updated readme with more details on essential knowledge and links to OAuth 2.0 specifications
 
