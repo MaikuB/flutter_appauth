@@ -483,12 +483,15 @@ AppAuthAuthorization *authorization;
             openURL:(NSURL *)url
             options:
                 (NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-  if ([_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:url]) {
-    _currentAuthorizationFlow = nil;
-    return YES;
-  }
-
-  return NO;
+    @try {
+      if ([_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:url]) {
+        _currentAuthorizationFlow = nil;
+        return YES;
+      }
+      return NO;
+    } @catch (NSException *exception) {
+        NSLog(@"Exception caught: %@, Reason: %@", exception.name, exception.reason);
+    }
 }
 
 - (BOOL)application:(UIApplication *)application
