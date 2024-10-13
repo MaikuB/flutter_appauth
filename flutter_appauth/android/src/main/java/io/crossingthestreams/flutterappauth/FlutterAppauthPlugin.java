@@ -143,7 +143,7 @@ public class FlutterAppauthPlugin
       authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
       authConfigBuilder.setSkipIssuerHttpsCheck(true);
       insecureAuthorizationService =
-              new AuthorizationService(applicationContext, authConfigBuilder.build());
+          new AuthorizationService(applicationContext, authConfigBuilder.build());
     }
   }
 
