@@ -21,6 +21,7 @@ import net.openid.appauth.EndSessionResponse;
 import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenRequest;
 import net.openid.appauth.TokenResponse;
+import net.openid.appauth.connectivity.ConnectionBuilder;
 import net.openid.appauth.connectivity.DefaultConnectionBuilder;
 
 import org.json.JSONException;
@@ -345,18 +346,20 @@ public class FlutterAppauthPlugin
         AuthorizationServiceConfiguration.fetchFromUrl(
             Uri.parse(tokenRequestParameters.discoveryUrl),
             callback,
-            allowInsecureConnections
-                ? InsecureConnectionBuilder.INSTANCE
-                : DefaultConnectionBuilder.INSTANCE);
+                getConnectionBuilder());
       } else {
         AuthorizationServiceConfiguration.fetchFromIssuer(
             Uri.parse(tokenRequestParameters.issuer),
             callback,
-            allowInsecureConnections
-                ? InsecureConnectionBuilder.INSTANCE
-                : DefaultConnectionBuilder.INSTANCE);
+                getConnectionBuilder());
       }
     }
+  }
+
+  private @NonNull ConnectionBuilder getConnectionBuilder() {
+    return allowInsecureConnections
+            ? InsecureConnectionBuilder.INSTANCE
+            : DefaultConnectionBuilder.INSTANCE;
   }
 
   private AuthorizationServiceConfiguration processServiceConfigurationParameters(
@@ -394,16 +397,12 @@ public class FlutterAppauthPlugin
         AuthorizationServiceConfiguration.fetchFromUrl(
             Uri.parse(tokenRequestParameters.discoveryUrl),
             callback,
-            allowInsecureConnections
-                ? InsecureConnectionBuilder.INSTANCE
-                : DefaultConnectionBuilder.INSTANCE);
+                getConnectionBuilder());
       } else {
         AuthorizationServiceConfiguration.fetchFromIssuer(
             Uri.parse(tokenRequestParameters.issuer),
             callback,
-            allowInsecureConnections
-                ? InsecureConnectionBuilder.INSTANCE
-                : DefaultConnectionBuilder.INSTANCE);
+                getConnectionBuilder());
       }
     }
   }
@@ -551,16 +550,12 @@ public class FlutterAppauthPlugin
         AuthorizationServiceConfiguration.fetchFromUrl(
             Uri.parse(endSessionRequestParameters.discoveryUrl),
             callback,
-            allowInsecureConnections
-                ? InsecureConnectionBuilder.INSTANCE
-                : DefaultConnectionBuilder.INSTANCE);
+                getConnectionBuilder());
       } else {
         AuthorizationServiceConfiguration.fetchFromIssuer(
             Uri.parse(endSessionRequestParameters.issuer),
             callback,
-            allowInsecureConnections
-                ? InsecureConnectionBuilder.INSTANCE
-                : DefaultConnectionBuilder.INSTANCE);
+                getConnectionBuilder());
       }
     }
   }
