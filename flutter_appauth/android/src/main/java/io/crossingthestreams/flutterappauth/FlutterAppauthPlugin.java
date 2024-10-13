@@ -139,8 +139,9 @@ public class FlutterAppauthPlugin
     authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
     authConfigBuilder.setSkipIssuerHttpsCheck(true);
     insecureAuthorizationService =
-            new AuthorizationService(applicationContext, authConfigBuilder.build());
+        new AuthorizationService(applicationContext, authConfigBuilder.build());
   }
+
   private void disposeAuthorizationServices() {
     defaultAuthorizationService.dispose();
     insecureAuthorizationService.dispose();
@@ -344,22 +345,18 @@ public class FlutterAppauthPlugin
           };
       if (tokenRequestParameters.discoveryUrl != null) {
         AuthorizationServiceConfiguration.fetchFromUrl(
-            Uri.parse(tokenRequestParameters.discoveryUrl),
-            callback,
-                getConnectionBuilder());
+            Uri.parse(tokenRequestParameters.discoveryUrl), callback, getConnectionBuilder());
       } else {
         AuthorizationServiceConfiguration.fetchFromIssuer(
-            Uri.parse(tokenRequestParameters.issuer),
-            callback,
-                getConnectionBuilder());
+            Uri.parse(tokenRequestParameters.issuer), callback, getConnectionBuilder());
       }
     }
   }
 
   private @NonNull ConnectionBuilder getConnectionBuilder() {
     return allowInsecureConnections
-            ? InsecureConnectionBuilder.INSTANCE
-            : DefaultConnectionBuilder.INSTANCE;
+        ? InsecureConnectionBuilder.INSTANCE
+        : DefaultConnectionBuilder.INSTANCE;
   }
 
   private AuthorizationServiceConfiguration processServiceConfigurationParameters(
@@ -395,14 +392,10 @@ public class FlutterAppauthPlugin
           };
       if (tokenRequestParameters.discoveryUrl != null) {
         AuthorizationServiceConfiguration.fetchFromUrl(
-            Uri.parse(tokenRequestParameters.discoveryUrl),
-            callback,
-                getConnectionBuilder());
+            Uri.parse(tokenRequestParameters.discoveryUrl), callback, getConnectionBuilder());
       } else {
         AuthorizationServiceConfiguration.fetchFromIssuer(
-            Uri.parse(tokenRequestParameters.issuer),
-            callback,
-                getConnectionBuilder());
+            Uri.parse(tokenRequestParameters.issuer), callback, getConnectionBuilder());
       }
     }
   }
@@ -548,14 +541,10 @@ public class FlutterAppauthPlugin
 
       if (endSessionRequestParameters.discoveryUrl != null) {
         AuthorizationServiceConfiguration.fetchFromUrl(
-            Uri.parse(endSessionRequestParameters.discoveryUrl),
-            callback,
-                getConnectionBuilder());
+            Uri.parse(endSessionRequestParameters.discoveryUrl), callback, getConnectionBuilder());
       } else {
         AuthorizationServiceConfiguration.fetchFromIssuer(
-            Uri.parse(endSessionRequestParameters.issuer),
-            callback,
-                getConnectionBuilder());
+            Uri.parse(endSessionRequestParameters.issuer), callback, getConnectionBuilder());
       }
     }
   }
