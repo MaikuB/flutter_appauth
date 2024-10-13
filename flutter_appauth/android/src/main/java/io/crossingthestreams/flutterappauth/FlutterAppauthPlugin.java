@@ -94,12 +94,7 @@ public class FlutterAppauthPlugin
 
   private void onAttachedToEngine(Context context, BinaryMessenger binaryMessenger) {
     this.applicationContext = context;
-    defaultAuthorizationService = new AuthorizationService(this.applicationContext);
-    AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-    authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
-    authConfigBuilder.setSkipIssuerHttpsCheck(true);
-    insecureAuthorizationService =
-        new AuthorizationService(applicationContext, authConfigBuilder.build());
+    createAuthorizationServices();
     final MethodChannel channel =
         new MethodChannel(binaryMessenger, "crossingthestreams.io/flutter_appauth");
     channel.setMethodCallHandler(this);
@@ -137,6 +132,14 @@ public class FlutterAppauthPlugin
     this.mainActivity = null;
   }
 
+  private void createAuthorizationServices() {
+    defaultAuthorizationService = new AuthorizationService(this.applicationContext);
+    AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
+    authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
+    authConfigBuilder.setSkipIssuerHttpsCheck(true);
+    insecureAuthorizationService =
+            new AuthorizationService(applicationContext, authConfigBuilder.build());
+  }
   private void disposeAuthorizationServices() {
     defaultAuthorizationService.dispose();
     insecureAuthorizationService.dispose();
@@ -461,8 +464,7 @@ public class FlutterAppauthPlugin
       authRequestBuilder.setAdditionalParameters(additionalParameters);
     }
 
-    AuthorizationService authorizationService =
-        allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
+    AuthorizationService authorizationService = getAuthorizationService();
 
     try {
       Intent authIntent =
@@ -513,8 +515,7 @@ public class FlutterAppauthPlugin
         };
 
     TokenRequest tokenRequest = builder.build();
-    AuthorizationService authorizationService =
-        allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
+    AuthorizationService authorizationService = getAuthorizationService();
     if (clientSecret == null) {
       authorizationService.performTokenRequest(tokenRequest, tokenResponseCallback);
     } else {
@@ -588,10 +589,15 @@ public class FlutterAppauthPlugin
     }
 
     final EndSessionRequest endSessionRequest = endSessionRequestBuilder.build();
-    AuthorizationService authorizationService =
-        allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
+    AuthorizationService authorizationService = getAuthorizationService();
     Intent endSessionIntent = authorizationService.getEndSessionRequestIntent(endSessionRequest);
     mainActivity.startActivityForResult(endSessionIntent, RC_END_SESSION);
+  }
+
+  private AuthorizationService getAuthorizationService() {
+    AuthorizationService authorizationService =
+        allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
+    return authorizationService;
   }
 
   private void finishWithTokenError(AuthorizationException ex) {
@@ -702,14 +708,7 @@ public class FlutterAppauthPlugin
       boolean exchangeCode) {
     if (authException == null) {
       if (exchangeCode) {
-        AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-        if (allowInsecureConnections) {
-          authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
-          authConfigBuilder.setSkipIssuerHttpsCheck(true);
-        }
-
-        AuthorizationService authService =
-            new AuthorizationService(applicationContext, authConfigBuilder.build());
+        AuthorizationService authService = getAuthorizationService();
         AuthorizationService.TokenResponseCallback tokenResponseCallback =
             new AuthorizationService.TokenResponseCallback() {
               @Override
