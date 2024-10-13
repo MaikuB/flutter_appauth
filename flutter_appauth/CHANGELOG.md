@@ -1,6 +1,6 @@
 ## [8.0.0-dev.4]
 
-* [Android] no functional changes but some code around dealing with `allowInsecureConnections` has been done in response to issue [554](https://github.com/MaikuB/flutter_appauth/issues/554)
+* [Android] some refactoring around code related to `allowInsecureConnections` has been done in response to issue [554](https://github.com/MaikuB/flutter_appauth/issues/554)
 * [Android] added logic to help with issues like [205](https://github.com/MaikuB/flutter_appauth/issues/205) where an app tries to refresh a token but the instances of `AuthorizationService` have been disposed
 
 ## [8.0.0-dev.3]
