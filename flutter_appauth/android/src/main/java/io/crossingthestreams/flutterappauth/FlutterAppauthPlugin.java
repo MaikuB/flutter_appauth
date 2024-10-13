@@ -134,12 +134,17 @@ public class FlutterAppauthPlugin
   }
 
   private void createAuthorizationServices() {
-    defaultAuthorizationService = new AuthorizationService(this.applicationContext);
-    AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-    authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
-    authConfigBuilder.setSkipIssuerHttpsCheck(true);
-    insecureAuthorizationService =
-        new AuthorizationService(applicationContext, authConfigBuilder.build());
+    if (defaultAuthorizationService == null) {
+      defaultAuthorizationService = new AuthorizationService(this.applicationContext);
+    }
+
+    if (insecureAuthorizationService == null) {
+      AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
+      authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
+      authConfigBuilder.setSkipIssuerHttpsCheck(true);
+      insecureAuthorizationService =
+          new AuthorizationService(applicationContext, authConfigBuilder.build());
+    }
   }
 
   private void disposeAuthorizationServices() {
@@ -579,6 +584,9 @@ public class FlutterAppauthPlugin
   }
 
   private AuthorizationService getAuthorizationService() {
+    // Call to createAuthorizationService() is done as there have been some reported instances where
+    // the services have been disposed but they're still needed e.g. to refresh tokens
+    createAuthorizationServices();
     AuthorizationService authorizationService =
         allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
     return authorizationService;
