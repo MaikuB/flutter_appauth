@@ -584,7 +584,7 @@ public class FlutterAppauthPlugin
   }
 
   private AuthorizationService getAuthorizationService() {
-    // Call to  createAuthorizationService()is done as there have been some reported instances where
+    // Call to createAuthorizationService() is done as there have been some reported instances where
     // the services have been disposed but they're still needed e.g. to refresh tokens
     createAuthorizationServices();
     AuthorizationService authorizationService =
