@@ -579,6 +579,10 @@ public class FlutterAppauthPlugin
   }
 
   private AuthorizationService getAuthorizationService() {
+    if (insecureAuthorizationService == null || defaultAuthorizationService == null) {
+      // There have been some reported instances where the services have been disposed but they're still needed e.g. to refresh token
+      createAuthorizationServices();
+    }
     AuthorizationService authorizationService =
         allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
     return authorizationService;
