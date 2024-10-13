@@ -1,3 +1,7 @@
+## [8.0.0-dev.4]
+
+* [Android] no functional changes but some code around dealing with `allowInsecureConnections` has been done in response to issue [554](https://github.com/MaikuB/flutter_appauth/issues/554)
+
 ## [8.0.0-dev.3]
 
 * Includes changes from the 7.0.1 release
