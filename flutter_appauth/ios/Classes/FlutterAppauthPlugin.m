@@ -507,17 +507,17 @@ AppAuthAuthorization *authorization;
 #if TARGET_OS_OSX
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event
            withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
-    @try {
-        NSString *URLString =
-                [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
-        NSURL *URL = [NSURL URLWithString:URLString];
-        [_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:URL];
-        _currentAuthorizationFlow = nil;
-    } @catch (NSException *exception) {
-        NSLog(@"Exception caught: %@, Reason: %@", exception.name,
-              exception.reason);
-        @throw;
-    }
+  @try {
+    NSString *URLString =
+        [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
+    NSURL *URL = [NSURL URLWithString:URLString];
+    [_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:URL];
+    _currentAuthorizationFlow = nil;
+  } @catch (NSException *exception) {
+    NSLog(@"Exception caught: %@, Reason: %@", exception.name,
+          exception.reason);
+    @throw;
+  }
 }
 #endif
 
