@@ -1,3 +1,7 @@
+## [8.0.0+1]
+
+* Updated 8.0.0 as it was missing mention of the privacy manifest file to the macOS implementation of the plugin
+
 ## [8.0.0]
 
 * **Breaking change** Replaced the `preferEphemeralSession` property in the `AuthorizationRequest`, `AuthorizationTokenRequest` and  `EndSessionRequest` classes with `externalUserAgent`. Thanks to the PR from [john-slow](https://github.com/john-slow). `externalUserAgent` is presented by the newly `ExternalUserAgent` enum that has the following values
@@ -8,6 +12,7 @@
 * Updated macOS plugin details to indicate it needs a minimum iOS version of 10.14. This aligns with the minimum best supported version for Flutter 3.13.0
 * [Android] some refactoring around code related to `allowInsecureConnections` has been done in response to issue [554](https://github.com/MaikuB/flutter_appauth/issues/554)
 * [Android] added logic to help with issues like [205](https://github.com/MaikuB/flutter_appauth/issues/205) where an app tries to refresh a token but the instances of `AuthorizationService` have been disposed
+* [macOS] added privacy manifest file
 
 # 7.0.1
 
