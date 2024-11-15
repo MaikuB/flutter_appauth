@@ -14,11 +14,8 @@
         limitations under the License.
  */
 
+#import <AppAuth/AppAuth.h>
 #import <UIKit/UIKit.h>
-
-#import "OIDExternalUserAgent.h"
-#import "OIDExternalUserAgentIOS.h"
-#import "OIDExternalUserAgentIOSSafariViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

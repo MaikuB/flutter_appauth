@@ -1,3 +1,7 @@
+## [8.0.1]
+
+* Fixed issue [568](https://github.com/MaikuB/flutter_appauth/issues/568) where compilation could fail with a `'OIDExternalUserAgent.h' file not found` error
+
 ## [8.0.0+1]
 
 * Updated 8.0.0 as it was missing mention of the privacy manifest file to the macOS implementation of the plugin
