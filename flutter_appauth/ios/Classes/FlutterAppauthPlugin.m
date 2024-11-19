@@ -483,12 +483,17 @@ AppAuthAuthorization *authorization;
             openURL:(NSURL *)url
             options:
                 (NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-  if ([_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:url]) {
-    _currentAuthorizationFlow = nil;
-    return YES;
+  @try {
+    if ([_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:url]) {
+      _currentAuthorizationFlow = nil;
+      return YES;
+    }
+    return NO;
+  } @catch (NSException *exception) {
+    NSLog(@"Exception caught: %@, Reason: %@", exception.name,
+          exception.reason);
+    @throw;
   }
-
-  return NO;
 }
 
 - (BOOL)application:(UIApplication *)application
@@ -502,11 +507,17 @@ AppAuthAuthorization *authorization;
 #if TARGET_OS_OSX
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event
            withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
-  NSString *URLString =
-      [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
-  NSURL *URL = [NSURL URLWithString:URLString];
-  [_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:URL];
-  _currentAuthorizationFlow = nil;
+  @try {
+    NSString *URLString =
+        [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
+    NSURL *URL = [NSURL URLWithString:URLString];
+    [_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:URL];
+    _currentAuthorizationFlow = nil;
+  } @catch (NSException *exception) {
+    NSLog(@"Exception caught: %@, Reason: %@", exception.name,
+          exception.reason);
+    @throw;
+  }
 }
 #endif
 
