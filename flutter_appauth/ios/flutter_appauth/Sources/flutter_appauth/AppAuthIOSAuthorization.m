@@ -1,6 +1,6 @@
-#import "AppAuthMacOSAuthorization.h"
+#import "./include/flutter_appauth/AppAuthIOSAuthorization.h"
 
-@implementation AppAuthMacOSAuthorization
+@implementation AppAuthIOSAuthorization
 
 - (id<OIDExternalUserAgentSession>)
     performAuthorization:(OIDServiceConfiguration *)serviceConfiguration
@@ -32,11 +32,11 @@
               codeChallenge:codeChallenge
         codeChallengeMethod:OIDOAuthorizationRequestCodeChallengeMethodS256
        additionalParameters:additionalParameters];
-  NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
+  UIViewController *rootViewController = [self rootViewController];
   if (exchangeCode) {
-    NSObject<OIDExternalUserAgent> *agent =
-        [self userAgentWithPresentingWindow:keyWindow
-                          externalUserAgent:externalUserAgent];
+    id<OIDExternalUserAgent> agent =
+        [self userAgentWithViewController:rootViewController
+                        externalUserAgent:externalUserAgent];
     return [OIDAuthState
         authStateByPresentingAuthorizationRequest:request
                                 externalUserAgent:agent
@@ -66,9 +66,9 @@
                                            }
                                          }];
   } else {
-    NSObject<OIDExternalUserAgent> *agent =
-        [self userAgentWithPresentingWindow:keyWindow
-                          externalUserAgent:externalUserAgent];
+    id<OIDExternalUserAgent> agent =
+        [self userAgentWithViewController:rootViewController
+                        externalUserAgent:externalUserAgent];
     return [OIDAuthorizationService
         presentAuthorizationRequest:request
                   externalUserAgent:agent
@@ -133,10 +133,11 @@
                 postLogoutRedirectURL:postLogoutRedirectURL
                  additionalParameters:requestParameters.additionalParameters];
 
-  NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
+  UIViewController *rootViewController = [self rootViewController];
   id<OIDExternalUserAgent> externalUserAgent =
-      [self userAgentWithPresentingWindow:keyWindow
-                        externalUserAgent:requestParameters.externalUserAgent];
+      [self userAgentWithViewController:rootViewController
+                      externalUserAgent:requestParameters.externalUserAgent];
+
   return [OIDAuthorizationService
       presentEndSessionRequest:endSessionRequest
              externalUserAgent:externalUserAgent
@@ -162,14 +163,32 @@
 }
 
 - (id<OIDExternalUserAgent>)
-    userAgentWithPresentingWindow:(NSWindow *)presentingWindow
-                externalUserAgent:(NSNumber *)externalUserAgent {
+    userAgentWithViewController:(UIViewController *)rootViewController
+              externalUserAgent:(NSNumber *)externalUserAgent {
   if ([externalUserAgent integerValue] == EphemeralASWebAuthenticationSession) {
-    return [[OIDExternalUserAgentMacNoSSO alloc]
-        initWithPresentingWindow:presentingWindow];
+    return [[OIDExternalUserAgentIOSNoSSO alloc]
+        initWithPresentingViewController:rootViewController];
   }
-  return [[OIDExternalUserAgentMac alloc]
-      initWithPresentingWindow:presentingWindow];
+  if ([externalUserAgent integerValue] == SafariViewController) {
+    return [[OIDExternalUserAgentIOSSafariViewController alloc]
+        initWithPresentingViewController:rootViewController];
+  }
+  return [[OIDExternalUserAgentIOS alloc]
+      initWithPresentingViewController:rootViewController];
+}
+
+- (UIViewController *)rootViewController {
+  if (@available(iOS 13, *)) {
+    return [[UIApplication sharedApplication].windows
+               filteredArrayUsingPredicate:[NSPredicate
+                                               predicateWithBlock:^BOOL(
+                                                   id window,
+                                                   NSDictionary *bindings) {
+                                                 return [window isKeyWindow];
+                                               }]]
+        .firstObject.rootViewController;
+  }
+  return [UIApplication sharedApplication].delegate.window.rootViewController;
 }
 
 @end

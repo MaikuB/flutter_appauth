@@ -1,6 +1,6 @@
 #import <TargetConditionals.h>
 
-#import "FlutterAppauthPlugin.h"
+#import "./include/flutter_appauth/FlutterAppauthPlugin.h"
 
 @interface ArgumentProcessor : NSObject
 + (id _Nullable)processArgumentValue:(NSDictionary *)arguments

@@ -1,6 +1,6 @@
-#import "AppAuthIOSAuthorization.h"
+#import "./include/flutter_appauth/AppAuthMacOSAuthorization.h"
 
-@implementation AppAuthIOSAuthorization
+@implementation AppAuthMacOSAuthorization
 
 - (id<OIDExternalUserAgentSession>)
     performAuthorization:(OIDServiceConfiguration *)serviceConfiguration
@@ -32,11 +32,11 @@
               codeChallenge:codeChallenge
         codeChallengeMethod:OIDOAuthorizationRequestCodeChallengeMethodS256
        additionalParameters:additionalParameters];
-  UIViewController *rootViewController = [self rootViewController];
+  NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
   if (exchangeCode) {
-    id<OIDExternalUserAgent> agent =
-        [self userAgentWithViewController:rootViewController
-                        externalUserAgent:externalUserAgent];
+    NSObject<OIDExternalUserAgent> *agent =
+        [self userAgentWithPresentingWindow:keyWindow
+                          externalUserAgent:externalUserAgent];
     return [OIDAuthState
         authStateByPresentingAuthorizationRequest:request
                                 externalUserAgent:agent
@@ -66,9 +66,9 @@
                                            }
                                          }];
   } else {
-    id<OIDExternalUserAgent> agent =
-        [self userAgentWithViewController:rootViewController
-                        externalUserAgent:externalUserAgent];
+    NSObject<OIDExternalUserAgent> *agent =
+        [self userAgentWithPresentingWindow:keyWindow
+                          externalUserAgent:externalUserAgent];
     return [OIDAuthorizationService
         presentAuthorizationRequest:request
                   externalUserAgent:agent
@@ -133,11 +133,10 @@
                 postLogoutRedirectURL:postLogoutRedirectURL
                  additionalParameters:requestParameters.additionalParameters];
 
-  UIViewController *rootViewController = [self rootViewController];
+  NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
   id<OIDExternalUserAgent> externalUserAgent =
-      [self userAgentWithViewController:rootViewController
-                      externalUserAgent:requestParameters.externalUserAgent];
-
+      [self userAgentWithPresentingWindow:keyWindow
+                        externalUserAgent:requestParameters.externalUserAgent];
   return [OIDAuthorizationService
       presentEndSessionRequest:endSessionRequest
              externalUserAgent:externalUserAgent
@@ -163,32 +162,14 @@
 }
 
 - (id<OIDExternalUserAgent>)
-    userAgentWithViewController:(UIViewController *)rootViewController
-              externalUserAgent:(NSNumber *)externalUserAgent {
+    userAgentWithPresentingWindow:(NSWindow *)presentingWindow
+                externalUserAgent:(NSNumber *)externalUserAgent {
   if ([externalUserAgent integerValue] == EphemeralASWebAuthenticationSession) {
-    return [[OIDExternalUserAgentIOSNoSSO alloc]
-        initWithPresentingViewController:rootViewController];
+    return [[OIDExternalUserAgentMacNoSSO alloc]
+        initWithPresentingWindow:presentingWindow];
   }
-  if ([externalUserAgent integerValue] == SafariViewController) {
-    return [[OIDExternalUserAgentIOSSafariViewController alloc]
-        initWithPresentingViewController:rootViewController];
-  }
-  return [[OIDExternalUserAgentIOS alloc]
-      initWithPresentingViewController:rootViewController];
-}
-
-- (UIViewController *)rootViewController {
-  if (@available(iOS 13, *)) {
-    return [[UIApplication sharedApplication].windows
-               filteredArrayUsingPredicate:[NSPredicate
-                                               predicateWithBlock:^BOOL(
-                                                   id window,
-                                                   NSDictionary *bindings) {
-                                                 return [window isKeyWindow];
-                                               }]]
-        .firstObject.rootViewController;
-  }
-  return [UIApplication sharedApplication].delegate.window.rootViewController;
+  return [[OIDExternalUserAgentMac alloc]
+      initWithPresentingWindow:presentingWindow];
 }
 
 @end
