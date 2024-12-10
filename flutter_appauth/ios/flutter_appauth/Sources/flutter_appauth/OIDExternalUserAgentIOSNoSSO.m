@@ -6,7 +6,7 @@
    13 or newer to avoid cookies being shared across the device.
  */
 
-#import "OIDExternalUserAgentIOSNoSSO.h"
+#import "./include/flutter_appauth/OIDExternalUserAgentIOSNoSSO.h"
 
 #import <AuthenticationServices/AuthenticationServices.h>
 #import <SafariServices/SafariServices.h>

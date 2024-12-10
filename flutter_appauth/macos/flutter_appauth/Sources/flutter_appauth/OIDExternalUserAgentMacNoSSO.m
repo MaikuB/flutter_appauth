@@ -18,7 +18,7 @@
         limitations under the License.
  */
 
-#import "OIDExternalUserAgentMacNoSSO.h"
+#import "./include/flutter_appauth/OIDExternalUserAgentMacNoSSO.h"
 
 #import <AuthenticationServices/AuthenticationServices.h>
 #import <Cocoa/Cocoa.h>

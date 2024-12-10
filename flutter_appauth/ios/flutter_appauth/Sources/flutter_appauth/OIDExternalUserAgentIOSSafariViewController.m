@@ -14,7 +14,7 @@
         limitations under the License.
  */
 
-#import "OIDExternalUserAgentIOSSafariViewController.h"
+#import "./include/flutter_appauth/OIDExternalUserAgentIOSSafariViewController.h"
 
 #import <SafariServices/SafariServices.h>
 

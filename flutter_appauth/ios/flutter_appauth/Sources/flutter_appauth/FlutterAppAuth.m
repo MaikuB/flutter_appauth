@@ -1,4 +1,4 @@
-#import "FlutterAppAuth.h"
+#import "./include/flutter_appauth/FlutterAppAuth.h"
 
 @implementation FlutterAppAuth
 
