@@ -1,3 +1,7 @@
+## [8.0.2]
+
+* [iOS][macOS] bumped AppAuth iOS dependency to 1.7.6
+
 ## [8.0.1]
 
 * Fixed issue [568](https://github.com/MaikuB/flutter_appauth/issues/568) where compilation could fail with a `'OIDExternalUserAgent.h' file not found` error
