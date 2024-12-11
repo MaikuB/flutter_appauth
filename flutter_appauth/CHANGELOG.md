@@ -1,6 +1,7 @@
 ## [8.0.3]
 
-* [iOS][macOS] fixed an issue with setting up Swift Package Manager support
+* [iOS][macOS] fixed an issue with setting up Swift Package Manager support. 8.0.2 has been retracted on pub.dev as result
+
 
 ## [8.0.2]
 
