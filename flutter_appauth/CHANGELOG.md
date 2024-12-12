@@ -1,6 +1,12 @@
+## [8.0.3]
+
+* [iOS][macOS] reverted change on attempt to add Swift Package Manager as there were issues found. 8.0.2 has now been considered retracted on pub.dev as a result
+
+
 ## [8.0.2]
 
 * [iOS][macOS] bumped AppAuth iOS dependency to 1.7.6
+* [iOS][macOS] added Swift Package Manager support
 
 ## [8.0.1]
 
