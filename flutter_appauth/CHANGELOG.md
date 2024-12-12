@@ -1,7 +1,6 @@
 ## [8.0.2]
 
 * [iOS][macOS] bumped AppAuth iOS dependency to 1.7.6
-* [iOS][macOS] added Swift Package Manager support
 
 ## [8.0.1]
 
