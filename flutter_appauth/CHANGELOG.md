@@ -1,6 +1,7 @@
 ## [8.0.3]
 
 * [iOS][macOS] reverted change on attempt to add Swift Package Manager as there were issues found. 8.0.2 has now been considered retracted on pub.dev as a result
+* Pinned compileSdkVersion of Android example app to 34 to continue support the current AGP versions until plugin and example app are updated
 
 
 ## [8.0.2]
