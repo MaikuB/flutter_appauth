@@ -75,54 +75,54 @@
                            callback:^(OIDAuthorizationResponse
                                           *_Nullable authorizationResponse,
                                       NSError *_Nullable error) {
-                            @try {
-                                if (authorizationResponse) {
-                                NSMutableDictionary *processedResponse =
-                                    [[NSMutableDictionary alloc] init];
-                                [processedResponse
-                                    setObject:authorizationResponse
-                                                    .additionalParameters
-                                        forKey:
-                                            @"authorizationAdditionalParameters"];
-                                [processedResponse
-                                    setObject:authorizationResponse
-                                                    .authorizationCode
-                                        forKey:@"authorizationCode"];
-                                [processedResponse
-                                    setObject:authorizationResponse.request
-                                                    .codeVerifier
-                                        forKey:@"codeVerifier"];
-                                [processedResponse
-                                    setObject:authorizationResponse.request.nonce
-                                        forKey:@"nonce"];
-                                result(processedResponse);
-                                } else {
-                                    [FlutterAppAuth
-                                        finishWithError:AUTHORIZE_ERROR_CODE
-                                                message:
-                                                    [FlutterAppAuth
-                                                        formatMessageWithError:
-                                                            AUTHORIZE_ERROR_MESSAGE_FORMAT
-                                                                        error:error]
-                                                result:result
-                                                    error:error];
-                                }
-                            } @catch (NSException *e) {
-                                error = [NSError errorWithDomain:e.name code:0 userInfo:@{
-                                    NSUnderlyingErrorKey: e,
-                                    NSDebugDescriptionErrorKey: e.userInfo ?: @{ },
-                                    NSLocalizedFailureReasonErrorKey: (e.reason ?: @"Failed to set processedResponse") }];
-                                [FlutterAppAuth
-                                    finishWithError:AUTHORIZE_ERROR_CODE
-                                            message:
-                                                [FlutterAppAuth
-                                                    formatMessageWithError:
-                                                        AUTHORIZE_ERROR_MESSAGE_FORMAT
-                                                                    error:error]
-                                            result:result
-                                            error:error];
-                            }
+                             [self authorizationResponseCallback:
+                                       authorizationResponse
+                                                           error:error
+                                                          result:result];
                            }];
+  }
+}
+
+- (void)authorizationResponseCallback:
+            (OIDAuthorizationResponse *_Nullable)response
+                                error:(NSError *_Nullable)error
+                               result:(FlutterResult)result {
+  @try {
+    if (response) {
+      NSMutableDictionary *resultData = [[NSMutableDictionary alloc] init];
+      [resultData setObject:response.additionalParameters
+                     forKey:@"authorizationAdditionalParameters"];
+      [resultData setObject:response.authorizationCode
+                     forKey:@"authorizationCode"];
+      [resultData setObject:response.request.codeVerifier
+                     forKey:@"codeVerifier"];
+      [resultData setObject:response.request.nonce forKey:@"nonce"];
+      result(resultData);
+    } else {
+      [FlutterAppAuth
+          finishWithError:AUTHORIZE_ERROR_CODE
+                  message:[FlutterAppAuth formatMessageWithError:
+                                              AUTHORIZE_ERROR_MESSAGE_FORMAT
+                                                           error:error]
+                   result:result
+                    error:error];
+    }
+  } @catch (NSException *e) {
+    error = [NSError errorWithDomain:e.name
+                                code:0
+                            userInfo:@{
+                              NSUnderlyingErrorKey : e,
+                              NSDebugDescriptionErrorKey : e.userInfo ?: @{},
+                              NSLocalizedFailureReasonErrorKey :
+                                  (e.reason ?: @"Failed to process response")
+                            }];
+    [FlutterAppAuth
+        finishWithError:AUTHORIZE_ERROR_CODE
+                message:[FlutterAppAuth formatMessageWithError:
+                                            AUTHORIZE_ERROR_MESSAGE_FORMAT
+                                                         error:error]
+                 result:result
+                  error:error];
   }
 }
 
@@ -170,11 +170,11 @@
                                                     error:error];
                           return;
                         }
-                        NSMutableDictionary *processedResponse =
+                        NSMutableDictionary *resp =
                             [[NSMutableDictionary alloc] init];
-                        [processedResponse setObject:endSessionResponse.state
-                                              forKey:@"state"];
-                        result(processedResponse);
+                        [resp setObject:endSessionResponse.state
+                                 forKey:@"state"];
+                        result(resp);
                       }];
 }
 
