@@ -18,7 +18,11 @@
         limitations under the License.
  */
 
+#ifdef SWIFT_PACKAGE
+@import AppAuth;
+#else
 #import <AppAuth/AppAuth.h>
+#endif
 #import <AppKit/AppKit.h>
 
 NS_ASSUME_NONNULL_BEGIN

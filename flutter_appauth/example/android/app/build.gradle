@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "io.crossingthestreams.flutter_appauth_example"
-    compileSdkVersion 34
+    compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
     compileOptions {

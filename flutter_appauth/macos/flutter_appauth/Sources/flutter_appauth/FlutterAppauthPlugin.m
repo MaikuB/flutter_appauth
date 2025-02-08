@@ -1,6 +1,6 @@
 #import <TargetConditionals.h>
 
-#import "FlutterAppauthPlugin.h"
+#import "FlutterAppauthPlugin_Private.h"
 
 @interface ArgumentProcessor : NSObject
 + (id _Nullable)processArgumentValue:(NSDictionary *)arguments
