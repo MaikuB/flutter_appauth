@@ -1,22 +1,23 @@
-- [Flutter AppAuth Plugin](#flutter-appauth-plugin)
-  - [Tutorials from identity providers](#tutorials-from-identity-providers)
-  - [Getting Started](#getting-started)
-    - [Detecting user cancellation](#detecting-user-cancellation)
-    - [Refreshing tokens](#refreshing-tokens)
-    - [End session](#end-session)
-    - [Handling errors](#handling-errors)
-    - [Ephemeral Sessions (iOS and macOS only)](#ephemeral-sessions-ios-and-macos-only)
-  - [Android setup](#android-setup)
-  - [iOS/macOS setup](#iosmacos-setup)
-  - [API docs](#api-docs)
-  - [FAQs](#faqs)
-
-
 # Flutter AppAuth Plugin
 
 [![pub package](https://img.shields.io/pub/v/flutter_appauth.svg)](https://pub.dartlang.org/packages/flutter_appauth)
 [![Build Status](https://api.cirrus-ci.com/github/MaikuB/flutter_appauth.svg)](https://cirrus-ci.com/github/MaikuB/flutter_appauth/)
 
+- [Introduction](#introduction)
+- [Tutorials from identity providers](#tutorials-from-identity-providers)
+- [Getting Started](#getting-started)
+  - [Detecting user cancellation](#detecting-user-cancellation)
+  - [Refreshing tokens](#refreshing-tokens)
+  - [End session](#end-session)
+  - [Handling errors](#handling-errors)
+  - [Ephemeral Sessions (iOS and macOS only)](#ephemeral-sessions-ios-and-macos-only)
+- [Android setup](#android-setup)
+- [iOS/macOS setup](#iosmacos-setup)
+- [API docs](#api-docs)
+- [FAQs](#faqs)
+
+
+## Introduction 
 A Flutter bridge for AppAuth (https://appauth.io) used authenticating and authorizing users. Note that AppAuth also supports the PKCE extension that is required some providers so this plugin should work with them.
 
 **IMPORTANT NOTES**:
