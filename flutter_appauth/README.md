@@ -113,7 +113,7 @@ If your server has an [end session endpoint](https://openid.net/specs/openid-con
 await appAuth.endSession(EndSessionRequest(
           idTokenHint: '<idToken>',
           postLogoutRedirectUrl: '<postLogoutRedirectUrl>',
-          serviceConfiguration: AuthorizationServiceConfiguration(authorizationEndpoint: '<authorization_endpoint>',  tokenEndpooint: '<token_endpoint>', endSessionEndpoint: '<end_session_endpoint>'));
+          serviceConfiguration: AuthorizationServiceConfiguration(authorizationEndpoint: '<authorization_endpoint>', tokenEndpoint: '<token_endpoint>', endSessionEndpoint: '<end_session_endpoint>')));
 ```
 
 The above code passes an `AuthorizationServiceConfiguration` with all the endpoints defined but alternatives are to specify an `issuer` or `discoveryUrl` like you would with the other APIs in the plugin (e.g. `authorizeAndExchangeCode()`).
