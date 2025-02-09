@@ -12,7 +12,7 @@
 #import <AppAuth/AppAuth.h>
 #endif
 
-@interface FlutterAppauthPlugin()
+@interface FlutterAppauthPlugin ()
 
 @property(nonatomic, strong, nullable) id<OIDExternalUserAgentSession>
     currentAuthorizationFlow;
