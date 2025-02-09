@@ -3,6 +3,7 @@
 * **Breaking change** Updated minimum supported SDK version to Flutter 3.16/Dart 3.2
 * [iOS][macOS] added Swift Package Manager support
 * [iOS][macOS] **Breaking changes** a number of Objective-C headers that were public are now no longer public. This means that classes were defined on the native side of the plugin may now no longer visible. These changes likely don't affect users of the plugin as this is to do with APIs that can be accessed via Objective-C or Swift. These changes were done to add Swift Package Manager support
+* Bumped `flutter_lints` dev dependency
 
 ## [8.0.2]
 
