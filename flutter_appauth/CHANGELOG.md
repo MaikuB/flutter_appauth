@@ -8,6 +8,7 @@
 * Bumped `flutter_lints` dev dependency
 * Fixed typo in the code snippet shown in the **End session** section of the readme. Thanks to the PR from [barryguvenkaya](https://github.com/barryguvenkaya)
 * Updated readme to add a table of contents
+* Updated links to tutorials associated with identity providers. The Auth0 one has been removed as their tutorial has changed to use a different SDK. A disclaimer has been added to warn that the content is managed by external parties and may also be out of date
 
 ## [8.0.2]
 

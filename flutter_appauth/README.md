@@ -26,9 +26,10 @@ A Flutter bridge for AppAuth (https://appauth.io) used authenticating and author
 
 ## Tutorials from identity providers
 
+The following are tutorials from identity providers that reference using this plugin. If the identity provider you're using isn't in this list, it doesn't mean that plugin doesn't work with it. It only means that these are some of the identity providers that have tutorials that specify that developers can use this plugin. Generally, if your identity provider supports OAuth 2.0 and follows the industry standards and specifications then the plugin can be expected to work. Developers should also note that the following links are managed by external parties. If you choose to open these links, do so at your own risk and be aware that it's possible the content may be out of date
+
 * [Asgardeo](https://wso2.com/asgardeo/docs/tutorials/auth-users-into-flutter-apps/)
-* [Auth0](https://auth0.com/blog/get-started-with-flutter-authentication/)
-* [FusionAuth](https://fusionauth.io/blog/2020/11/23/securing-flutter-oauth/)
+* [FusionAuth](https://fusionauth.io/docs/quickstarts/quickstart-flutter-native#setting-up-appauth)
 
 
 ## Getting Started
