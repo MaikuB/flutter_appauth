@@ -18,12 +18,6 @@
 
 #import <SafariServices/SafariServices.h>
 
-#ifdef SWIFT_PACKAGE
-@import AppAuth;
-#else
-#import <AppAuth/AppAuth.h>
-#endif
-
 NS_ASSUME_NONNULL_BEGIN
 
 /** @brief The global/shared Safari view controller factory. Responsible for
