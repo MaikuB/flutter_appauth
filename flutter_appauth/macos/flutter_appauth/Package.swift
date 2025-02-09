@@ -11,11 +11,11 @@ let package = Package(
     products: [
         .library(name: "flutter-appauth", targets: ["flutter_appauth"])
     ],
-    dependencies: [.package(url: "https://github.com/openid/AppAuth-iOS", exact: "1.7.6")]
+    dependencies: [.package(url: "https://github.com/openid/AppAuth-iOS", exact: "1.7.6")],
     targets: [
         .target(
             name: "flutter_appauth",
-            dependencies: [],
+            dependencies: [.product(name: "AppAuth", package: "AppAuth-iOS")],
             resources: [
                 .process("PrivacyInfo.xcprivacy")
             ],
