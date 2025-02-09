@@ -1,7 +1,7 @@
 ## [9.0.0-dev.1]
 
 * [iOS][macOS] added Swift Package Manager support
-* [iOS][macOS] **Breaking changes** a number of Objective-C headers that were public are now no longer public. These changes likely don't affect any users of the plugin and were done to add Swift Package Manager support
+* [iOS][macOS] **Breaking changes** a number of Objective-C headers that were public are now no longer public. This means that classes were defined on the native side of the plugin may now no longer visible. These changes likely don't affect users of the plugin as this is to do with APIs that can be accessed via Objective-C or Swift. These changes were done to add Swift Package Manager support
 
 ## [8.0.2]
 
