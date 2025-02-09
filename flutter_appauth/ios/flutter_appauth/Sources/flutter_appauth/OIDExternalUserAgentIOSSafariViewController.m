@@ -18,10 +18,6 @@
 
 #import <SafariServices/SafariServices.h>
 
-#import "OIDErrorUtilities.h"
-#import "OIDExternalUserAgentRequest.h"
-#import "OIDExternalUserAgentSession.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
 /** @brief The global/shared Safari view controller factory. Responsible for

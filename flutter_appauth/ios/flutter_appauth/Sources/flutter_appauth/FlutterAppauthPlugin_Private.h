@@ -1,16 +1,18 @@
-#import <TargetConditionals.h>
+#import "./include/flutter_appauth/FlutterAppauthPlugin.h"
 
 #if TARGET_OS_OSX
 #import "AppAuthMacOSAuthorization.h"
-#import <FlutterMacOS/FlutterMacOS.h>
 #else
 #import "AppAuthIOSAuthorization.h"
-#import <Flutter/Flutter.h>
 #endif
 
+#ifdef SWIFT_PACKAGE
+@import AppAuth;
+#else
 #import <AppAuth/AppAuth.h>
+#endif
 
-@interface FlutterAppauthPlugin : NSObject <FlutterPlugin>
+@interface FlutterAppauthPlugin ()
 
 @property(nonatomic, strong, nullable) id<OIDExternalUserAgentSession>
     currentAuthorizationFlow;

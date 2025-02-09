@@ -1,8 +1,7 @@
-## [8.0.3]
+## [9.0.0-dev.1]
 
-* [iOS][macOS] reverted change on attempt to add Swift Package Manager as there were issues found. 8.0.2 has now been considered retracted on pub.dev as a result
-* Pinned compileSdkVersion of Android example app to 34 to continue support the current AGP versions until plugin and example app are updated
-
+* [iOS][macOS] added Swift Package Manager support
+* [iOS][macOS] **Breaking changes** a number of Objective-C headers that were public are now no longer public. This means that classes were defined on the native side of the plugin may now no longer visible. These changes likely don't affect users of the plugin as this is to do with APIs that can be accessed via Objective-C or Swift. These changes were done to add Swift Package Manager support
 
 ## [8.0.2]
 
