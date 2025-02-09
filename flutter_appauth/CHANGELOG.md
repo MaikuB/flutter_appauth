@@ -7,6 +7,7 @@
 * Migrated Android side of example to use plugin DSL
 * Bumped `flutter_lints` dev dependency
 * Fixed typo in the code snippet shown in the **End session** section of the readme. Thanks to the PR from [barryguvenkaya](https://github.com/barryguvenkaya)
+* Updated readme to add a table of contents
 
 ## [8.0.2]
 
