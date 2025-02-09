@@ -6,13 +6,13 @@ version: 9.0.0-dev.1
 homepage: https://github.com/MaikuB/flutter_appauth/tree/master/flutter_appauth
 
 environment:
-  sdk: ^3.1.0
-  flutter: ">=3.13.0"
+  sdk: ^3.3.0
+  flutter: ">=3.19.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_appauth_platform_interface: ^8.0.0
+  flutter_appauth_platform_interface: ^9.0.0
 
 flutter:
   plugin:
@@ -25,4 +25,4 @@ flutter:
       macos:
         pluginClass: FlutterAppauthPlugin
 dev_dependencies:
-  flutter_lints: ^3.0.2
+  flutter_lints: ^4.0.0

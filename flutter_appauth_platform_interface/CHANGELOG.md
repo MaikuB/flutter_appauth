@@ -1,3 +1,8 @@
+## [9.0.0-dev.1]
+
+* **Breaking change** updated minimum supported SDK version to Flutter 3.19/Dart 3.3
+* Bumped `flutter_lints` dev dependency
+
 ## [8.0.0]
 
 * **Breaking change** Replaced the `preferEphemeralSession` property in the `AuthorizationRequest`, `AuthorizationTokenRequest` and  `EndSessionRequest` classes with `externalUserAgent`. Thanks to the PR from [john-slow](https://github.com/john-slow). `externalUserAgent` is presented by the newly `ExternalUserAgent` enum that has the following values
