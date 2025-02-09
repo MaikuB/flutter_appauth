@@ -1,6 +1,7 @@
 ## [9.0.0-dev.1]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.19/Dart 3.3
+* [Android] **Breaking changes** updated `compileSdkVersion` to 33 and AGP to 8.0.1 to align with what's used by the AppAuth Android SDK
 * [iOS][macOS] added Swift Package Manager support
 * [iOS][macOS] **Breaking changes** a number of Objective-C headers that were public are now no longer public. This means that classes were defined on the native side of the plugin may now no longer visible. These changes likely don't affect users of the plugin as this is to do with APIs that can be accessed via Objective-C or Swift. These changes were done to add Swift Package Manager support
 * Migrated Android side of example to use plugin DSL
