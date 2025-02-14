@@ -147,10 +147,14 @@ public class FlutterAppauthPlugin
   }
 
   private void disposeAuthorizationServices() {
-    defaultAuthorizationService.dispose();
-    insecureAuthorizationService.dispose();
-    defaultAuthorizationService = null;
-    insecureAuthorizationService = null;
+      if (defaultAuthorizationService != null) {
+          defaultAuthorizationService.dispose();
+          defaultAuthorizationService = null;
+      }
+      if (insecureAuthorizationService != null) {
+        insecureAuthorizationService.dispose();
+        insecureAuthorizationService = null;
+      }
   }
 
   private void checkAndSetPendingOperation(String method, Result result) {
