@@ -88,11 +88,7 @@ public class FlutterAppauthPlugin
   private boolean allowInsecureConnections;
   private AuthorizationService defaultAuthorizationService;
   private AuthorizationService insecureAuthorizationService;
-
-  private void setActivity(Activity flutterActivity) {
-    this.mainActivity = flutterActivity;
-  }
-
+  
   private void onAttachedToEngine(Context context, BinaryMessenger binaryMessenger) {
     this.applicationContext = context;
     createAuthorizationServices();
