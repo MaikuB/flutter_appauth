@@ -1,4 +1,4 @@
-## [9.0.0-dev.1]
+## [9.0.0]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.19/Dart 3.3
 * Bumped `flutter_lints` dev dependency

@@ -1,4 +1,4 @@
-## [9.0.0-dev.1]
+## [9.0.0]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.19/Dart 3.3
 * [Android] **Breaking changes** updated `compileSdkVersion` to 33 and AGP to 8.0.1 to align with what's used by the AppAuth Android SDK
@@ -11,7 +11,6 @@
 * Updated links to tutorials associated with identity providers. The Auth0 one has been removed as their tutorial has changed to use a different SDK. A disclaimer has been added to warn that the content is managed by external parties and may also be out of date
 
 ## [8.0.2]
-
 
 * [iOS][macOS] bumped AppAuth iOS dependency to 1.7.6
 * [iOS][macOS] **BAD** added Swift Package Manager support but "local" testing didn't uncover. This has been reverted by 8.0.3
