@@ -33,8 +33,6 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
-import io.flutter.view.FlutterNativeView;
 
 /**
  * FlutterAppauthPlugin
@@ -64,25 +62,6 @@ public class FlutterAppauthPlugin implements FlutterPlugin, MethodCallHandler, P
     private boolean allowInsecureConnections;
     private AuthorizationService defaultAuthorizationService;
     private AuthorizationService insecureAuthorizationService;
-
-    /**
-     * Plugin registration.
-     */
-    public static void registerWith(Registrar registrar) {
-        final FlutterAppauthPlugin plugin = new FlutterAppauthPlugin();
-        plugin.setActivity(registrar.activity());
-        plugin.onAttachedToEngine(registrar.context(), registrar.messenger());
-        registrar.addActivityResultListener(plugin);
-        registrar.addViewDestroyListener(
-                new PluginRegistry.ViewDestroyListener() {
-                    @Override
-                    public boolean onViewDestroy(FlutterNativeView view) {
-                        plugin.disposeAuthorizationServices();
-                        return false;
-                    }
-                });
-    }
-
 
     private void setActivity(Activity flutterActivity) {
         this.mainActivity = flutterActivity;
