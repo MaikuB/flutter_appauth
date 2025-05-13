@@ -45,5 +45,12 @@ enum ExternalUserAgent {
   /// Note that as this does not follow the best practices on using the
   /// appropriate native APIs based on the OS version, developers should use
   /// this at their own discretion.
-  sfSafariViewController
+  sfSafariViewController,
+
+
+  /// Indicates a preference for using an external user-agent,
+  /// suitable for e.g. the secure browser of a MDM solution,
+  /// SSO flows and using the cookies/context of the system main browser.
+  /// This is only applicable to iOS (fallback is [asWebAuthenticationSession]).
+  customBrowser
 }
