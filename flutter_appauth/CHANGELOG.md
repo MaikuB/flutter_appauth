@@ -1,3 +1,7 @@
+## [9.0.1]
+
+* [iOS][macOS] bumped AppAuth iOS dependency to 2.0.0
+
 ## [9.0.0]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.19/Dart 3.3
