@@ -207,13 +207,20 @@ AndroidManifest.xml:
 ...
 ```
 
-Please ensure that value of `<your_custom_scheme>` is all in lowercase as there've been reports from the community who had issues with redirects if there were any capital letters. You may also notice the `+=` operation is applied on `manifestPlaceholders` instead of `=`. This is intentional and required as newer versions of the Flutter SDK has made some changes underneath the hood to deal with multidex. Using `=` instead of `+=` can lead to errors like the following
+### Common Errors
 
+Please ensure that value of `<your_custom_scheme>` is all in lowercase as there've been reports from the community who had issues with redirects if there were any capital letters. You may also notice the `+=` operation is applied on `manifestPlaceholders` instead of `=`. This is intentional and required as newer versions of the Flutter SDK has made some changes underneath the hood to deal with multidex. Using `=` instead of `+=` can lead to errors like the following
 ```
 Attribute application@name at AndroidManifest.xml:5:9-42 requires a placeholder substitution but no value for <applicationName> is provided.
 ```
 
 If you see this error then update your `build.gradle` to use `+=` instead.
+
+```
+W AppAuth: No stored state - unable to handle response
+```
+
+If you're experiencing issues where the authorization flow does not return to your Flutter app, even though the intent filter is correctly set and `RedirectUriReceiverActivity` is invoked, the issue might be due to the following line in your `AndroidManifest.xml`: `android:taskAffinity=""`. Removing it fixes the [Issue](https://github.com/MaikuB/flutter_appauth/issues/503#issuecomment-2165906205)
 
 ## iOS/macOS setup
 
