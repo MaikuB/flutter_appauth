@@ -126,6 +126,19 @@ class _MyAppState extends State<MyApp> {
                               ExternalUserAgent.sfSafariViewController),
                     ),
                   ),
+                if (Platform.isIOS)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: const Text(
+                        'Auto code exchange using system browser (iOS only)',
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () => _signInWithAutoCodeExchange(
+                        externalUserAgent:
+                          ExternalUserAgent.customBrowser),
+                    ),
+                  ),
                 ElevatedButton(
                   onPressed: _refreshToken != null ? _refresh : null,
                   child: const Text('Refresh token'),
