@@ -13,6 +13,11 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_appauth_platform_interface: ^9.0.0
+  flutter_web_plugins:
+    sdk: flutter
+  crypto: ^3.0.0
+  web: ^1.0.0
+  http: ^1.0.0
 
 flutter:
   plugin:
@@ -24,5 +29,8 @@ flutter:
         pluginClass: FlutterAppauthPlugin
       macos:
         pluginClass: FlutterAppauthPlugin
+      web:
+        pluginClass: FlutterAppAuthWeb
+        fileName: src/flutter_appauth_web.dart
 dev_dependencies:
   flutter_lints: ^4.0.0

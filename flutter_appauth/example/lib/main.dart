@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 import 'dart:math';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
@@ -28,6 +29,38 @@ class _MyAppState extends State<MyApp> {
   String? _idToken;
   String? _error;
 
+  @override
+  void initState() {
+    super.initState();
+    if (kIsWeb) {
+      _checkForPendingAuthorization();
+    }
+  }
+
+  Future<void> _checkForPendingAuthorization() async {
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    setState(() {
+      _isBusy = true;
+    });
+
+    try {
+      final result = await _appAuth.authorizeAndExchangeCode(
+        AuthorizationTokenRequest(_clientId, _redirectUrl,
+            serviceConfiguration: _serviceConfiguration,
+            scopes: _scopes),
+      );
+      _processAuthTokenResponse(result);
+      await _testApi(result);
+    } catch (e) {
+      if (!e.toString().contains('authorization_in_progress')) {
+        _handleError(e);
+      }
+    } finally {
+      _clearBusyState();
+    }
+  }
+
   final TextEditingController _authorizationCodeTextController =
       TextEditingController();
   final TextEditingController _accessTokenTextController =
@@ -40,13 +73,16 @@ class _MyAppState extends State<MyApp> {
       TextEditingController();
   String? _userInfo;
 
-  // For a list of client IDs, go to https://demo.duendesoftware.com
   final String _clientId = 'interactive.public';
-  final String _redirectUrl = 'com.duendesoftware.demo:/oauthredirect';
+  final String _redirectUrl = kIsWeb 
+      ? 'http://localhost:8080/'
+      : 'com.duendesoftware.demo:/oauthredirect';
   final String _issuer = 'https://demo.duendesoftware.com';
   final String _discoveryUrl =
       'https://demo.duendesoftware.com/.well-known/openid-configuration';
-  final String _postLogoutRedirectUrl = 'com.duendesoftware.demo:/';
+  final String _postLogoutRedirectUrl = kIsWeb
+      ? 'http://localhost:8080/'
+      : 'com.duendesoftware.demo:/';
   final List<String> _scopes = <String>[
     'openid',
     'profile',
@@ -96,9 +132,11 @@ class _MyAppState extends State<MyApp> {
                 const SizedBox(height: 8),
                 ElevatedButton(
                   child: const Text('Sign in with auto code exchange'),
-                  onPressed: () => _signInWithAutoCodeExchange(),
+                  onPressed: () {
+                    _signInWithAutoCodeExchange();
+                  },
                 ),
-                if (Platform.isIOS || Platform.isMacOS)
+                if (!kIsWeb && (Platform.isIOS || Platform.isMacOS))
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -112,7 +150,7 @@ class _MyAppState extends State<MyApp> {
                               .ephemeralAsWebAuthenticationSession),
                     ),
                   ),
-                if (Platform.isIOS)
+                if (!kIsWeb && Platform.isIOS)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -139,7 +177,7 @@ class _MyAppState extends State<MyApp> {
                       : null,
                   child: const Text('End session'),
                 ),
-                if (Platform.isIOS || Platform.isMacOS)
+                if (!kIsWeb && (Platform.isIOS || Platform.isMacOS))
                   Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
@@ -153,7 +191,7 @@ class _MyAppState extends State<MyApp> {
                         child:
                             const Text('End session using ephemeral session'),
                       )),
-                if (Platform.isIOS)
+                if (!kIsWeb && Platform.isIOS)
                   Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
