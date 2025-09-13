@@ -167,10 +167,28 @@ Otherwise, there will be still an active login session in the browser.
 
 ## Android setup
 
-Go to the `build.gradle` file for your Android app to specify the custom scheme so that there should be a section in it that look similar to the following but replace `<your_custom_scheme>` with the desired value
+Go to the `build.gradle.kts` file for your Android app to specify the custom scheme so that there should be a section in it that look similar to the following but replace `<your_custom_scheme>` with the desired value:
 
+```kotlin
+
+android {
+    ...
+    defaultConfig {
+        ...
+        manifestPlaceholders.putAll(
+            mapOf(
+                "appAuthRedirectScheme" to "<your_custom_scheme>"
+            )
+        )
+    }
+}
 ```
-...groovy
+
+If you're using `build.gradle`:
+
+
+```groovy
+
 android {
     ...
     defaultConfig {
