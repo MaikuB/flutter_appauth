@@ -1,3 +1,7 @@
+## [10.0.0]
+
+* [Android] **Breaking changes** updated `compileSdkVersion` to 35 and AGP to 8.6.0
+
 ## [9.0.1]
 
 * [iOS][macOS] bumped AppAuth iOS dependency to 2.0.0
