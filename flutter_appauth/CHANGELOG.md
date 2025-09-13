@@ -1,6 +1,7 @@
 ## [10.0.0]
 
 * [Android] **Breaking changes** updated `compileSdkVersion` to 35 and AGP to 8.6.0
+* Updated Android setup section in readme with instructions for apps using Kotlin DSL. Thanks to the PR from [LennartMart](https://github.com/LennartMart)
 
 ## [9.0.1]
 
