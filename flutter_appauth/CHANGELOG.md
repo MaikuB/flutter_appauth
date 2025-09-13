@@ -1,3 +1,10 @@
+## [10.0.0]
+
+* **Breaking change** updated minimum supported SDK version to Flutter 3.29/Dart 3.7
+* Bumped `flutter_lints` dev dependency
+* [Android] **Breaking changes** updated `compileSdkVersion` to 35 and AGP to 8.6.0
+* Updated Android setup section in readme with instructions for apps using Kotlin DSL. Thanks to the PR from [LennartMart](https://github.com/LennartMart)
+
 ## [9.0.1]
 
 * [iOS][macOS] bumped AppAuth iOS dependency to 2.0.0
