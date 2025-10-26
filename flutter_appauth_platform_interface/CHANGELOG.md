@@ -1,3 +1,7 @@
+## [11.0.0]
+
+* Added `Prompt` class that exposes standard `prompt` string values as defined in the OIDC specification. Thanks to the PR from [Valentin Michalak](https://github.com/vmichalak)
+
 ## [10.0.0]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.29/Dart 3.7
