@@ -194,7 +194,7 @@ android {
     defaultConfig {
         ...
         manifestPlaceholders += [
-                'appAuthRedirectScheme': '<your_custom_scheme>'
+                appAuthRedirectScheme: '<your_custom_scheme>'
         ]
     }
 }
