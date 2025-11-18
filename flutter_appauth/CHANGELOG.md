@@ -1,3 +1,15 @@
+## [11.0.0]
+
+* Added `Prompt` class that exposes standard `prompt` string values as defined in the OIDC specification. Thanks to the PR from [Valentin Michalak](https://github.com/vmichalak)
+* **Potentiallu breaking change** [Android] plugin will now throw a `PlatformException` with a `null_activity` error code when plugin runs into a scenario where the bound Flutter activity has been detached/disposed. Thanks to the PR from [Sam Costa](https://github.com/SamCosta1)
+
+## [10.0.0]
+
+* **Breaking change** updated minimum supported SDK version to Flutter 3.29/Dart 3.7
+* Bumped `flutter_lints` dev dependency
+* [Android] **Breaking changes** updated `compileSdkVersion` to 35 and AGP to 8.6.0
+* Updated Android setup section in readme with instructions for apps using Kotlin DSL. Thanks to the PR from [LennartMart](https://github.com/LennartMart)
+
 ## [9.0.1]
 
 * [iOS][macOS] bumped AppAuth iOS dependency to 2.0.0
