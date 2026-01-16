@@ -1,0 +1,11 @@
+{
+  "name": "flutter_appauth_example",
+  "short_name": "flutter_appauth_example",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0175C2",
+  "theme_color": "#0175C2",
+  "description": "A Flutter AppAuth example application.",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false
+}
