@@ -5,5 +5,7 @@
     <activity android:name="net.openid.appauth.RedirectUriReceiverActivity"
       android:theme="@style/Theme.AppCompat.Translucent.NoTitleBar"
       tools:replace="android:theme" />
+    <activity android:name="AppAuthIntentLauncherActivity"
+        android:theme="@style/Theme.AppCompat.Translucent.NoTitleBar"/>
   </application>
 </manifest>

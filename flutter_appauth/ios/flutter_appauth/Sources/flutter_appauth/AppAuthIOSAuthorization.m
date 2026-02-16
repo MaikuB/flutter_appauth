@@ -32,10 +32,10 @@
               codeChallenge:codeChallenge
         codeChallengeMethod:OIDOAuthorizationRequestCodeChallengeMethodS256
        additionalParameters:additionalParameters];
-  UIViewController *rootViewController = [self rootViewController];
+  UIViewController *presentingViewController = [self topMostViewController];
   if (exchangeCode) {
     id<OIDExternalUserAgent> agent =
-        [self userAgentWithViewController:rootViewController
+        [self userAgentWithViewController:presentingViewController
                         externalUserAgent:externalUserAgent];
     return [OIDAuthState
         authStateByPresentingAuthorizationRequest:request
@@ -67,7 +67,7 @@
                                          }];
   } else {
     id<OIDExternalUserAgent> agent =
-        [self userAgentWithViewController:rootViewController
+        [self userAgentWithViewController:presentingViewController
                         externalUserAgent:externalUserAgent];
     return [OIDAuthorizationService
         presentAuthorizationRequest:request
@@ -133,9 +133,9 @@
                 postLogoutRedirectURL:postLogoutRedirectURL
                  additionalParameters:requestParameters.additionalParameters];
 
-  UIViewController *rootViewController = [self rootViewController];
+  UIViewController *presentingViewController = [self topMostViewController];
   id<OIDExternalUserAgent> externalUserAgent =
-      [self userAgentWithViewController:rootViewController
+      [self userAgentWithViewController:presentingViewController
                       externalUserAgent:requestParameters.externalUserAgent];
 
   return [OIDAuthorizationService
@@ -163,32 +163,56 @@
 }
 
 - (id<OIDExternalUserAgent>)
-    userAgentWithViewController:(UIViewController *)rootViewController
+    userAgentWithViewController:(UIViewController *)presentingViewController
               externalUserAgent:(NSNumber *)externalUserAgent {
   if ([externalUserAgent integerValue] == EphemeralASWebAuthenticationSession) {
     return [[OIDExternalUserAgentIOSNoSSO alloc]
-        initWithPresentingViewController:rootViewController];
+        initWithPresentingViewController:presentingViewController];
   }
   if ([externalUserAgent integerValue] == SafariViewController) {
     return [[OIDExternalUserAgentIOSSafariViewController alloc]
-        initWithPresentingViewController:rootViewController];
+        initWithPresentingViewController:presentingViewController];
   }
   return [[OIDExternalUserAgentIOS alloc]
-      initWithPresentingViewController:rootViewController];
+      initWithPresentingViewController:presentingViewController];
+}
+
+- (UIViewController *)topMostViewController {
+    return [self topMostViewControllerWithRootViewController:[self rootViewController]];
+}
+
+- (UIViewController *)topMostViewControllerWithRootViewController:(UIViewController *)viewController {
+    if (viewController.presentedViewController && !viewController.presentedViewController.isBeingDismissed) {
+        return [self topMostViewControllerWithRootViewController:viewController.presentedViewController];
+    }
+    if ([viewController isKindOfClass:[UITabBarController class]]) {
+        UITabBarController *tabBarController = (UITabBarController *)viewController;
+        return [self topMostViewControllerWithRootViewController:tabBarController.selectedViewController];
+    }
+    if ([viewController isKindOfClass:[UINavigationController class]]) {
+        UINavigationController *navController = (UINavigationController *)viewController;
+        return [self topMostViewControllerWithRootViewController:navController.visibleViewController];
+    }
+
+    return viewController;
 }
 
 - (UIViewController *)rootViewController {
-  if (@available(iOS 13, *)) {
-    return [[UIApplication sharedApplication].windows
-               filteredArrayUsingPredicate:[NSPredicate
-                                               predicateWithBlock:^BOOL(
-                                                   id window,
-                                                   NSDictionary *bindings) {
-                                                 return [window isKeyWindow];
-                                               }]]
-        .firstObject.rootViewController;
-  }
-  return [UIApplication sharedApplication].delegate.window.rootViewController;
+    if (@available(iOS 13.0, *)) {
+        for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
+            if (scene.activationState == UISceneActivationStateForegroundActive && [scene isKindOfClass:[UIWindowScene class]]) {
+                UIWindowScene *windowScene = (UIWindowScene *)scene;
+                for (UIWindow *window in windowScene.windows) {
+                    if (window.isKeyWindow) {
+                        return window.rootViewController;
+                    }
+                }
+            }
+        }
+        return nil;
+    } else {
+        return [UIApplication sharedApplication].delegate.window.rootViewController;
+    }
 }
 
 @end

@@ -93,6 +93,12 @@ public class FlutterAppauthPlugin
   private AuthorizationService defaultAuthorizationService;
   private AuthorizationService insecureAuthorizationService;
 
+  private static FlutterAppauthPlugin instance = null;
+
+  @Nullable static FlutterAppauthPlugin getInstance() {
+    return instance;
+  }
+
   private void onAttachedToEngine(Context context, BinaryMessenger binaryMessenger) {
     this.applicationContext = context;
     createAuthorizationServices();
@@ -104,11 +110,13 @@ public class FlutterAppauthPlugin
   @Override
   public void onAttachedToEngine(FlutterPluginBinding binding) {
     onAttachedToEngine(binding.getApplicationContext(), binding.getBinaryMessenger());
+    instance = this;
   }
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     disposeAuthorizationServices();
+    instance = null;
   }
 
   @Override
@@ -466,13 +474,19 @@ public class FlutterAppauthPlugin
     try {
       Intent authIntent =
           authorizationService.getAuthorizationRequestIntent(authRequestBuilder.build());
-      mainActivity.startActivityForResult(
-          authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
+      startIntentLauncherActivityForResult(authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
     } catch (ActivityNotFoundException ex) {
       finishWithError(NO_BROWSER_AVAILABLE_ERROR_CODE, NO_BROWSER_AVAILABLE_ERROR_FORMAT, ex);
     } catch (NullPointerException ex) {
       finishWithError(NULL_ACTIVITY_ERROR_CODE, NULL_ACTIVITY_ERROR_FORMAT, ex);
     }
+  }
+
+  private void startIntentLauncherActivityForResult(Intent intent, int requestCode) {
+    Intent launcherIntent = new Intent(mainActivity, AppAuthIntentLauncherActivity.class);
+    launcherIntent.putExtra(AppAuthIntentLauncherActivity.IntentExtraKey.INTENT, intent);
+    launcherIntent.putExtra(AppAuthIntentLauncherActivity.IntentExtraKey.REQUEST_CODE, requestCode);
+    mainActivity.startActivity(launcherIntent);
   }
 
   private void performTokenRequest(
@@ -584,7 +598,7 @@ public class FlutterAppauthPlugin
     Intent endSessionIntent = authorizationService.getEndSessionRequestIntent(endSessionRequest);
 
     try {
-      mainActivity.startActivityForResult(endSessionIntent, RC_END_SESSION);
+      startIntentLauncherActivityForResult(endSessionIntent, RC_END_SESSION);
     } catch (NullPointerException ex) {
       finishWithError(NULL_ACTIVITY_ERROR_CODE, NULL_ACTIVITY_ERROR_FORMAT, ex);
     }
