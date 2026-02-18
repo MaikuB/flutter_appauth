@@ -1,3 +1,10 @@
+## [12.0.0-dev.1]
+
+* **Breaking change** updated minimum supported SDK version to Flutter 3.38.1/Dart 3.10. Consequently the minimum OS requirements for each platform has been updated as well
+  * [Android] minimum Android version is now 7.0 (API level 24)
+  * [iOS] minimum iOS version is now 13
+  * [macOS] minimum macOS version is now 10.15
+
 ## [11.0.0]
 
 * Added `Prompt` class that exposes standard `prompt` string values as defined in the OIDC specification. Thanks to the PR from [Valentin Michalak](https://github.com/vmichalak)
