@@ -4,6 +4,7 @@
   * [Android] minimum Android version is now 7.0 (API level 24)
   * [iOS] minimum iOS version is now 13
   * [macOS] minimum macOS version is now 10.15
+* Plugin and example app now adopt UISceneDelegate
 
 ## [11.0.0]
 
