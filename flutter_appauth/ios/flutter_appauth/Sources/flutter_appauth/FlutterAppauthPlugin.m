@@ -499,9 +499,11 @@ AppAuthAuthorization *authorization;
   return [self application:application openURL:url options:@{}];
 }
 
-- (BOOL)scene:(UIScene*)scene openURLContexts:(NSSet<UIOpenURLContext*>*)URLContexts {
+- (BOOL)scene:(UIScene *)scene
+    openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts {
   for (UIOpenURLContext *URLContext in URLContexts) {
-    if ([_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:URLContext.URL]) {
+    if ([_currentAuthorizationFlow
+            resumeExternalUserAgentFlowWithURL:URLContext.URL]) {
       _currentAuthorizationFlow = nil;
       return YES;
     }
