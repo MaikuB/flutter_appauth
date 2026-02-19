@@ -146,6 +146,7 @@ AppAuthAuthorization *authorization;
   authorization = [[AppAuthIOSAuthorization alloc] init];
 
   [registrar addApplicationDelegate:instance];
+  [registrar addSceneDelegate:instance];
 #endif
 }
 
@@ -497,6 +498,19 @@ AppAuthAuthorization *authorization;
            annotation:(id)annotation {
   return [self application:application openURL:url options:@{}];
 }
+
+- (BOOL)scene:(UIScene *)scene
+    openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts {
+  for (UIOpenURLContext *URLContext in URLContexts) {
+    if ([_currentAuthorizationFlow
+            resumeExternalUserAgentFlowWithURL:URLContext.URL]) {
+      _currentAuthorizationFlow = nil;
+      return YES;
+    }
+  }
+  return NO;
+}
+
 #endif
 
 #if TARGET_OS_OSX

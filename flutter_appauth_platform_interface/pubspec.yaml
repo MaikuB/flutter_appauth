@@ -1,11 +1,11 @@
 name: flutter_appauth_platform_interface
 description: A common platform interface for the flutter_appauth plugin.
-version: 11.0.0
+version: 12.0.0-dev.1
 homepage: https://github.com/MaikuB/flutter_appauth/tree/master/flutter_appauth_platform_interface
 
 environment:
-  sdk: ^3.7.0
-  flutter: ">=3.29.0"
+  sdk: ^3.10.0
+  flutter: ">=3.38.1"
 
 dependencies:
   flutter:

@@ -1,3 +1,11 @@
+## [12.0.0-dev.1]
+
+* **Breaking change** updated minimum supported SDK version to Flutter 3.38.1/Dart 3.10. Consequently the minimum OS requirements for each platform has been updated as well
+  * [Android] minimum Android version is now 7.0 (API level 24)
+  * [iOS] minimum iOS version is now 13
+  * [macOS] minimum macOS version is now 10.15
+* Plugin and example app now adopt UISceneDelegate. Note that whilst migration required Flutter 3.38.0 as a minimum, I have set the minimum supported Flutter SDK version to 3.38.1. This was done as the Dart 3.10 SDK bundled with Flutter 3.38.0 was technically still a beta. The Dart 3.10 SDK bundled with Flutter 3.38.1 is considered stable
+
 ## [11.0.0]
 
 * Added `Prompt` class that exposes standard `prompt` string values as defined in the OIDC specification. Thanks to the PR from [Valentin Michalak](https://github.com/vmichalak)
