@@ -1,4 +1,4 @@
-## [12.0.0-dev.1]
+## [12.0.0]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.38.1/Dart 3.10
 

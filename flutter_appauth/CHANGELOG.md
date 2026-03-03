@@ -1,4 +1,4 @@
-## [12.0.0-dev.1]
+## [12.0.0]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.38.1/Dart 3.10. Consequently the minimum OS requirements for each platform has been updated as well
   * [Android] minimum Android version is now 7.0 (API level 24)
