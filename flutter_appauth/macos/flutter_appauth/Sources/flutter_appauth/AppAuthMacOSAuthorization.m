@@ -1,6 +1,8 @@
 #import "AppAuthMacOSAuthorization.h"
 
-@implementation AppAuthMacOSAuthorization
+@implementation AppAuthMacOSAuthorization {
+  id<OIDExternalUserAgent> _currentExternalUserAgent;
+}
 
 - (id<OIDExternalUserAgentSession>)
     performAuthorization:(OIDServiceConfiguration *)serviceConfiguration
@@ -37,6 +39,7 @@
     NSObject<OIDExternalUserAgent> *agent =
         [self userAgentWithPresentingWindow:keyWindow
                           externalUserAgent:externalUserAgent];
+    _currentExternalUserAgent = agent;
     return [OIDAuthState
         authStateByPresentingAuthorizationRequest:request
                                 externalUserAgent:agent
@@ -69,6 +72,7 @@
     NSObject<OIDExternalUserAgent> *agent =
         [self userAgentWithPresentingWindow:keyWindow
                           externalUserAgent:externalUserAgent];
+    _currentExternalUserAgent = agent;
     return [OIDAuthorizationService
         presentAuthorizationRequest:request
                   externalUserAgent:agent
@@ -137,6 +141,7 @@
   id<OIDExternalUserAgent> externalUserAgent =
       [self userAgentWithPresentingWindow:keyWindow
                         externalUserAgent:requestParameters.externalUserAgent];
+  _currentExternalUserAgent = externalUserAgent;
   return [OIDAuthorizationService
       presentEndSessionRequest:endSessionRequest
              externalUserAgent:externalUserAgent
@@ -170,6 +175,23 @@
   }
   return [[OIDExternalUserAgentMac alloc]
       initWithPresentingWindow:presentingWindow];
+}
+
+- (void)cancelPendingSessionWithCompletion:(void (^)(void))completion {
+  id<OIDExternalUserAgent> agent = _currentExternalUserAgent;
+  _currentExternalUserAgent = nil;
+  if (agent) {
+    [agent dismissExternalUserAgentAnimated:NO
+                                completion:^{
+                                  if (completion) {
+                                    completion();
+                                  }
+                                }];
+  } else {
+    if (completion) {
+      completion();
+    }
+  }
 }
 
 @end

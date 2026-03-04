@@ -164,6 +164,11 @@ AppAuthAuthorization *authorization;
     [self handleTokenMethodCall:[call arguments] result:result];
   } else if ([END_SESSION_METHOD isEqualToString:call.method]) {
     [self handleEndSessionMethodCall:[call arguments] result:result];
+  } else if ([CANCEL_PENDING_SESSION_METHOD isEqualToString:call.method]) {
+    [authorization cancelPendingSessionWithCompletion:^{
+      self.currentAuthorizationFlow = nil;
+      result(@{});
+    }];
   } else {
     result(FlutterMethodNotImplemented);
   }

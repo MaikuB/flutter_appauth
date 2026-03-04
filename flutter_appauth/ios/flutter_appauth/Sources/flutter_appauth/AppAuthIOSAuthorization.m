@@ -1,6 +1,8 @@
 #import "AppAuthIOSAuthorization.h"
 
-@implementation AppAuthIOSAuthorization
+@implementation AppAuthIOSAuthorization {
+  id<OIDExternalUserAgent> _currentExternalUserAgent;
+}
 
 - (id<OIDExternalUserAgentSession>)
     performAuthorization:(OIDServiceConfiguration *)serviceConfiguration
@@ -37,6 +39,7 @@
     id<OIDExternalUserAgent> agent =
         [self userAgentWithViewController:rootViewController
                         externalUserAgent:externalUserAgent];
+    _currentExternalUserAgent = agent;
     return [OIDAuthState
         authStateByPresentingAuthorizationRequest:request
                                 externalUserAgent:agent
@@ -69,6 +72,7 @@
     id<OIDExternalUserAgent> agent =
         [self userAgentWithViewController:rootViewController
                         externalUserAgent:externalUserAgent];
+    _currentExternalUserAgent = agent;
     return [OIDAuthorizationService
         presentAuthorizationRequest:request
                   externalUserAgent:agent
@@ -137,6 +141,7 @@
   id<OIDExternalUserAgent> externalUserAgent =
       [self userAgentWithViewController:rootViewController
                       externalUserAgent:requestParameters.externalUserAgent];
+  _currentExternalUserAgent = externalUserAgent;
 
   return [OIDAuthorizationService
       presentEndSessionRequest:endSessionRequest
@@ -189,6 +194,23 @@
         .firstObject.rootViewController;
   }
   return [UIApplication sharedApplication].delegate.window.rootViewController;
+}
+
+- (void)cancelPendingSessionWithCompletion:(void (^)(void))completion {
+  id<OIDExternalUserAgent> agent = _currentExternalUserAgent;
+  _currentExternalUserAgent = nil;
+  if (agent) {
+    [agent dismissExternalUserAgentAnimated:NO
+                                completion:^{
+                                  if (completion) {
+                                    completion();
+                                  }
+                                }];
+  } else {
+    if (completion) {
+      completion();
+    }
+  }
 }
 
 @end
