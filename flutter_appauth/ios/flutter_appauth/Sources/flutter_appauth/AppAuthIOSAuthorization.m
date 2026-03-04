@@ -201,11 +201,11 @@
   _currentExternalUserAgent = nil;
   if (agent) {
     [agent dismissExternalUserAgentAnimated:NO
-                                completion:^{
-                                  if (completion) {
-                                    completion();
-                                  }
-                                }];
+                                 completion:^{
+                                   if (completion) {
+                                     completion();
+                                   }
+                                 }];
   } else {
     if (completion) {
       completion();
