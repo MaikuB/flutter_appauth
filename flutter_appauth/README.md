@@ -267,6 +267,10 @@ API docs can be found [here](https://pub.dartlang.org/documentation/flutter_appa
 
 ## FAQs
 
+**On iOS/macOS, the "Wants to Use [domain] to Sign In" consent dialog appears automatically when I open the app (e.g. after the app was backgrounded during login). How do I clear it?**
+
+Call [cancelPendingSession](https://pub.dev/documentation/flutter_appauth/latest/flutter_appauth/FlutterAppAuth/cancelPendingSession.html) early at app startup (e.g. after plugin init, before showing the main UI). This cancels any pending [ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) so the system does not re-present it on launch. See [issue #643](https://github.com/MaikuB/flutter_appauth/issues/643). Note: If the app process was killed (cold start), the plugin does not retain a reference to the session; this API helps when the app was only backgrounded.
+
 **When connecting to Azure B2C or Azure AD, the login request redirects properly on Android but not on iOS. What's going on?**
 
 The AppAuth iOS SDK has some logic to validate the redirect URL to see if it should be responsible for processing the redirect. This appears to be failing under certain circumstances. Adding a trailing slash to the redirect URL specified in your code has been reported to fix the issue.
