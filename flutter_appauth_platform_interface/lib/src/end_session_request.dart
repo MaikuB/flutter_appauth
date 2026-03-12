@@ -7,6 +7,7 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
     this.idTokenHint,
     this.postLogoutRedirectUrl,
     this.state,
+    this.autoGenerateState = true,
     this.allowInsecureConnections = false,
     this.externalUserAgent = ExternalUserAgent.asWebAuthenticationSession,
     this.additionalParameters,
@@ -32,6 +33,17 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
   final String? postLogoutRedirectUrl;
 
   final String? state;
+
+  /// Whether to to automatically generate a random state value when none is provided via [state].
+  /// Defaults to `true`.
+  ///
+  /// Set to `false` to explicitly omit the state parameter from the end-session
+  /// request. This is necessary when the IdP does not support or expect a state
+  /// value and rejects requests that include one.
+  ///
+  /// When [state] is explicitly provided this flag has no effect; the supplied
+  /// value is always used.
+  final bool autoGenerateState;
 
   /// Whether to allow non-HTTPS endpoints.
   ///

@@ -120,7 +120,7 @@
           : nil;
 
   OIDEndSessionRequest *endSessionRequest =
-      requestParameters.state
+      (requestParameters.state != nil || !requestParameters.autoGenerateState)
           ? [[OIDEndSessionRequest alloc]
                 initWithConfiguration:serviceConfiguration
                           idTokenHint:requestParameters.idTokenHint

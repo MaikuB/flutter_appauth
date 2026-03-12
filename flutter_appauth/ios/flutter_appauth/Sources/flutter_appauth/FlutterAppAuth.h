@@ -51,6 +51,7 @@ static NSString *const END_SESSION_ERROR_MESSAGE_FORMAT =
 @property(nonatomic, strong) NSString *idTokenHint;
 @property(nonatomic, strong) NSString *postLogoutRedirectUrl;
 @property(nonatomic, strong) NSString *state;
+@property(nonatomic, assign) BOOL autoGenerateState;
 @property(nonatomic, strong) NSString *issuer;
 @property(nonatomic, strong) NSString *discoveryUrl;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
