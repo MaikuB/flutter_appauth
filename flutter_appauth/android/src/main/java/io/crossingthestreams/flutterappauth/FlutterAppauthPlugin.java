@@ -287,6 +287,7 @@ public class FlutterAppauthPlugin
     final String idTokenHint = (String) arguments.get("idTokenHint");
     final String postLogoutRedirectUrl = (String) arguments.get("postLogoutRedirectUrl");
     final String state = (String) arguments.get("state");
+    final boolean autoGenerateState = (boolean) arguments.get("autoGenerateState");
     final boolean allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
     final String issuer = (String) arguments.get("issuer");
     final String discoveryUrl = (String) arguments.get("discoveryUrl");
@@ -298,6 +299,7 @@ public class FlutterAppauthPlugin
         idTokenHint,
         postLogoutRedirectUrl,
         state,
+        autoGenerateState,
         issuer,
         discoveryUrl,
         allowInsecureConnections,
@@ -570,7 +572,7 @@ public class FlutterAppauthPlugin
           Uri.parse(endSessionRequestParameters.postLogoutRedirectUrl));
     }
 
-    if (endSessionRequestParameters.state != null) {
+    if (endSessionRequestParameters.state != null || !endSessionRequestParameters.autoGenerateState) {
       endSessionRequestBuilder.setState(endSessionRequestParameters.state);
     }
 
@@ -831,6 +833,7 @@ public class FlutterAppauthPlugin
     final String idTokenHint;
     final String postLogoutRedirectUrl;
     final String state;
+    final boolean autoGenerateState;
     final String issuer;
     final String discoveryUrl;
     final boolean allowInsecureConnections;
@@ -841,6 +844,7 @@ public class FlutterAppauthPlugin
         String idTokenHint,
         String postLogoutRedirectUrl,
         String state,
+        boolean autoGenerateState,
         String issuer,
         String discoveryUrl,
         boolean allowInsecureConnections,
@@ -849,6 +853,7 @@ public class FlutterAppauthPlugin
       this.idTokenHint = idTokenHint;
       this.postLogoutRedirectUrl = postLogoutRedirectUrl;
       this.state = state;
+      this.autoGenerateState = autoGenerateState;
       this.issuer = issuer;
       this.discoveryUrl = discoveryUrl;
       this.allowInsecureConnections = allowInsecureConnections;

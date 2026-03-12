@@ -103,6 +103,9 @@
       [ArgumentProcessor processArgumentValue:arguments
                                       withKey:@"postLogoutRedirectUrl"];
   _state = [ArgumentProcessor processArgumentValue:arguments withKey:@"state"];
+  NSNumber *autoGenerateStateValue =
+      [ArgumentProcessor processArgumentValue:arguments withKey:@"autoGenerateState"];
+  _autoGenerateState = autoGenerateStateValue ? [autoGenerateStateValue boolValue] : YES;
   _issuer = [ArgumentProcessor processArgumentValue:arguments
                                             withKey:@"issuer"];
   _discoveryUrl = [ArgumentProcessor processArgumentValue:arguments

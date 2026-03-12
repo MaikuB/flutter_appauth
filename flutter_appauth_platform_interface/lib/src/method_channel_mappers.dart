@@ -28,6 +28,7 @@ extension EndSessionRequestMapper on EndSessionRequest {
       'idTokenHint': idTokenHint,
       'postLogoutRedirectUrl': postLogoutRedirectUrl,
       'state': state,
+      'autoGenerateState': autoGenerateState,
       'allowInsecureConnections': allowInsecureConnections,
       'additionalParameters': additionalParameters,
       'issuer': issuer,
