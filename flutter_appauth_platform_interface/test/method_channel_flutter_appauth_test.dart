@@ -174,7 +174,7 @@ void main() {
     await flutterAppAuth.endSession(EndSessionRequest(
         idTokenHint: 'someIdToken',
         postLogoutRedirectUrl: 'somePostLogoutRedirectUrl',
-        state: 'someState',
+        state: const CustomState('someState'),
         discoveryUrl: 'someDiscoveryUrl'));
     expect(log, <Matcher>[
       isMethodCall('endSession', arguments: <String, Object?>{
