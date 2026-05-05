@@ -48,6 +48,66 @@ void main() {
     );
   });
 
+  test('authorize with CustomState', () async {
+    await flutterAppAuth.authorize(AuthorizationRequest(
+        'someClientId', 'someRedirectUrl',
+        discoveryUrl: 'someDiscoveryUrl',
+        loginHint: 'someLoginHint',
+        state: const CustomState('someState')));
+    expect(
+      log,
+      <Matcher>[
+        isMethodCall('authorize', arguments: <String, Object?>{
+          'clientId': 'someClientId',
+          'issuer': null,
+          'redirectUrl': 'someRedirectUrl',
+          'discoveryUrl': 'someDiscoveryUrl',
+          'loginHint': 'someLoginHint',
+          'scopes': null,
+          'serviceConfiguration': null,
+          'additionalParameters': null,
+          'allowInsecureConnections': false,
+          'externalUserAgent':
+              ExternalUserAgent.asWebAuthenticationSession.index,
+          'promptValues': null,
+          'responseMode': null,
+          'nonce': null,
+          'state': 'someState',
+        })
+      ],
+    );
+  });
+
+  test('authorize with SuppressedState sends null state', () async {
+    await flutterAppAuth.authorize(AuthorizationRequest(
+        'someClientId', 'someRedirectUrl',
+        discoveryUrl: 'someDiscoveryUrl',
+        loginHint: 'someLoginHint',
+        state: const SuppressedState()));
+    expect(
+      log,
+      <Matcher>[
+        isMethodCall('authorize', arguments: <String, Object?>{
+          'clientId': 'someClientId',
+          'issuer': null,
+          'redirectUrl': 'someRedirectUrl',
+          'discoveryUrl': 'someDiscoveryUrl',
+          'loginHint': 'someLoginHint',
+          'scopes': null,
+          'serviceConfiguration': null,
+          'additionalParameters': null,
+          'allowInsecureConnections': false,
+          'externalUserAgent':
+              ExternalUserAgent.asWebAuthenticationSession.index,
+          'promptValues': null,
+          'responseMode': null,
+          'nonce': null,
+          'state': null,
+        })
+      ],
+    );
+  });
+
   test('authorizeAndExchangeCode', () async {
     await flutterAppAuth.authorizeAndExchangeCode(AuthorizationTokenRequest(
         'someClientId', 'someRedirectUrl',
@@ -77,6 +137,79 @@ void main() {
           'codeVerifier': null,
           'responseMode': 'fragment',
           'nonce': null,
+        })
+      ],
+    );
+  });
+
+  test('authorizeAndExchangeCode with CustomState', () async {
+    await flutterAppAuth.authorizeAndExchangeCode(AuthorizationTokenRequest(
+        'someClientId', 'someRedirectUrl',
+        discoveryUrl: 'someDiscoveryUrl',
+        loginHint: 'someLoginHint',
+        responseMode: 'fragment',
+        state: const CustomState('someState')));
+    expect(
+      log,
+      <Matcher>[
+        isMethodCall('authorizeAndExchangeCode', arguments: <String, Object?>{
+          'clientId': 'someClientId',
+          'issuer': null,
+          'redirectUrl': 'someRedirectUrl',
+          'discoveryUrl': 'someDiscoveryUrl',
+          'loginHint': 'someLoginHint',
+          'scopes': null,
+          'serviceConfiguration': null,
+          'additionalParameters': null,
+          'allowInsecureConnections': false,
+          'externalUserAgent':
+              ExternalUserAgent.asWebAuthenticationSession.index,
+          'promptValues': null,
+          'clientSecret': null,
+          'refreshToken': null,
+          'authorizationCode': null,
+          'grantType': 'authorization_code',
+          'codeVerifier': null,
+          'responseMode': 'fragment',
+          'nonce': null,
+          'state': 'someState',
+        })
+      ],
+    );
+  });
+
+  test('authorizeAndExchangeCode with SuppressedState sends null state',
+      () async {
+    await flutterAppAuth.authorizeAndExchangeCode(AuthorizationTokenRequest(
+        'someClientId', 'someRedirectUrl',
+        discoveryUrl: 'someDiscoveryUrl',
+        loginHint: 'someLoginHint',
+        responseMode: 'fragment',
+        state: const SuppressedState()));
+    expect(
+      log,
+      <Matcher>[
+        isMethodCall('authorizeAndExchangeCode', arguments: <String, Object?>{
+          'clientId': 'someClientId',
+          'issuer': null,
+          'redirectUrl': 'someRedirectUrl',
+          'discoveryUrl': 'someDiscoveryUrl',
+          'loginHint': 'someLoginHint',
+          'scopes': null,
+          'serviceConfiguration': null,
+          'additionalParameters': null,
+          'allowInsecureConnections': false,
+          'externalUserAgent':
+              ExternalUserAgent.asWebAuthenticationSession.index,
+          'promptValues': null,
+          'clientSecret': null,
+          'refreshToken': null,
+          'authorizationCode': null,
+          'grantType': 'authorization_code',
+          'codeVerifier': null,
+          'responseMode': 'fragment',
+          'nonce': null,
+          'state': null,
         })
       ],
     );
@@ -170,7 +303,26 @@ void main() {
     });
   });
 
-  test('endSession', () async {
+  test('endSession with default AutoGeneratedState omits state key', () async {
+    await flutterAppAuth.endSession(EndSessionRequest(
+        idTokenHint: 'someIdToken',
+        postLogoutRedirectUrl: 'somePostLogoutRedirectUrl',
+        discoveryUrl: 'someDiscoveryUrl'));
+    expect(log, <Matcher>[
+      isMethodCall('endSession', arguments: <String, Object?>{
+        'idTokenHint': 'someIdToken',
+        'postLogoutRedirectUrl': 'somePostLogoutRedirectUrl',
+        'allowInsecureConnections': false,
+        'additionalParameters': null,
+        'issuer': null,
+        'discoveryUrl': 'someDiscoveryUrl',
+        'serviceConfiguration': null,
+        'externalUserAgent': ExternalUserAgent.asWebAuthenticationSession.index,
+      })
+    ]);
+  });
+
+  test('endSession with CustomState', () async {
     await flutterAppAuth.endSession(EndSessionRequest(
         idTokenHint: 'someIdToken',
         postLogoutRedirectUrl: 'somePostLogoutRedirectUrl',
@@ -181,6 +333,27 @@ void main() {
         'idTokenHint': 'someIdToken',
         'postLogoutRedirectUrl': 'somePostLogoutRedirectUrl',
         'state': 'someState',
+        'allowInsecureConnections': false,
+        'additionalParameters': null,
+        'issuer': null,
+        'discoveryUrl': 'someDiscoveryUrl',
+        'serviceConfiguration': null,
+        'externalUserAgent': ExternalUserAgent.asWebAuthenticationSession.index,
+      })
+    ]);
+  });
+
+  test('endSession with SuppressedState sends null state', () async {
+    await flutterAppAuth.endSession(EndSessionRequest(
+        idTokenHint: 'someIdToken',
+        postLogoutRedirectUrl: 'somePostLogoutRedirectUrl',
+        state: const SuppressedState(),
+        discoveryUrl: 'someDiscoveryUrl'));
+    expect(log, <Matcher>[
+      isMethodCall('endSession', arguments: <String, Object?>{
+        'idTokenHint': 'someIdToken',
+        'postLogoutRedirectUrl': 'somePostLogoutRedirectUrl',
+        'state': null,
         'allowInsecureConnections': false,
         'additionalParameters': null,
         'issuer': null,
