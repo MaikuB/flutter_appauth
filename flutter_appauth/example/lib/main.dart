@@ -373,7 +373,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       {ExternalUserAgent externalUserAgent =
           ExternalUserAgent.asWebAuthenticationSession}) async {
     try {
-      _setBusyState(isAuthFlow: externalUserAgent == ExternalUserAgent.customBrowser);
+      _setBusyState(
+          isAuthFlow: externalUserAgent == ExternalUserAgent.customBrowser
+      );
 
       /*
         This shows that we can also explicitly specify the endpoints rather than
@@ -447,7 +449,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     });
   }
 
-  void _setBusyState({bool? isAuthFlow = null}) {
+  void _setBusyState({bool? isAuthFlow}) {
     setState(() {
       _error = '';
       _isBusy = true;
