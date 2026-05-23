@@ -137,11 +137,11 @@ AppAuthAuthorization *authorization;
 
   NSAppleEventManager *appleEventManager =
       [NSAppleEventManager sharedAppleEventManager];
-  [appleEventManager setEventHandler:instance
-                         andSelector:@selector(handleGetURLEvent:
-                                                  withReplyEvent:)
-                       forEventClass:kInternetEventClass
-                          andEventID:kAEGetURL];
+  [appleEventManager
+      setEventHandler:instance
+          andSelector:@selector(handleGetURLEvent:withReplyEvent:)
+        forEventClass:kInternetEventClass
+           andEventID:kAEGetURL];
 #else
   authorization = [[AppAuthIOSAuthorization alloc] init];
 
