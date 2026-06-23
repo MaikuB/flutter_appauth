@@ -1,3 +1,7 @@
+## [12.1.0]
+
+* [iOS] Added support for `https` redirect URIs on iOS 17.4 and newer. When the redirect URL uses the `https` scheme, the plugin now starts the `ASWebAuthenticationSession` using the `callbackWithHTTPSHost:path:` API. This applies to both the default and ephemeral `ASWebAuthenticationSession` external user agents. No Dart API changes are required — pass an `https` redirect URL as usual. Note that the app must declare the matching Associated Domains entitlement (e.g. `webcredentials:<host>`) for the callback to be delivered.
+
 ## [12.0.1]
 
 * Removed assertion around tied to `idTokenHint` and `postLogoutRedirectUrl` parameters passed to the `EndSessionRequest` constructor. This was done as both are optional according to the [OIDC RP-initiated logout specification](https://openid.net/specs/openid-connect-rpinitiated-1_0.html)

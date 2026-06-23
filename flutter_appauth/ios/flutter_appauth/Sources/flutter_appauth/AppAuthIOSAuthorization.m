@@ -36,7 +36,8 @@
   if (exchangeCode) {
     id<OIDExternalUserAgent> agent =
         [self userAgentWithViewController:rootViewController
-                        externalUserAgent:externalUserAgent];
+                        externalUserAgent:externalUserAgent
+                              redirectURL:[NSURL URLWithString:redirectUrl]];
     return [OIDAuthState
         authStateByPresentingAuthorizationRequest:request
                                 externalUserAgent:agent
@@ -68,7 +69,8 @@
   } else {
     id<OIDExternalUserAgent> agent =
         [self userAgentWithViewController:rootViewController
-                        externalUserAgent:externalUserAgent];
+                        externalUserAgent:externalUserAgent
+                              redirectURL:[NSURL URLWithString:redirectUrl]];
     return [OIDAuthorizationService
         presentAuthorizationRequest:request
                   externalUserAgent:agent
@@ -136,7 +138,8 @@
   UIViewController *rootViewController = [self rootViewController];
   id<OIDExternalUserAgent> externalUserAgent =
       [self userAgentWithViewController:rootViewController
-                      externalUserAgent:requestParameters.externalUserAgent];
+                      externalUserAgent:requestParameters.externalUserAgent
+                            redirectURL:postLogoutRedirectURL];
 
   return [OIDAuthorizationService
       presentEndSessionRequest:endSessionRequest
@@ -164,17 +167,22 @@
 
 - (id<OIDExternalUserAgent>)
     userAgentWithViewController:(UIViewController *)rootViewController
-              externalUserAgent:(NSNumber *)externalUserAgent {
-  if ([externalUserAgent integerValue] == EphemeralASWebAuthenticationSession) {
-    return [[OIDExternalUserAgentIOSNoSSO alloc]
-        initWithPresentingViewController:rootViewController];
-  }
+              externalUserAgent:(NSNumber *)externalUserAgent
+                    redirectURL:(NSURL *)redirectURL {
   if ([externalUserAgent integerValue] == SafariViewController) {
     return [[OIDExternalUserAgentIOSSafariViewController alloc]
         initWithPresentingViewController:rootViewController];
   }
-  return [[OIDExternalUserAgentIOS alloc]
-      initWithPresentingViewController:rootViewController];
+  // Both the default (SSO) and ephemeral ASWebAuthenticationSession modes are
+  // served by OIDExternalUserAgentIOSNoSSO so that `https` redirect URIs are
+  // supported on iOS 17.4+. AppAuth's own OIDExternalUserAgentIOS only supports
+  // custom-scheme callbacks.
+  BOOL prefersEphemeralSession =
+      [externalUserAgent integerValue] == EphemeralASWebAuthenticationSession;
+  return [[OIDExternalUserAgentIOSNoSSO alloc]
+      initWithPresentingViewController:rootViewController
+               prefersEphemeralSession:prefersEphemeralSession
+                           redirectURL:redirectURL];
 }
 
 - (UIViewController *)rootViewController {
