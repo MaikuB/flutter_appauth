@@ -13,6 +13,7 @@
   - [Ephemeral Sessions (iOS and macOS only)](#ephemeral-sessions-ios-and-macos-only)
 - [Android setup](#android-setup)
 - [iOS/macOS setup](#iosmacos-setup)
+- [Web setup](#web-setup)
 - [API docs](#api-docs)
 - [FAQs](#faqs)
 
@@ -259,6 +260,19 @@ Go to the `Info.plist` for your iOS/macOS app to specify the custom scheme so th
 ```
 
 Note: iOS apps generate a file called `cache.db` which contains the table `cfurl_cache_receiver_data`. This table will contain the access token obtained after the login is completed. If the potential data leak represents a threat for your application then you can disable the information caching for the entire iOS app (ex. https://kunalgupta1508.medium.com/data-leakage-with-cache-db-2d311582cf23).
+
+
+## Web setup
+
+Web support is provided by the [`flutter_appauth_web`](https://pub.dev/packages/flutter_appauth_web) package, which wraps the official [AppAuth-JS](https://github.com/openid/AppAuth-JS) SDK. It is endorsed, so it is pulled in automatically when you build for the web — no extra dependency or `web/index.html` changes are required.
+
+A few things to be aware of on the web:
+
+* Only the authorization code flow with PKCE via a full-page redirect is supported (no popups).
+* The `redirectUrl` (and `postLogoutRedirectUrl`) must be a URL served by your app and registered with your identity provider, for example `http://localhost:8080/` during development.
+* Because the flow uses a redirect, the call that starts sign in navigates away and its future does not complete. After the identity provider redirects back (the URL contains a `code`, or an `error`), call `authorizeAndExchangeCode` again — for example on startup when `Uri.base.queryParameters` contains `code` or `error` — to complete the exchange or surface the error.
+
+See the [`flutter_appauth_web` README](https://github.com/MaikuB/flutter_appauth/tree/master/flutter_appauth_web) for more details.
 
 
 ## API docs

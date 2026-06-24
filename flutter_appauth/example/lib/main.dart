@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'dart:io' show Platform;
 import 'dart:math';
 
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
@@ -42,11 +43,16 @@ class _MyAppState extends State<MyApp> {
 
   // For a list of client IDs, go to https://demo.duendesoftware.com
   final String _clientId = 'interactive.public';
-  final String _redirectUrl = 'com.duendesoftware.demo:/oauthredirect';
+  // On the web the redirect must be a URL served by this app (and registered
+  // with the identity provider). On other platforms a custom scheme is used.
+  final String _redirectUrl = kIsWeb
+      ? 'http://localhost:8080/'
+      : 'com.duendesoftware.demo:/oauthredirect';
   final String _issuer = 'https://demo.duendesoftware.com';
   final String _discoveryUrl =
       'https://demo.duendesoftware.com/.well-known/openid-configuration';
-  final String _postLogoutRedirectUrl = 'com.duendesoftware.demo:/';
+  final String _postLogoutRedirectUrl =
+      kIsWeb ? 'http://localhost:8080/' : 'com.duendesoftware.demo:/';
   final List<String> _scopes = <String>[
     'openid',
     'profile',
@@ -61,6 +67,30 @@ class _MyAppState extends State<MyApp> {
     tokenEndpoint: 'https://demo.duendesoftware.com/connect/token',
     endSessionEndpoint: 'https://demo.duendesoftware.com/connect/endsession',
   );
+
+  /// Whether the example is running on an Apple mobile platform (iOS).
+  bool get _isIOS => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+
+  /// Whether the example is running on an Apple platform (iOS or macOS).
+  bool get _isApplePlatform =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.macOS);
+
+  @override
+  void initState() {
+    super.initState();
+    // On the web the authorization flow uses a full-page redirect. When the
+    // identity provider redirects back, the URL contains an authorization
+    // `code` (success) or an `error` (failure); in both cases complete the
+    // pending sign in so the result — tokens or an error — is surfaced.
+    if (kIsWeb) {
+      final Map<String, String> parameters = Uri.base.queryParameters;
+      if (parameters.containsKey('code') || parameters.containsKey('error')) {
+        _signInWithAutoCodeExchange();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +128,7 @@ class _MyAppState extends State<MyApp> {
                   child: const Text('Sign in with auto code exchange'),
                   onPressed: () => _signInWithAutoCodeExchange(),
                 ),
-                if (Platform.isIOS || Platform.isMacOS)
+                if (_isApplePlatform)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -112,7 +142,7 @@ class _MyAppState extends State<MyApp> {
                               .ephemeralAsWebAuthenticationSession),
                     ),
                   ),
-                if (Platform.isIOS)
+                if (_isIOS)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -139,7 +169,7 @@ class _MyAppState extends State<MyApp> {
                       : null,
                   child: const Text('End session'),
                 ),
-                if (Platform.isIOS || Platform.isMacOS)
+                if (_isApplePlatform)
                   Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
@@ -153,7 +183,7 @@ class _MyAppState extends State<MyApp> {
                         child:
                             const Text('End session using ephemeral session'),
                       )),
-                if (Platform.isIOS)
+                if (_isIOS)
                   Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(

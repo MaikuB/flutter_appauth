@@ -8,6 +8,7 @@ command:
 packages:
   - flutter_appauth
   - flutter_appauth_platform_interface
+  - flutter_appauth_web
   - flutter_appauth/example/
 
 ide:

@@ -1,0 +1,33 @@
+name: flutter_appauth_web
+description: Web implementation of the flutter_appauth plugin, wrapping the
+  official AppAuth-JS (@openid/appauth) SDK to communicate with OAuth 2.0 and
+  OpenID Connect providers.
+version: 1.0.0
+homepage: https://github.com/MaikuB/flutter_appauth/tree/master/flutter_appauth_web
+
+environment:
+  sdk: ^3.10.0
+  flutter: ">=3.38.1"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  flutter_appauth_platform_interface: ^12.0.1
+  web: ^1.1.0
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  plugin:
+    implements: flutter_appauth
+    platforms:
+      web:
+        pluginClass: FlutterAppAuthWeb
+        fileName: flutter_appauth_web.dart
+  assets:
+    - assets/appauth.bundle.js
