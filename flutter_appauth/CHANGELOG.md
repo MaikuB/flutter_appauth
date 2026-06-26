@@ -1,3 +1,7 @@
+## [12.0.2]
+
+* [iOS][macOS] improved SPM (Swift Package Manager) compatibility
+
 ## [12.0.1]
 
 * Removed assertion around tied to `idTokenHint` and `postLogoutRedirectUrl` parameters passed to the `EndSessionRequest` constructor. This was done as both are optional according to the [OIDC RP-initiated logout specification](https://openid.net/specs/openid-connect-rpinitiated-1_0.html)
