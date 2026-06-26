@@ -84,6 +84,11 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
     return EndSessionResponse(result['state']);
   }
 
+  @override
+  Future<void> cancelPendingSession() async {
+    await _channel.invokeMethod<void>('cancelPendingSession');
+  }
+
   Future<Map<dynamic, dynamic>> invokeMethod(
       String method, dynamic arguments) async {
     try {

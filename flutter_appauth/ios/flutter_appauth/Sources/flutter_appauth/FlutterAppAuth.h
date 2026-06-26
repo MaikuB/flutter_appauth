@@ -33,6 +33,7 @@ static NSString *const AUTHORIZE_AND_EXCHANGE_CODE_METHOD =
     @"authorizeAndExchangeCode";
 static NSString *const TOKEN_METHOD = @"token";
 static NSString *const END_SESSION_METHOD = @"endSession";
+static NSString *const CANCEL_PENDING_SESSION_METHOD = @"cancelPendingSession";
 static NSString *const AUTHORIZE_ERROR_CODE = @"authorize_failed";
 static NSString *const AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE =
     @"authorize_and_exchange_code_failed";
@@ -82,6 +83,10 @@ typedef NS_ENUM(NSInteger, ExternalUserAgent) {
     performEndSessionRequest:(OIDServiceConfiguration *)serviceConfiguration
            requestParameters:(EndSessionRequestParameters *)requestParameters
                       result:(FlutterResult)result;
+
+/// Cancels any pending ASWebAuthenticationSession so it is not re-presented
+/// on app launch. Completion is called when the session has been dismissed.
+- (void)cancelPendingSessionWithCompletion:(void (^)(void))completion;
 
 @end
 
