@@ -1,6 +1,6 @@
 ## [12.0.2]
 
-* [iOS][macOS] improved SPM (Swift Package Manager) compatibility
+* [iOS][macOS] improved SPM (Swift Package Manager) compatibility. Thanks to PR from [JarvanMo](https://github.com/JarvanMo)
 
 ## [12.0.1]
 
