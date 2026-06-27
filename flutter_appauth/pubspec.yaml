@@ -13,6 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_appauth_platform_interface: ^12.0.1
+  flutter_appauth_web: ^1.0.0
 
 flutter:
   plugin:
@@ -24,5 +25,7 @@ flutter:
         pluginClass: FlutterAppauthPlugin
       macos:
         pluginClass: FlutterAppauthPlugin
+      web:
+        default_package: flutter_appauth_web
 dev_dependencies:
   flutter_lints: ^5.0.0
