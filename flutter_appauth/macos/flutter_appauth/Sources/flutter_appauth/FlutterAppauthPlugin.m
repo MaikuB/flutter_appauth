@@ -2,6 +2,90 @@
 
 #import "FlutterAppauthPlugin_Private.h"
 
+#pragma mark - InsecureURLProtocol
+
+@interface InsecureURLProtocol : NSURLProtocol <NSURLSessionDataDelegate>
+@property (nonatomic, strong) NSURLSessionDataTask *dataTask;
+@property (nonatomic, strong) NSURLSession *session;
+@end
+
+static NSString *const kInsecureURLProtocolHandledKey = @"InsecureURLProtocolHandled";
+
+@implementation InsecureURLProtocol
+
++ (BOOL)canInitWithRequest:(NSURLRequest *)request {
+  return [self propertyForKey:kInsecureURLProtocolHandledKey inRequest:request] == nil;
+}
+
++ (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request {
+  return request;
+}
+
+- (void)startLoading {
+  NSMutableURLRequest *mutableRequest = [self.request mutableCopy];
+  [InsecureURLProtocol setProperty:@YES
+                            forKey:kInsecureURLProtocolHandledKey
+                         inRequest:mutableRequest];
+
+  NSURLSessionConfiguration *config =
+      [NSURLSessionConfiguration defaultSessionConfiguration];
+  config.protocolClasses = @[];
+
+  self.session = [NSURLSession sessionWithConfiguration:config
+                                               delegate:self
+                                          delegateQueue:[NSOperationQueue mainQueue]];
+  self.dataTask = [self.session dataTaskWithRequest:mutableRequest];
+  [self.dataTask resume];
+}
+
+- (void)stopLoading {
+  [self.dataTask cancel];
+}
+
+- (void)URLSession:(NSURLSession *)session
+    didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
+      completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition,
+                                  NSURLCredential *_Nullable credential))completionHandler {
+  if (challenge.protectionSpace.authenticationMethod ==
+      NSURLAuthenticationMethodServerTrust) {
+    SecTrustRef serverTrust = challenge.protectionSpace.serverTrust;
+    completionHandler(NSURLSessionAuthChallengeUseCredential,
+                      [NSURLCredential credentialForTrust:serverTrust]);
+  } else {
+    completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+  }
+}
+
+- (void)URLSession:(NSURLSession *)session
+          dataTask:(NSURLSessionDataTask *)dataTask
+didReceiveResponse:(NSURLResponse *)response
+ completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
+  [self.client URLProtocol:self
+        didReceiveResponse:response
+        cacheStoragePolicy:NSURLCacheStorageNotAllowed];
+  completionHandler(NSURLSessionResponseAllow);
+}
+
+- (void)URLSession:(NSURLSession *)session
+          dataTask:(NSURLSessionDataTask *)dataTask
+    didReceiveData:(NSData *)data {
+  [self.client URLProtocol:self didLoadData:data];
+}
+
+- (void)URLSession:(NSURLSession *)session
+              task:(NSURLSessionTask *)task
+didCompleteWithError:(NSError *)error {
+  if (error) {
+    [self.client URLProtocol:self didFailWithError:error];
+  } else {
+    [self.client URLProtocolDidFinishLoading:self];
+  }
+}
+
+@end
+
+#pragma mark - ArgumentProcessor
+
 @interface ArgumentProcessor : NSObject
 + (id _Nullable)processArgumentValue:(NSDictionary *)arguments
                              withKey:(NSString *)key;
@@ -31,6 +115,7 @@
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
 @property(nonatomic, strong) NSNumber *externalUserAgent;
+@property(nonatomic, assign) BOOL allowInsecureConnections;
 
 @end
 
@@ -67,6 +152,10 @@
   _externalUserAgent =
       [ArgumentProcessor processArgumentValue:arguments
                                       withKey:@"externalUserAgent"];
+  NSNumber *allowInsecure =
+      [ArgumentProcessor processArgumentValue:arguments
+                                      withKey:@"allowInsecureConnections"];
+  _allowInsecureConnections = allowInsecure ? [allowInsecure boolValue] : NO;
 }
 
 - (id)initWithArguments:(NSDictionary *)arguments {
@@ -116,6 +205,10 @@
   _externalUserAgent =
       [ArgumentProcessor processArgumentValue:arguments
                                       withKey:@"externalUserAgent"];
+  NSNumber *allowInsecure =
+      [ArgumentProcessor processArgumentValue:arguments
+                                      withKey:@"allowInsecureConnections"];
+  _allowInsecureConnections = allowInsecure ? [allowInsecure boolValue] : NO;
   return self;
 }
 @end
@@ -196,6 +289,17 @@ AppAuthAuthorization *authorization;
           forKey:@"response_mode"];
   }
 
+  if (requestParameters.allowInsecureConnections) {
+    [NSURLProtocol registerClass:[InsecureURLProtocol class]];
+  }
+
+  FlutterResult insecureResult = ^(id _Nullable value) {
+    if (requestParameters.allowInsecureConnections) {
+      [NSURLProtocol unregisterClass:[InsecureURLProtocol class]];
+    }
+    result(value);
+  };
+
   if (requestParameters.serviceConfigurationParameters != nil) {
     OIDServiceConfiguration *serviceConfiguration =
         [self processServiceConfigurationParameters:
@@ -208,7 +312,7 @@ AppAuthAuthorization *authorization;
                  redirectUrl:requestParameters.redirectUrl
         additionalParameters:requestParameters.additionalParameters
            externalUserAgent:requestParameters.externalUserAgent
-                      result:result
+                      result:insecureResult
                 exchangeCode:exchangeCode
                        nonce:requestParameters.nonce];
   } else if (requestParameters.discoveryUrl) {
@@ -223,7 +327,7 @@ AppAuthAuthorization *authorization;
                                              [self
                                                  finishWithDiscoveryError:error
                                                                    result:
-                                                                       result];
+                                                                       insecureResult];
                                              return;
                                            }
 
@@ -248,7 +352,7 @@ AppAuthAuthorization *authorization;
                                                   externalUserAgent:
                                                       requestParameters
                                                           .externalUserAgent
-                                                             result:result
+                                                             result:insecureResult
                                                        exchangeCode:exchangeCode
                                                               nonce:
                                                                   requestParameters
@@ -263,7 +367,7 @@ AppAuthAuthorization *authorization;
                                                 NSError *_Nullable error) {
                                      if (!configuration) {
                                        [self finishWithDiscoveryError:error
-                                                               result:result];
+                                                               result:insecureResult];
                                        return;
                                      }
 
@@ -288,7 +392,7 @@ AppAuthAuthorization *authorization;
                                                 externalUserAgent:
                                                     requestParameters
                                                         .externalUserAgent
-                                                           result:result
+                                                           result:insecureResult
                                                      exchangeCode:exchangeCode
                                                             nonce:
                                                                 requestParameters
@@ -333,13 +437,25 @@ AppAuthAuthorization *authorization;
                        result:(FlutterResult)result {
   TokenRequestParameters *requestParameters =
       [[TokenRequestParameters alloc] initWithArguments:arguments];
+
+  if (requestParameters.allowInsecureConnections) {
+    [NSURLProtocol registerClass:[InsecureURLProtocol class]];
+  }
+
+  FlutterResult insecureResult = ^(id _Nullable value) {
+    if (requestParameters.allowInsecureConnections) {
+      [NSURLProtocol unregisterClass:[InsecureURLProtocol class]];
+    }
+    result(value);
+  };
+
   if (requestParameters.serviceConfigurationParameters != nil) {
     OIDServiceConfiguration *serviceConfiguration =
         [self processServiceConfigurationParameters:
                   requestParameters.serviceConfigurationParameters];
     [self performTokenRequest:serviceConfiguration
             requestParameters:requestParameters
-                       result:result];
+                       result:insecureResult];
   } else if (requestParameters.discoveryUrl) {
     NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
 
@@ -353,7 +469,7 @@ AppAuthAuthorization *authorization;
                                              [self
                                                  finishWithDiscoveryError:error
                                                                    result:
-                                                                       result];
+                                                                       insecureResult];
                                              return;
                                            }
 
@@ -361,7 +477,7 @@ AppAuthAuthorization *authorization;
                                                performTokenRequest:configuration
                                                  requestParameters:
                                                      requestParameters
-                                                            result:result];
+                                                            result:insecureResult];
                                          }];
   } else {
     NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -372,13 +488,13 @@ AppAuthAuthorization *authorization;
                                                 NSError *_Nullable error) {
                                      if (!configuration) {
                                        [self finishWithDiscoveryError:error
-                                                               result:result];
+                                                               result:insecureResult];
                                        return;
                                      }
 
                                      [self performTokenRequest:configuration
                                              requestParameters:requestParameters
-                                                        result:result];
+                                                        result:insecureResult];
                                    }];
   }
 }
@@ -387,6 +503,18 @@ AppAuthAuthorization *authorization;
                             result:(FlutterResult)result {
   EndSessionRequestParameters *requestParameters =
       [[EndSessionRequestParameters alloc] initWithArguments:arguments];
+
+  if (requestParameters.allowInsecureConnections) {
+    [NSURLProtocol registerClass:[InsecureURLProtocol class]];
+  }
+
+  FlutterResult insecureResult = ^(id _Nullable value) {
+    if (requestParameters.allowInsecureConnections) {
+      [NSURLProtocol unregisterClass:[InsecureURLProtocol class]];
+    }
+    result(value);
+  };
+
   if (requestParameters.serviceConfigurationParameters != nil) {
     OIDServiceConfiguration *serviceConfiguration =
         [self processServiceConfigurationParameters:
@@ -394,7 +522,7 @@ AppAuthAuthorization *authorization;
     _currentAuthorizationFlow =
         [authorization performEndSessionRequest:serviceConfiguration
                               requestParameters:requestParameters
-                                         result:result];
+                                         result:insecureResult];
   } else if (requestParameters.discoveryUrl) {
     NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
 
@@ -408,7 +536,7 @@ AppAuthAuthorization *authorization;
                                              [self
                                                  finishWithDiscoveryError:error
                                                                    result:
-                                                                       result];
+                                                                       insecureResult];
                                              return;
                                            }
 
@@ -419,7 +547,7 @@ AppAuthAuthorization *authorization;
                                                           requestParameters:
                                                               requestParameters
                                                                      result:
-                                                                         result];
+                                                                         insecureResult];
                                          }];
   } else {
     NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -430,7 +558,7 @@ AppAuthAuthorization *authorization;
                                                 NSError *_Nullable error) {
                                      if (!configuration) {
                                        [self finishWithDiscoveryError:error
-                                                               result:result];
+                                                               result:insecureResult];
                                        return;
                                      }
 
@@ -440,7 +568,7 @@ AppAuthAuthorization *authorization;
                                                  configuration
                                                     requestParameters:
                                                         requestParameters
-                                                               result:result];
+                                                               result:insecureResult];
                                    }];
   }
 }
