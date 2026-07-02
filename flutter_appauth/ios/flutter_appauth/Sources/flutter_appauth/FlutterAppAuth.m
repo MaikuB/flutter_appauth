@@ -135,7 +135,8 @@
        externalUserAgent:(NSNumber *)externalUserAgent
                   result:(FlutterResult)result
             exchangeCode:(BOOL)exchangeCode
-                   nonce:(NSString *)nonce {
+                   nonce:(NSString *)nonce
+            responseTypes:(NSArray *)responseTypes {
   return nil;
 }
 

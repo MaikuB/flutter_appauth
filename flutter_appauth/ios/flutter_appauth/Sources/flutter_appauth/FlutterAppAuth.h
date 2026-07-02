@@ -59,7 +59,7 @@ static NSString *const END_SESSION_ERROR_MESSAGE_FORMAT =
 @end
 
 typedef NS_ENUM(NSInteger, ExternalUserAgent) {
-  ASWebAuthenticationSession,
+  DefaultASWebAuthenticationSession,
   EphemeralASWebAuthenticationSession,
   SafariViewController
 };
@@ -76,7 +76,8 @@ typedef NS_ENUM(NSInteger, ExternalUserAgent) {
        externalUserAgent:(NSNumber *)externalUserAgent
                   result:(FlutterResult)result
             exchangeCode:(BOOL)exchangeCode
-                   nonce:(NSString *)nonce;
+                   nonce:(NSString *)nonce
+            responseTypes:(NSArray *)responseTypes;
 
 - (id<OIDExternalUserAgentSession>)
     performEndSessionRequest:(OIDServiceConfiguration *)serviceConfiguration

@@ -27,6 +27,8 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
       authorizationCode: result['authorizationCode'],
       codeVerifier: result['codeVerifier'],
       nonce: result['nonce'],
+      idToken: result['idToken'],
+      accessToken: result['accessToken'],
       authorizationAdditionalParameters:
           result['authorizationAdditionalParameters']?.cast<String, dynamic>(),
     );

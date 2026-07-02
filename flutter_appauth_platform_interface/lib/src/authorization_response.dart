@@ -4,6 +4,8 @@ class AuthorizationResponse {
     this.authorizationCode,
     this.codeVerifier,
     this.nonce,
+    this.idToken,
+    this.accessToken,
     this.authorizationAdditionalParameters,
   });
 
@@ -20,6 +22,12 @@ class AuthorizationResponse {
   ///
   /// Use this when exchanging the [authorizationCode] for a token.
   final String? nonce;
+
+  /// The ID token returned by implicit / hybrid authorization flows.
+  final String? idToken;
+
+  /// The access token returned by implicit / hybrid authorization flows.
+  final String? accessToken;
 
   /// Additional parameters included in the response.
   final Map<String, dynamic>? authorizationAdditionalParameters;

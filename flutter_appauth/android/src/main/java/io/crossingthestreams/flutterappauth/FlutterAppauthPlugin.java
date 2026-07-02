@@ -5,9 +5,11 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.browser.customtabs.CustomTabsIntent;
 
 import net.openid.appauth.AppAuthConfiguration;
 import net.openid.appauth.AuthorizationException;
@@ -30,6 +32,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -85,6 +88,8 @@ public class FlutterAppauthPlugin
   private final int RC_AUTH = 65031;
   private final int RC_END_SESSION = 65032;
 
+  private static @Nullable FlutterAppauthPlugin instance;
+
   private Context applicationContext;
   private Activity mainActivity;
   private PendingOperation pendingOperation;
@@ -94,6 +99,7 @@ public class FlutterAppauthPlugin
   private AuthorizationService insecureAuthorizationService;
 
   private void onAttachedToEngine(Context context, BinaryMessenger binaryMessenger) {
+    instance = this;
     this.applicationContext = context;
     createAuthorizationServices();
     final MethodChannel channel =
@@ -108,6 +114,9 @@ public class FlutterAppauthPlugin
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+    if (instance == this) {
+      instance = null;
+    }
     disposeAuthorizationServices();
   }
 
@@ -221,6 +230,7 @@ public class FlutterAppauthPlugin
         (Map<String, String>) arguments.get("additionalParameters");
     allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
     final String responseMode = (String) arguments.get("responseMode");
+    final ArrayList<String> responseTypes = (ArrayList<String>) arguments.get("responseTypes");
 
     return new AuthorizationTokenRequestParameters(
         clientId,
@@ -233,7 +243,8 @@ public class FlutterAppauthPlugin
         loginHint,
         nonce,
         promptValues,
-        responseMode);
+        responseMode,
+        responseTypes);
   }
 
   @SuppressWarnings("unchecked")
@@ -323,7 +334,8 @@ public class FlutterAppauthPlugin
           tokenRequestParameters.additionalParameters,
           exchangeCode,
           tokenRequestParameters.promptValues,
-          tokenRequestParameters.responseMode);
+          tokenRequestParameters.responseMode,
+          tokenRequestParameters.responseTypes);
     } else {
       AuthorizationServiceConfiguration.RetrieveConfigurationCallback callback =
           new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
@@ -342,7 +354,8 @@ public class FlutterAppauthPlugin
                     tokenRequestParameters.additionalParameters,
                     exchangeCode,
                     tokenRequestParameters.promptValues,
-                    tokenRequestParameters.responseMode);
+                    tokenRequestParameters.responseMode,
+                    tokenRequestParameters.responseTypes);
               } else {
                 finishWithDiscoveryError(ex);
               }
@@ -415,10 +428,15 @@ public class FlutterAppauthPlugin
       Map<String, String> additionalParameters,
       boolean exchangeCode,
       ArrayList<String> promptValues,
-      String responseMode) {
+      String responseMode,
+      ArrayList<String> responseTypes) {
+    final String responseType =
+        responseTypes != null && !responseTypes.isEmpty()
+            ? TextUtils.join(" ", responseTypes)
+            : ResponseTypeValues.CODE;
     AuthorizationRequest.Builder authRequestBuilder =
         new AuthorizationRequest.Builder(
-            serviceConfiguration, clientId, ResponseTypeValues.CODE, Uri.parse(redirectUrl));
+            serviceConfiguration, clientId, responseType, Uri.parse(redirectUrl));
 
     if (scopes != null && !scopes.isEmpty()) {
       authRequestBuilder.setScopes(scopes);
@@ -462,10 +480,26 @@ public class FlutterAppauthPlugin
     }
 
     AuthorizationService authorizationService = getAuthorizationService();
+    AuthorizationRequest authRequest = authRequestBuilder.build();
+
+    if (isManualImplicitResponseType(responseType)) {
+      pendingOperation.manualImplicit = true;
+      pendingOperation.expectedState = authRequest.state;
+      pendingOperation.expectedNonce = authRequest.nonce;
+
+      try {
+        CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder().build();
+        customTabsIntent.launchUrl(mainActivity, authRequest.toUri());
+      } catch (ActivityNotFoundException ex) {
+        finishWithError(NO_BROWSER_AVAILABLE_ERROR_CODE, NO_BROWSER_AVAILABLE_ERROR_FORMAT, ex);
+      } catch (NullPointerException ex) {
+        finishWithError(NULL_ACTIVITY_ERROR_CODE, NULL_ACTIVITY_ERROR_FORMAT, ex);
+      }
+      return;
+    }
 
     try {
-      Intent authIntent =
-          authorizationService.getAuthorizationRequestIntent(authRequestBuilder.build());
+      Intent authIntent = authorizationService.getAuthorizationRequestIntent(authRequest);
       mainActivity.startActivityForResult(
           authIntent, exchangeCode ? RC_AUTH_EXCHANGE_CODE : RC_AUTH);
     } catch (ActivityNotFoundException ex) {
@@ -473,6 +507,97 @@ public class FlutterAppauthPlugin
     } catch (NullPointerException ex) {
       finishWithError(NULL_ACTIVITY_ERROR_CODE, NULL_ACTIVITY_ERROR_FORMAT, ex);
     }
+  }
+
+  static boolean handleManualImplicitRedirectUri(@Nullable Uri uri) {
+    if (instance == null || instance.pendingOperation == null) {
+      return false;
+    }
+    return instance.processManualImplicitRedirectUri(uri);
+  }
+
+  private boolean isManualImplicitResponseType(@NonNull String responseType) {
+    return ResponseTypeValues.TOKEN.equals(responseType)
+        || ResponseTypeValues.ID_TOKEN.equals(responseType)
+        || "id_token token".equals(responseType)
+        || "token id_token".equals(responseType);
+  }
+
+  private boolean processManualImplicitRedirectUri(@Nullable Uri uri) {
+    if (pendingOperation == null || !pendingOperation.manualImplicit) {
+      return false;
+    }
+
+    if (uri == null) {
+      finishWithError(
+          NULL_INTENT_ERROR_CODE,
+          NULL_INTENT_ERROR_FORMAT,
+          null);
+      return true;
+    }
+
+    Map<String, String> params = parseUriParameters(uri);
+
+    if (params.containsKey("error")) {
+      String message =
+          params.containsKey("error_description")
+              ? params.get("error_description")
+              : params.get("error");
+      finishWithError(AUTHORIZE_ERROR_CODE, message, null);
+      return true;
+    }
+
+    String responseState = params.get("state");
+    if (pendingOperation.expectedState != null
+        && !pendingOperation.expectedState.equals(responseState)) {
+      finishWithError(
+          AUTHORIZE_ERROR_CODE,
+          "Response state param did not match request state",
+          null);
+      return true;
+    }
+
+    Map<String, Object> responseMap = new HashMap<>();
+    responseMap.put("authorizationAdditionalParameters", new HashMap<>());
+    if (params.containsKey("id_token")) {
+      responseMap.put("idToken", params.get("id_token"));
+    }
+    if (params.containsKey("access_token")) {
+      responseMap.put("accessToken", params.get("access_token"));
+    }
+    if (params.containsKey("code")) {
+      responseMap.put("authorizationCode", params.get("code"));
+    }
+    responseMap.put("nonce", pendingOperation.expectedNonce);
+    finishWithSuccess(responseMap);
+    return true;
+  }
+
+  private Map<String, String> parseUriParameters(@NonNull Uri uri) {
+    Map<String, String> params = new LinkedHashMap<>();
+    if (uri.getQuery() != null) {
+      params.putAll(parseParameterString(uri.getQuery()));
+    }
+    if (uri.getFragment() != null) {
+      params.putAll(parseParameterString(uri.getFragment()));
+    }
+    return params;
+  }
+
+  private Map<String, String> parseParameterString(@NonNull String parameterString) {
+    Map<String, String> params = new LinkedHashMap<>();
+    for (String pair : parameterString.split("&")) {
+      int separatorIndex = pair.indexOf('=');
+      if (separatorIndex == -1) {
+        continue;
+      }
+      String key = Uri.decode(pair.substring(0, separatorIndex));
+      String value = Uri.decode(pair.substring(separatorIndex + 1));
+      if (!key.isEmpty()) {
+        params.put(key, value);
+      }
+    }
+    return params;
   }
 
   private void performTokenRequest(
@@ -771,6 +896,8 @@ public class FlutterAppauthPlugin
     responseMap.put("codeVerifier", authResponse.request.codeVerifier);
     responseMap.put("nonce", authResponse.request.nonce);
     responseMap.put("authorizationCode", authResponse.authorizationCode);
+    responseMap.put("idToken", authResponse.idToken);
+    responseMap.put("accessToken", authResponse.accessToken);
     responseMap.put("authorizationAdditionalParameters", authResponse.additionalParameters);
     return responseMap;
   }
@@ -778,6 +905,9 @@ public class FlutterAppauthPlugin
   private class PendingOperation {
     final String method;
     final Result result;
+    boolean manualImplicit = false;
+    @Nullable String expectedState;
+    @Nullable String expectedNonce;
 
     PendingOperation(String method, Result result) {
       this.method = method;
@@ -861,6 +991,7 @@ public class FlutterAppauthPlugin
     final String loginHint;
     final ArrayList<String> promptValues;
     final String responseMode;
+    final ArrayList<String> responseTypes;
 
     private AuthorizationTokenRequestParameters(
         String clientId,
@@ -873,7 +1004,8 @@ public class FlutterAppauthPlugin
         String loginHint,
         String nonce,
         ArrayList<String> promptValues,
-        String responseMode) {
+        String responseMode,
+        ArrayList<String> responseTypes) {
       super(
           clientId,
           issuer,
@@ -890,6 +1022,7 @@ public class FlutterAppauthPlugin
       this.loginHint = loginHint;
       this.promptValues = promptValues;
       this.responseMode = responseMode;
+      this.responseTypes = responseTypes;
     }
   }
 }
