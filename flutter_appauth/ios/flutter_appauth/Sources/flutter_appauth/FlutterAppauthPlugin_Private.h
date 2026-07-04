@@ -19,5 +19,6 @@
 
 @property(nonatomic, strong, nullable) id<OIDExternalUserAgentSession>
     currentAuthorizationFlow;
+@property(nonatomic, strong, nullable) NSString *pendingProxyRedirectUrl;
 
 @end

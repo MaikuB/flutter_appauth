@@ -15,6 +15,7 @@ Map<String, Object?> _convertCommonRequestDetailsToMap(
     'nonce': commonRequestDetails.nonce,
     'discoveryUrl': commonRequestDetails.discoveryUrl,
     'redirectUrl': commonRequestDetails.redirectUrl,
+    'proxyRedirectUrl': commonRequestDetails.proxyRedirectUrl,
     'scopes': commonRequestDetails.scopes,
     'serviceConfiguration': commonRequestDetails.serviceConfiguration?.toMap(),
     'additionalParameters': commonRequestDetails.additionalParameters,

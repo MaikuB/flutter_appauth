@@ -11,6 +11,7 @@
   - [End session](#end-session)
   - [Handling errors](#handling-errors)
   - [Ephemeral Sessions (iOS and macOS only)](#ephemeral-sessions-ios-and-macos-only)
+  - [Using a proxy redirect URL](#using-a-proxy-redirect-url)
 - [Android setup](#android-setup)
 - [iOS/macOS setup](#iosmacos-setup)
 - [API docs](#api-docs)
@@ -164,6 +165,64 @@ With an ephemeral session there will be no warning like `"app_name" Wants to Use
 
 The option `preferEphemeralSession = true` must only be used for the end session call if it is also used for the sign in call. 
 Otherwise, there will be still an active login session in the browser.
+
+### Using a proxy redirect URL
+
+Some identity providers only allow HTTPS redirect URIs and wil reject custom-scheme deep links (e.g. `com.example.myapp://oauth2redirect`) during the authorization request. A common solution is to host a small HTTPS endpoint that immediately redirects to your app's custom scheme. The `proxyRedirectUrl` parameter supports this pattern.
+
+**How it works:**
+
+1. Your app registers a custom-scheme redirect URL (e.g. `com.example.myapp://oauth2redirect`) with the OS so it can intercept the callback — this is `redirectUrl`.
+2. You host an HTTPS endpoint (e.g. `https://myapp.example.com/oauth2redirect`) that simply redirects to the custom-scheme URL — this becomes `proxyRedirectUrl`.
+3. When making the authorization request, `proxyRedirectUrl` is sent to the identity provider as the `redirect_uri` parameter so that it passes the provider's HTTPS validation.
+4. The provider redirects the browser to `proxyRedirectUrl`, which in turn redirects to `redirectUrl`, and the OS hands the callback back to your app.
+5. When exchanging the authorization code for tokens, `proxyRedirectUrl` must also be specified so that the `redirect_uri` in the token request matches what was used during authorization.
+
+**Example:**
+
+```dart
+// Authorization + code exchange in one step
+final AuthorizationTokenResponse result = await appAuth.authorizeAndExchangeCode(
+  AuthorizationTokenRequest(
+    '<client_id>',
+    'com.example.myapp://oauth2redirect',   // redirectUrl: custom scheme the OS intercepts
+    proxyRedirectUrl: 'https://myapp.example.com/oauth2redirect', // sent to the provider as redirect_uri
+    discoveryUrl: '<discovery_url>',
+    scopes: ['openid', 'profile', 'email', 'offline_access'],
+  ),
+);
+```
+
+If you perform authorization and token exchange as separate steps, pass `proxyRedirectUrl` to both calls:
+
+```dart
+// Step 1: authorize
+final AuthorizationResponse authResult = await appAuth.authorize(
+  AuthorizationRequest(
+    '<client_id>',
+    'com.example.myapp://oauth2redirect',
+    proxyRedirectUrl: 'https://myapp.example.com/oauth2redirect',
+    discoveryUrl: '<discovery_url>',
+    scopes: ['openid', 'profile', 'email', 'offline_access'],
+  ),
+);
+
+// Step 2: exchange the code — proxyRedirectUrl must match what was sent during authorization
+final TokenResponse tokenResult = await appAuth.token(
+  TokenRequest(
+    '<client_id>',
+    'com.example.myapp://oauth2redirect',
+    proxyRedirectUrl: 'https://myapp.example.com/oauth2redirect',
+    authorizationCode: authResult.authorizationCode,
+    discoveryUrl: '<discovery_url>',
+    codeVerifier: authResult.codeVerifier,
+    nonce: authResult.nonce,
+    scopes: ['openid', 'profile', 'email', 'offline_access'],
+  ),
+);
+```
+
+> **Note:** The `redirectUrl` still needs to be registered with the OS (via `Info.plist` on iOS/macOS and `build.gradle`/`AndroidManifest.xml` on Android) so the OS knows to route the deep link back to your app. Only `proxyRedirectUrl` is sent to the identity provider.
 
 ## Android setup
 

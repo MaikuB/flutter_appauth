@@ -31,6 +31,7 @@
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
 @property(nonatomic, strong) NSNumber *externalUserAgent;
+@property(nonatomic, strong) NSString *proxyRedirectUrl;
 
 @end
 
@@ -67,6 +68,9 @@
   _externalUserAgent =
       [ArgumentProcessor processArgumentValue:arguments
                                       withKey:@"externalUserAgent"];
+  _proxyRedirectUrl =
+      [ArgumentProcessor processArgumentValue:arguments
+                                      withKey:@"proxyRedirectUrl"];
 }
 
 - (id)initWithArguments:(NSDictionary *)arguments {
@@ -197,6 +201,16 @@ AppAuthAuthorization *authorization;
           forKey:@"response_mode"];
   }
 
+  if (requestParameters.proxyRedirectUrl) {
+    NSInteger agentValue = [requestParameters.externalUserAgent integerValue];
+    // ASWebAuthenticationSession cases are handled by FlutterAppAuthProxyUserAgent internally.
+    // Only set _pendingProxyRedirectUrl for SafariViewController and browser user agents,
+    // which rely on openURL:/scene:openURLContexts: for the callback.
+    if (agentValue != ASWebAuthenticationSession &&
+        agentValue != EphemeralASWebAuthenticationSession) {
+      _pendingProxyRedirectUrl = requestParameters.proxyRedirectUrl;
+    }
+  }
   if (requestParameters.serviceConfigurationParameters != nil) {
     OIDServiceConfiguration *serviceConfiguration =
         [self processServiceConfigurationParameters:
@@ -207,6 +221,7 @@ AppAuthAuthorization *authorization;
                 clientSecret:requestParameters.clientSecret
                       scopes:requestParameters.scopes
                  redirectUrl:requestParameters.redirectUrl
+             proxyRedirectUrl:requestParameters.proxyRedirectUrl
         additionalParameters:requestParameters.additionalParameters
            externalUserAgent:requestParameters.externalUserAgent
                       result:result
@@ -243,6 +258,9 @@ AppAuthAuthorization *authorization;
                                                         redirectUrl:
                                                             requestParameters
                                                                 .redirectUrl
+                                                    proxyRedirectUrl:
+                                                        requestParameters
+                                                            .proxyRedirectUrl
                                                additionalParameters:
                                                    requestParameters
                                                        .additionalParameters
@@ -283,6 +301,9 @@ AppAuthAuthorization *authorization;
                                                       redirectUrl:
                                                           requestParameters
                                                               .redirectUrl
+                                                 proxyRedirectUrl:
+                                                     requestParameters
+                                                         .proxyRedirectUrl
                                              additionalParameters:
                                                  requestParameters
                                                      .additionalParameters
@@ -449,11 +470,12 @@ AppAuthAuthorization *authorization;
 - (void)performTokenRequest:(OIDServiceConfiguration *)serviceConfiguration
           requestParameters:(TokenRequestParameters *)requestParameters
                      result:(FlutterResult)result {
+  NSString *effectiveRedirectUrl = requestParameters.proxyRedirectUrl ?: requestParameters.redirectUrl;
   OIDTokenRequest *tokenRequest = [[OIDTokenRequest alloc]
       initWithConfiguration:serviceConfiguration
                   grantType:requestParameters.grantType
           authorizationCode:requestParameters.authorizationCode
-                redirectURL:[NSURL URLWithString:requestParameters.redirectUrl]
+                redirectURL:[NSURL URLWithString:effectiveRedirectUrl]
                    clientID:requestParameters.clientId
                clientSecret:requestParameters.clientSecret
                      scopes:requestParameters.scopes
@@ -480,11 +502,25 @@ AppAuthAuthorization *authorization;
 }
 
 #if TARGET_OS_IOS
+- (NSURL *)rewriteUrlForProxyIfNeeded:(NSURL *)url {
+  if (_pendingProxyRedirectUrl) {
+    NSURLComponents *proxyComponents =
+        [NSURLComponents componentsWithString:_pendingProxyRedirectUrl];
+    NSURLComponents *incomingComponents =
+        [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
+    proxyComponents.queryItems = incomingComponents.queryItems;
+    _pendingProxyRedirectUrl = nil;
+    return [proxyComponents URL];
+  }
+  return url;
+}
+
 - (BOOL)application:(UIApplication *)application
             openURL:(NSURL *)url
             options:
                 (NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-  if ([_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:url]) {
+  NSURL *effectiveUrl = [self rewriteUrlForProxyIfNeeded:url];
+  if ([_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:effectiveUrl]) {
     _currentAuthorizationFlow = nil;
     return YES;
   }
@@ -502,8 +538,9 @@ AppAuthAuthorization *authorization;
 - (BOOL)scene:(UIScene *)scene
     openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts {
   for (UIOpenURLContext *URLContext in URLContexts) {
+    NSURL *effectiveUrl = [self rewriteUrlForProxyIfNeeded:URLContext.URL];
     if ([_currentAuthorizationFlow
-            resumeExternalUserAgentFlowWithURL:URLContext.URL]) {
+            resumeExternalUserAgentFlowWithURL:effectiveUrl]) {
       _currentAuthorizationFlow = nil;
       return YES;
     }

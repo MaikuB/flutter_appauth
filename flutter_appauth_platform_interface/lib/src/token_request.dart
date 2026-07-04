@@ -6,6 +6,7 @@ class TokenRequest extends CommonRequestDetails {
   TokenRequest(
     String clientId,
     String redirectUrl, {
+    String? proxyRedirectUrl,
     this.clientSecret,
     List<String>? scopes,
     String? issuer,
@@ -21,6 +22,7 @@ class TokenRequest extends CommonRequestDetails {
   }) {
     this.clientId = clientId;
     this.redirectUrl = redirectUrl;
+    this.proxyRedirectUrl = proxyRedirectUrl;
     this.scopes = scopes;
     this.serviceConfiguration = serviceConfiguration;
     this.additionalParameters = additionalParameters;
