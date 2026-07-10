@@ -21,6 +21,7 @@ class AuthorizationRequest extends CommonRequestDetails
         ExternalUserAgent.asWebAuthenticationSession,
     String? nonce,
     String? responseMode,
+    List<String>? responseTypes,
   }) {
     this.clientId = clientId;
     this.redirectUrl = redirectUrl;
@@ -35,6 +36,7 @@ class AuthorizationRequest extends CommonRequestDetails
     this.externalUserAgent = externalUserAgent;
     this.nonce = nonce;
     this.responseMode = responseMode;
+    this.responseTypes = responseTypes;
     assertConfigurationInfo();
   }
 }

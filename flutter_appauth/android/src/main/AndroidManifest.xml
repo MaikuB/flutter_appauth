@@ -3,7 +3,18 @@
   xmlns:tools="http://schemas.android.com/tools">
   <application>
     <activity android:name="net.openid.appauth.RedirectUriReceiverActivity"
-      android:theme="@style/Theme.AppCompat.Translucent.NoTitleBar"
-      tools:replace="android:theme" />
+      tools:node="remove" />
+
+    <activity
+      android:name=".FlutterAppAuthRedirectUriReceiverActivity"
+      android:exported="true"
+      android:theme="@style/Theme.AppCompat.Translucent.NoTitleBar">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="${appAuthRedirectScheme}" />
+      </intent-filter>
+    </activity>
   </application>
 </manifest>

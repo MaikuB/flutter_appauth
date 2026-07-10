@@ -80,6 +80,7 @@
 @property(nonatomic, strong) NSString *loginHint;
 @property(nonatomic, strong) NSArray *promptValues;
 @property(nonatomic, strong) NSString *responseMode;
+@property(nonatomic, strong) NSArray *responseTypes;
 @end
 
 @implementation AuthorizationTokenRequestParameters
@@ -91,6 +92,8 @@
                                                   withKey:@"promptValues"];
   _responseMode = [ArgumentProcessor processArgumentValue:arguments
                                                   withKey:@"responseMode"];
+  _responseTypes = [ArgumentProcessor processArgumentValue:arguments
+                                                  withKey:@"responseTypes"];
   return self;
 }
 @end
@@ -211,7 +214,8 @@ AppAuthAuthorization *authorization;
            externalUserAgent:requestParameters.externalUserAgent
                       result:result
                 exchangeCode:exchangeCode
-                       nonce:requestParameters.nonce];
+                       nonce:requestParameters.nonce
+                responseTypes:requestParameters.responseTypes];
   } else if (requestParameters.discoveryUrl) {
     NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
     [OIDAuthorizationService
@@ -253,7 +257,10 @@ AppAuthAuthorization *authorization;
                                                        exchangeCode:exchangeCode
                                                               nonce:
                                                                   requestParameters
-                                                                      .nonce];
+                                                                      .nonce
+                                                       responseTypes:
+                                                           requestParameters
+                                                               .responseTypes];
                                          }];
   } else {
     NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -293,7 +300,10 @@ AppAuthAuthorization *authorization;
                                                      exchangeCode:exchangeCode
                                                             nonce:
                                                                 requestParameters
-                                                                    .nonce];
+                                                                    .nonce
+                                                     responseTypes:
+                                                         requestParameters
+                                                             .responseTypes];
                                    }];
   }
 }

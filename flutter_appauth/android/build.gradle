@@ -40,4 +40,5 @@ android {
 
 dependencies {
     implementation 'net.openid:appauth:0.11.1'
+    implementation 'androidx.browser:browser:1.8.0'
 }

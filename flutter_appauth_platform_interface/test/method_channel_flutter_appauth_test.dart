@@ -42,6 +42,37 @@ void main() {
               ExternalUserAgent.asWebAuthenticationSession.index,
           'promptValues': null,
           'responseMode': null,
+          'responseTypes': null,
+          'nonce': null,
+        })
+      ],
+    );
+  });
+
+  test('authorize with responseTypes', () async {
+    await flutterAppAuth.authorize(AuthorizationRequest(
+        'someClientId', 'someRedirectUrl',
+        discoveryUrl: 'someDiscoveryUrl',
+        responseTypes: ['id_token', 'token'],
+        responseMode: 'fragment'));
+    expect(
+      log,
+      <Matcher>[
+        isMethodCall('authorize', arguments: <String, Object?>{
+          'clientId': 'someClientId',
+          'issuer': null,
+          'redirectUrl': 'someRedirectUrl',
+          'discoveryUrl': 'someDiscoveryUrl',
+          'loginHint': null,
+          'scopes': null,
+          'serviceConfiguration': null,
+          'additionalParameters': null,
+          'allowInsecureConnections': false,
+          'externalUserAgent':
+              ExternalUserAgent.asWebAuthenticationSession.index,
+          'promptValues': null,
+          'responseMode': 'fragment',
+          'responseTypes': ['id_token', 'token'],
           'nonce': null,
         })
       ],
@@ -76,6 +107,7 @@ void main() {
           'grantType': 'authorization_code',
           'codeVerifier': null,
           'responseMode': 'fragment',
+          'responseTypes': null,
           'nonce': null,
         })
       ],

@@ -101,5 +101,6 @@ Map<String, Object?> _convertAuthorizationParametersToMap(
     'promptValues': authorizationParameters.promptValues,
     'externalUserAgent': authorizationParameters.externalUserAgent?.index,
     'responseMode': authorizationParameters.responseMode,
+    'responseTypes': authorizationParameters.responseTypes,
   };
 }

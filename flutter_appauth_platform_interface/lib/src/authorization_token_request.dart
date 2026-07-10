@@ -22,6 +22,7 @@ class AuthorizationTokenRequest extends TokenRequest
         ExternalUserAgent.asWebAuthenticationSession,
     super.nonce,
     String? responseMode,
+    List<String>? responseTypes,
   }) : super(
           grantType: GrantType.authorizationCode,
         ) {
@@ -29,5 +30,6 @@ class AuthorizationTokenRequest extends TokenRequest
     this.promptValues = promptValues;
     this.externalUserAgent = externalUserAgent;
     this.responseMode = responseMode;
+    this.responseTypes = responseTypes;
   }
 }

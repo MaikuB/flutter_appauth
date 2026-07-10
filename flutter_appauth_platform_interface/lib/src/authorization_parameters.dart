@@ -14,4 +14,9 @@ mixin AuthorizationParameters {
 
   /// Specifies the response mode to use.
   String? responseMode;
+
+  /// OAuth 2.0 / OpenID Connect response types (e.g. `['code']`, `['id_token', 'token']`).
+  ///
+  /// Joined with a space when sent to the authorization endpoint as `response_type`.
+  List<String>? responseTypes;
 }
