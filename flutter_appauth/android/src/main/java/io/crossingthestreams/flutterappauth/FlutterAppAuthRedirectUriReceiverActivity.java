@@ -10,6 +10,9 @@ import net.openid.appauth.AuthorizationManagementActivity;
  *
  * <p>Implicit flows ({@code id_token token}, etc.) are handled manually so query and fragment
  * parameters are both parsed. Authorization code flows are forwarded to AppAuth as usual.
+ *
+ * <p>{@link AuthorizationManagementActivity} is always notified so the browser tab opened during
+ * authorization is removed from the back stack.
  */
 public class FlutterAppAuthRedirectUriReceiverActivity extends AppCompatActivity {
   @Override
@@ -17,10 +20,7 @@ public class FlutterAppAuthRedirectUriReceiverActivity extends AppCompatActivity
     super.onCreate(savedInstanceState);
 
     Uri uri = getIntent() != null ? getIntent().getData() : null;
-    if (FlutterAppauthPlugin.handleManualImplicitRedirectUri(uri)) {
-      finish();
-      return;
-    }
+    FlutterAppauthPlugin.handleManualImplicitRedirectUri(uri);
 
     startActivity(
         AuthorizationManagementActivity.createResponseHandlingIntent(this, uri));

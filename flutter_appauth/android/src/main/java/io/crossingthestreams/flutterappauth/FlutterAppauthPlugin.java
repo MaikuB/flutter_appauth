@@ -9,7 +9,6 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.browser.customtabs.CustomTabsIntent;
 
 import net.openid.appauth.AppAuthConfiguration;
 import net.openid.appauth.AuthorizationException;
@@ -486,16 +485,6 @@ public class FlutterAppauthPlugin
       pendingOperation.manualImplicit = true;
       pendingOperation.expectedState = authRequest.state;
       pendingOperation.expectedNonce = authRequest.nonce;
-
-      try {
-        CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder().build();
-        customTabsIntent.launchUrl(mainActivity, authRequest.toUri());
-      } catch (ActivityNotFoundException ex) {
-        finishWithError(NO_BROWSER_AVAILABLE_ERROR_CODE, NO_BROWSER_AVAILABLE_ERROR_FORMAT, ex);
-      } catch (NullPointerException ex) {
-        finishWithError(NULL_ACTIVITY_ERROR_CODE, NULL_ACTIVITY_ERROR_FORMAT, ex);
-      }
-      return;
     }
 
     try {
