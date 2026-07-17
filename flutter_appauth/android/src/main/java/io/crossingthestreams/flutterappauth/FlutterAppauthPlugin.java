@@ -221,6 +221,9 @@ public class FlutterAppauthPlugin
         (Map<String, String>) arguments.get("additionalParameters");
     allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
     final String responseMode = (String) arguments.get("responseMode");
+    final RequestState state = arguments.containsKey("state")
+        ? new RequestState((String) arguments.get("state"))
+        : null;
 
     return new AuthorizationTokenRequestParameters(
         clientId,
@@ -233,7 +236,8 @@ public class FlutterAppauthPlugin
         loginHint,
         nonce,
         promptValues,
-        responseMode);
+        responseMode,
+        state);
   }
 
   @SuppressWarnings("unchecked")
@@ -286,7 +290,9 @@ public class FlutterAppauthPlugin
       Map<String, Object> arguments) {
     final String idTokenHint = (String) arguments.get("idTokenHint");
     final String postLogoutRedirectUrl = (String) arguments.get("postLogoutRedirectUrl");
-    final String state = (String) arguments.get("state");
+    final RequestState state = arguments.containsKey("state")
+        ? new RequestState((String) arguments.get("state"))
+        : null;
     final boolean allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
     final String issuer = (String) arguments.get("issuer");
     final String discoveryUrl = (String) arguments.get("discoveryUrl");
@@ -323,7 +329,8 @@ public class FlutterAppauthPlugin
           tokenRequestParameters.additionalParameters,
           exchangeCode,
           tokenRequestParameters.promptValues,
-          tokenRequestParameters.responseMode);
+          tokenRequestParameters.responseMode,
+          tokenRequestParameters.state);
     } else {
       AuthorizationServiceConfiguration.RetrieveConfigurationCallback callback =
           new AuthorizationServiceConfiguration.RetrieveConfigurationCallback() {
@@ -342,7 +349,8 @@ public class FlutterAppauthPlugin
                     tokenRequestParameters.additionalParameters,
                     exchangeCode,
                     tokenRequestParameters.promptValues,
-                    tokenRequestParameters.responseMode);
+                    tokenRequestParameters.responseMode,
+                    tokenRequestParameters.state);
               } else {
                 finishWithDiscoveryError(ex);
               }
@@ -415,7 +423,8 @@ public class FlutterAppauthPlugin
       Map<String, String> additionalParameters,
       boolean exchangeCode,
       ArrayList<String> promptValues,
-      String responseMode) {
+      String responseMode,
+      @Nullable RequestState state) {
     AuthorizationRequest.Builder authRequestBuilder =
         new AuthorizationRequest.Builder(
             serviceConfiguration, clientId, ResponseTypeValues.CODE, Uri.parse(redirectUrl));
@@ -459,6 +468,10 @@ public class FlutterAppauthPlugin
       }
 
       authRequestBuilder.setAdditionalParameters(additionalParameters);
+    }
+
+    if (state != null) {
+      authRequestBuilder.setState(state.value);
     }
 
     AuthorizationService authorizationService = getAuthorizationService();
@@ -571,7 +584,7 @@ public class FlutterAppauthPlugin
     }
 
     if (endSessionRequestParameters.state != null) {
-      endSessionRequestBuilder.setState(endSessionRequestParameters.state);
+      endSessionRequestBuilder.setState(endSessionRequestParameters.state.value);
     }
 
     if (endSessionRequestParameters.additionalParameters != null) {
@@ -827,10 +840,17 @@ public class FlutterAppauthPlugin
     }
   }
 
+  /** Wraps an explicit state value from the method channel.
+   *  null state = key absent (auto-generate); non-null = key was present (null value = suppress, String = custom). */
+  private static class RequestState {
+    @Nullable final String value;
+    RequestState(@Nullable String value) { this.value = value; }
+  }
+
   private class EndSessionRequestParameters {
     final String idTokenHint;
     final String postLogoutRedirectUrl;
-    final String state;
+    @Nullable final RequestState state;
     final String issuer;
     final String discoveryUrl;
     final boolean allowInsecureConnections;
@@ -840,7 +860,7 @@ public class FlutterAppauthPlugin
     private EndSessionRequestParameters(
         String idTokenHint,
         String postLogoutRedirectUrl,
-        String state,
+        @Nullable RequestState state,
         String issuer,
         String discoveryUrl,
         boolean allowInsecureConnections,
@@ -861,6 +881,7 @@ public class FlutterAppauthPlugin
     final String loginHint;
     final ArrayList<String> promptValues;
     final String responseMode;
+    @Nullable final RequestState state;
 
     private AuthorizationTokenRequestParameters(
         String clientId,
@@ -873,7 +894,8 @@ public class FlutterAppauthPlugin
         String loginHint,
         String nonce,
         ArrayList<String> promptValues,
-        String responseMode) {
+        String responseMode,
+        @Nullable RequestState state) {
       super(
           clientId,
           issuer,
@@ -890,6 +912,7 @@ public class FlutterAppauthPlugin
       this.loginHint = loginHint;
       this.promptValues = promptValues;
       this.responseMode = responseMode;
+      this.state = state;
     }
   }
 }

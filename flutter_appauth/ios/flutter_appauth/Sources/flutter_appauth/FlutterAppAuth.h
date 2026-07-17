@@ -50,7 +50,7 @@ static NSString *const END_SESSION_ERROR_MESSAGE_FORMAT =
 @interface EndSessionRequestParameters : NSObject
 @property(nonatomic, strong) NSString *idTokenHint;
 @property(nonatomic, strong) NSString *postLogoutRedirectUrl;
-@property(nonatomic, strong) NSString *state;
+@property(nonatomic, strong) id state;
 @property(nonatomic, strong) NSString *issuer;
 @property(nonatomic, strong) NSString *discoveryUrl;
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
@@ -76,7 +76,8 @@ typedef NS_ENUM(NSInteger, ExternalUserAgent) {
        externalUserAgent:(NSNumber *)externalUserAgent
                   result:(FlutterResult)result
             exchangeCode:(BOOL)exchangeCode
-                   nonce:(NSString *)nonce;
+                   nonce:(NSString *)nonce
+               state:(id)state;
 
 - (id<OIDExternalUserAgentSession>)
     performEndSessionRequest:(OIDServiceConfiguration *)serviceConfiguration
