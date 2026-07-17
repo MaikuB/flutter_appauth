@@ -52,6 +52,7 @@ public class FlutterAppauthPlugin
   private static final String AUTHORIZE_METHOD = "authorize";
   private static final String TOKEN_METHOD = "token";
   private static final String END_SESSION_METHOD = "endSession";
+  private static final String RESUME_PENDING_AUTHORIZATION_METHOD = "resumePendingAuthorization";
 
   private static final String DISCOVERY_ERROR_CODE = "discovery_failed";
   private static final String AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE =
@@ -197,6 +198,17 @@ public class FlutterAppauthPlugin
           handleEndSessionMethodCall(arguments);
         } catch (Exception ex) {
           finishWithError(END_SESSION_ERROR_CODE, ex.getLocalizedMessage(), ex);
+        }
+        break;
+      case RESUME_PENDING_AUTHORIZATION_METHOD:
+        try {
+          handleResumePendingAuthorizationMethodCall(result);
+        } catch (Exception ex) {
+          String errorCode = AUTHORIZE_ERROR_CODE;
+          if (pendingAuthorization != null && pendingAuthorization.exchangeCode ) {
+            errorCode = AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE;
+          }
+          finishWithError(errorCode, ex.getLocalizedMessage(), ex);
         }
         break;
       default:
@@ -712,6 +724,19 @@ public class FlutterAppauthPlugin
       return true;
     }
     return false;
+  }
+
+  private void handleResumePendingAuthorizationMethodCall(Result result) {
+    if (pendingAuthorization == null) {
+      result.success(null);
+      return;
+    }
+
+    final PendingAuthorization pendingAuth = pendingAuthorization;
+    pendingAuthorization = null;
+
+    checkAndSetPendingOperation(RESUME_PENDING_AUTHORIZATION_METHOD, result);
+    processAuthorizationData(pendingAuth.response, pendingAuth.exception, pendingAuth.exchangeCode);
   }
 
   private void processAuthorizationData(
