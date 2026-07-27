@@ -92,6 +92,11 @@ static id<OIDSafariViewControllerFactory> __nullable
   if (@available(iOS 9.0, *)) {
     SFSafariViewController *safariVC = [[[self class]
         safariViewControllerFactory] safariViewControllerWithURL:requestURL];
+
+    if (@available(iOS 11.0, *)) {
+        safariVC.dismissButtonStyle = SFSafariViewControllerDismissButtonStyleCancel;
+    }
+
     safariVC.delegate = self;
     safariVC.modalPresentationStyle = UIModalPresentationFormSheet;
     safariVC.presentationController.delegate = self;
