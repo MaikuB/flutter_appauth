@@ -171,7 +171,7 @@ static id<OIDSafariViewControllerFactory> __nullable
   id<OIDExternalUserAgentSession> session = _session;
   [self cleanUp];
   NSError *error = [OIDErrorUtilities
-        errorWithCode:OIDErrorCodeProgramCanceledAuthorizationFlow
+        errorWithCode:OIDErrorCodeUserCanceledAuthorizationFlow
       underlyingError:nil
           description:nil];
   [session failExternalUserAgentFlowWithError:error];
@@ -192,7 +192,7 @@ static id<OIDSafariViewControllerFactory> __nullable
     id<OIDExternalUserAgentSession> session = _session;
     [self cleanUp];
     NSError *error = [OIDErrorUtilities
-          errorWithCode:OIDErrorCodeProgramCanceledAuthorizationFlow
+          errorWithCode:OIDErrorCodeUserCanceledAuthorizationFlow
         underlyingError:nil
             description:nil];
     [session failExternalUserAgentFlowWithError:error];
