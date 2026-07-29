@@ -173,6 +173,9 @@
     return [[OIDExternalUserAgentIOSSafariViewController alloc]
         initWithPresentingViewController:rootViewController];
   }
+  if ([externalUserAgent integerValue] == CustomBrowser) {
+    return [OIDExternalUserAgentIOSCustomBrowser CustomBrowserSafari];
+  }
   return [[OIDExternalUserAgentIOS alloc]
       initWithPresentingViewController:rootViewController];
 }
