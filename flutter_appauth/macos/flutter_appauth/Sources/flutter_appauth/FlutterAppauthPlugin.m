@@ -142,6 +142,23 @@ AppAuthAuthorization *authorization;
                                                   withReplyEvent:)
                        forEventClass:kInternetEventClass
                           andEventID:kAEGetURL];
+
+  // Also receive URLs through the Flutter application lifecycle.
+  //
+  // `setEventHandler:` above REPLACES any existing handler for kAEGetURL, and
+  // AppKit installs its own — the one that drives `application:openURLs:` —
+  // during `finishLaunching`, which happens after plugin registration. So in
+  // any host app whose delegate implements `application:openURLs:` (i.e. any
+  // app with deep links) AppKit wins and `handleGetURLEvent:` never fires.
+  // The pending authorization is then never resumed for a redirect delivered
+  // from outside the app's own browser session, and the login hangs with no
+  // error.
+  //
+  // Registering as an application delegate makes `FlutterAppDelegate` forward
+  // `application:openURLs:` here too, so the resume happens on whichever path
+  // actually delivers the URL. Both are safe together: the flow is cleared
+  // after the first successful resume.
+  [registrar addApplicationDelegate:instance];
 #else
   authorization = [[AppAuthIOSAuthorization alloc] init];
 
@@ -507,6 +524,24 @@ AppAuthAuthorization *authorization;
   NSURL *URL = [NSURL URLWithString:URLString];
   [_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:URL];
   _currentAuthorizationFlow = nil;
+}
+
+/// The `FlutterAppLifecycleDelegate` counterpart of `handleGetURLEvent:`, for
+/// hosts where AppKit owns the kAEGetURL handler.
+///
+/// Returns YES only when a pending flow accepted the URL, so unrelated deep
+/// links keep flowing to the host app's own handling.
+- (BOOL)handleOpenURLs:(NSArray<NSURL *> *)urls {
+  if (_currentAuthorizationFlow == nil) {
+    return NO;
+  }
+  for (NSURL *url in urls) {
+    if ([_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:url]) {
+      _currentAuthorizationFlow = nil;
+      return YES;
+    }
+  }
+  return NO;
 }
 #endif
 
