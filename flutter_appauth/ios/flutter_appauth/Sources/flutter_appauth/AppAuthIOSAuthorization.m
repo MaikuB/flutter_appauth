@@ -173,8 +173,17 @@
     return [[OIDExternalUserAgentIOSSafariViewController alloc]
         initWithPresentingViewController:rootViewController];
   }
-  if ([externalUserAgent integerValue] == CustomBrowser) {
+  if ([externalUserAgent integerValue] == CustomBrowserSafari) {
     return [OIDExternalUserAgentIOSCustomBrowser CustomBrowserSafari];
+  }
+  if ([externalUserAgent integerValue] == CustomBrowserChrome) {
+    return [OIDExternalUserAgentIOSCustomBrowser CustomBrowserChrome];
+  }
+  if ([externalUserAgent integerValue] == CustomBrowserFirefox) {
+    return [OIDExternalUserAgentIOSCustomBrowser CustomBrowserFirefox];
+  }
+  if ([externalUserAgent integerValue] == CustomBrowserOpera) {
+    return [OIDExternalUserAgentIOSCustomBrowser CustomBrowserOpera];
   }
   return [[OIDExternalUserAgentIOS alloc]
       initWithPresentingViewController:rootViewController];

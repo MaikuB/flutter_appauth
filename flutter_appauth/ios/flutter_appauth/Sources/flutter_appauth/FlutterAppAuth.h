@@ -62,7 +62,10 @@ typedef NS_ENUM(NSInteger, ExternalUserAgent) {
   ASWebAuthenticationSession,
   EphemeralASWebAuthenticationSession,
   SafariViewController,
-  CustomBrowser
+  CustomBrowserSafari,
+  CustomBrowserChrome,
+  CustomBrowserFirefox,
+  CustomBrowserOpera
 };
 
 @interface AppAuthAuthorization : NSObject

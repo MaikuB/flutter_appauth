@@ -161,7 +161,46 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                       ),
                       onPressed: () => _signInWithAutoCodeExchange(
                         externalUserAgent:
-                          ExternalUserAgent.customBrowser),
+                          ExternalUserAgent.customBrowserSafari),
+                    ),
+                  ),
+                if (Platform.isIOS)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: const Text(
+                        'Auto code exchange using Chrome (iOS only)',
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () => _signInWithAutoCodeExchange(
+                        externalUserAgent:
+                          ExternalUserAgent.customBrowserChrome),
+                    ),
+                  ),
+                if (Platform.isIOS)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: const Text(
+                        'Auto code exchange using Firefox (iOS only)',
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () => _signInWithAutoCodeExchange(
+                        externalUserAgent:
+                          ExternalUserAgent.customBrowserFirefox),
+                    ),
+                  ),
+                if (Platform.isIOS)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: const Text(
+                        'Auto code exchange using Opera (iOS only)',
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () => _signInWithAutoCodeExchange(
+                        externalUserAgent:
+                          ExternalUserAgent.customBrowserOpera),
                     ),
                   ),
                 ElevatedButton(
@@ -369,13 +408,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
+  bool _isCustomBrowser(ExternalUserAgent externalUserAgent) {
+    return externalUserAgent == ExternalUserAgent.customBrowserSafari ||
+        externalUserAgent == ExternalUserAgent.customBrowserChrome ||
+        externalUserAgent == ExternalUserAgent.customBrowserFirefox ||
+        externalUserAgent == ExternalUserAgent.customBrowserOpera;
+  }
+
   Future<void> _signInWithAutoCodeExchange(
       {ExternalUserAgent externalUserAgent =
           ExternalUserAgent.asWebAuthenticationSession}) async {
     try {
-      _setBusyState(
-          isAuthFlow: externalUserAgent == ExternalUserAgent.customBrowser
-      );
+      _setBusyState(isAuthFlow: _isCustomBrowser(externalUserAgent));
 
       /*
         This shows that we can also explicitly specify the endpoints rather than
@@ -390,8 +434,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       );
 
       // Apply timeout only when using an external browser user agent.
-      final AuthorizationTokenResponse result =
-      externalUserAgent == ExternalUserAgent.customBrowser
+      final AuthorizationTokenResponse result = _isCustomBrowser(externalUserAgent)
           ? await authRequest.timeout(const Duration(minutes: 2))
           : await authRequest;
 

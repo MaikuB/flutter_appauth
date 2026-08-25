@@ -48,9 +48,49 @@ enum ExternalUserAgent {
   sfSafariViewController,
 
 
-  /// Indicates a preference for using an external user-agent,
-  /// suitable for e.g. the secure browser of a MDM solution,
-  /// SSO flows and using the cookies/context of the system main browser.
+  /// Uses the `CustomBrowserSafari` factory method of [OIDExternalUserAgentIOSCustomBrowser](https://openid.github.io/AppAuth-iOS/docs/latest/interface_o_i_d_external_user_agent_i_o_s_custom_browser.html)
+  /// to open Safari as an external browser.
+  ///
+  /// This is suitable for e.g. the secure browser of a MDM solution, SSO
+  /// flows and using the cookies/context of the system main browser.
+  ///
   /// This is only applicable to iOS (fallback is [asWebAuthenticationSession]).
-  customBrowser
+  ///
+  /// Note that this is undocumented but confirmed behaviour of the AppAuth
+  /// iOS SDK: if Safari isn't the device's default browser, the actual
+  /// default browser will be opened instead.
+  customBrowserSafari,
+
+  /// Uses the `CustomBrowserChrome` factory method of [OIDExternalUserAgentIOSCustomBrowser](https://openid.github.io/AppAuth-iOS/docs/latest/interface_o_i_d_external_user_agent_i_o_s_custom_browser.html)
+  /// to open Chrome as an external browser.
+  ///
+  /// This is only applicable to iOS (fallback is [asWebAuthenticationSession]).
+  /// Requires Chrome to be installed on the device, otherwise the sign in
+  /// flow will fail.
+  ///
+  /// Note that, like [customBrowserSafari], the device's actual default
+  /// browser may be opened instead of Chrome.
+  customBrowserChrome,
+
+  /// Uses the `CustomBrowserFirefox` factory method of [OIDExternalUserAgentIOSCustomBrowser](https://openid.github.io/AppAuth-iOS/docs/latest/interface_o_i_d_external_user_agent_i_o_s_custom_browser.html)
+  /// to open Firefox as an external browser.
+  ///
+  /// This is only applicable to iOS (fallback is [asWebAuthenticationSession]).
+  /// Requires Firefox to be installed on the device, otherwise the sign in
+  /// flow will fail.
+  ///
+  /// Note that, like [customBrowserSafari], the device's actual default
+  /// browser may be opened instead of Firefox.
+  customBrowserFirefox,
+
+  /// Uses the `CustomBrowserOpera` factory method of [OIDExternalUserAgentIOSCustomBrowser](https://openid.github.io/AppAuth-iOS/docs/latest/interface_o_i_d_external_user_agent_i_o_s_custom_browser.html)
+  /// to open Opera as an external browser.
+  ///
+  /// This is only applicable to iOS (fallback is [asWebAuthenticationSession]).
+  /// Requires Opera to be installed on the device, otherwise the sign in
+  /// flow will fail.
+  ///
+  /// Note that, like [customBrowserSafari], the device's actual default
+  /// browser may be opened instead of Opera.
+  customBrowserOpera,
 }
