@@ -6,3 +6,7 @@ updates:
       interval: "weekly"
     ignore:
       - dependency-name: "com.android.tools.build:gradle"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

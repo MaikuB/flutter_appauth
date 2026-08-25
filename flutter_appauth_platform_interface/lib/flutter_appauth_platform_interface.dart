@@ -9,5 +9,6 @@ export 'src/errors.dart';
 export 'src/external_user_agent.dart';
 export 'src/flutter_appauth_platform.dart';
 export 'src/grant_type.dart';
+export 'src/prompt.dart';
 export 'src/token_request.dart';
 export 'src/token_response.dart';

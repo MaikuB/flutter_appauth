@@ -167,10 +167,28 @@ Otherwise, there will be still an active login session in the browser.
 
 ## Android setup
 
-Go to the `build.gradle` file for your Android app to specify the custom scheme so that there should be a section in it that look similar to the following but replace `<your_custom_scheme>` with the desired value
+Go to the `build.gradle.kts` file for your Android app to specify the custom scheme so that there should be a section in it that look similar to the following but replace `<your_custom_scheme>` with the desired value:
 
+```kotlin
+
+android {
+    ...
+    defaultConfig {
+        ...
+        manifestPlaceholders.putAll(
+            mapOf(
+                "appAuthRedirectScheme" to "<your_custom_scheme>"
+            )
+        )
+    }
+}
 ```
-...groovy
+
+If you're using `build.gradle`:
+
+
+```groovy
+
 android {
     ...
     defaultConfig {
@@ -214,6 +232,12 @@ Attribute application@name at AndroidManifest.xml:5:9-42 requires a placeholder 
 ```
 
 If you see this error then update your `build.gradle` to use `+=` instead.
+
+### Troubleshooting
+
+#### No Redirect to app after login
+
+If you're experiencing issues where the authorization flow does not return to your Flutter app, even though the intent filter is correctly set and `RedirectUriReceiverActivity` is invoked, the issue might be due to the following line in your `AndroidManifest.xml`: `android:taskAffinity=""`. Removing it fixes the [issue](https://github.com/MaikuB/flutter_appauth/issues/503#issuecomment-2165906205)
 
 ## iOS/macOS setup
 

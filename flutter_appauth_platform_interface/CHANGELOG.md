@@ -1,3 +1,21 @@
+## [12.0.1]
+
+* Removed assertion around tied to `idTokenHint` and `postLogoutRedirectUrl` parameters passed to the `EndSessionRequest` constructor. This was done as both are optional according to the [OIDC RP-initiated logout specification](https://openid.net/specs/openid-connect-rpinitiated-1_0.html)
+
+## [12.0.0]
+
+* **Breaking change** updated minimum supported SDK version to Flutter 3.38.1/Dart 3.10
+
+## [11.0.0]
+
+* Added `Prompt` class that exposes standard `prompt` string values as defined in the OIDC specification. Thanks to the PR from [Valentin Michalak](https://github.com/vmichalak)
+
+## [10.0.0]
+
+* **Breaking change** updated minimum supported SDK version to Flutter 3.29/Dart 3.7
+* Bumped `flutter_lints` dev dependency
+
+
 ## [9.0.0]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.19/Dart 3.3

@@ -13,6 +13,9 @@
 #endif
 
 @interface FlutterAppauthPlugin ()
+#if TARGET_OS_IOS
+    <FlutterSceneLifeCycleDelegate>
+#endif
 
 @property(nonatomic, strong, nullable) id<OIDExternalUserAgentSession>
     currentAuthorizationFlow;

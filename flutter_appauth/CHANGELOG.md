@@ -1,3 +1,35 @@
+## [12.0.2]
+
+* [iOS][macOS] improved SPM (Swift Package Manager) compatibility. Thanks to PR from [JarvanMo](https://github.com/JarvanMo)
+
+## [12.0.1]
+
+* Removed assertion around tied to `idTokenHint` and `postLogoutRedirectUrl` parameters passed to the `EndSessionRequest` constructor. This was done as both are optional according to the [OIDC RP-initiated logout specification](https://openid.net/specs/openid-connect-rpinitiated-1_0.html)
+
+## [12.0.0]
+
+* **Breaking change** updated minimum supported SDK version to Flutter 3.38.1/Dart 3.10. Consequently the minimum OS requirements for each platform has been updated as well
+  * [Android] minimum Android version is now 7.0 (API level 24)
+  * [iOS] minimum iOS version is now 13
+  * [macOS] minimum macOS version is now 10.15
+* Plugin and example app now adopt UISceneDelegate. Note that whilst migration required Flutter 3.38.0 as a minimum, I have set the minimum supported Flutter SDK version to 3.38.1. This was done as the Dart 3.10 SDK bundled with Flutter 3.38.0 was technically still a beta. The Dart 3.10 SDK bundled with Flutter 3.38.1 is considered stable
+
+## [11.0.0]
+
+* Added `Prompt` class that exposes standard `prompt` string values as defined in the OIDC specification. Thanks to the PR from [Valentin Michalak](https://github.com/vmichalak)
+* **Potentiallu breaking change** [Android] plugin will now throw a `PlatformException` with a `null_activity` error code when plugin runs into a scenario where the bound Flutter activity has been detached/disposed. Thanks to the PR from [Sam Costa](https://github.com/SamCosta1)
+
+## [10.0.0]
+
+* **Breaking change** updated minimum supported SDK version to Flutter 3.29/Dart 3.7
+* Bumped `flutter_lints` dev dependency
+* [Android] **Breaking changes** updated `compileSdkVersion` to 35 and AGP to 8.6.0
+* Updated Android setup section in readme with instructions for apps using Kotlin DSL. Thanks to the PR from [LennartMart](https://github.com/LennartMart)
+
+## [9.0.1]
+
+* [iOS][macOS] bumped AppAuth iOS dependency to 2.0.0
+
 ## [9.0.0]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.19/Dart 3.3
