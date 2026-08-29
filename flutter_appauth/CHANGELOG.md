@@ -1,3 +1,8 @@
+## [12.1.0]
+
+* [iOS] added custom browser support. Thanks to the PR from [Kuurse)](https://github.com/Kuurse)
+* [iOS][macOS] bumped AppAuth IOS SDK dependency to 2.1.0
+
 ## [12.0.2]
 
 * [iOS][macOS] improved SPM (Swift Package Manager) compatibility. Thanks to PR from [JarvanMo](https://github.com/JarvanMo)
