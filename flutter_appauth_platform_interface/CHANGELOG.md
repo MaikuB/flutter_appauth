@@ -1,3 +1,7 @@
+## [12.1.0]
+
+* Added `ExternalUserAgent.customBrowserSafari`, `ExternalUserAgent.customBrowserChrome`, `ExternalUserAgent.customBrowserChrome`, `ExternalUserAgent.customBrowserFirefox` and `ExternalUserAgent.customBrowserOpera` enumeration values. This to support custom browsers on iOS. Thanks to the PR from [Kuurse)](https://github.com/Kuurse)
+
 ## [12.0.1]
 
 * Removed assertion around tied to `idTokenHint` and `postLogoutRedirectUrl` parameters passed to the `EndSessionRequest` constructor. This was done as both are optional according to the [OIDC RP-initiated logout specification](https://openid.net/specs/openid-connect-rpinitiated-1_0.html)
