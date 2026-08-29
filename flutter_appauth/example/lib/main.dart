@@ -137,7 +137,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                               .ephemeralAsWebAuthenticationSession),
                     ),
                   ),
-                if (Platform.isIOS)
+                if (Platform.isIOS) ...[
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -151,7 +151,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                               ExternalUserAgent.sfSafariViewController),
                     ),
                   ),
-                if (Platform.isIOS)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -164,7 +163,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                               ExternalUserAgent.customBrowserSafari),
                     ),
                   ),
-                if (Platform.isIOS)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -177,7 +175,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                               ExternalUserAgent.customBrowserChrome),
                     ),
                   ),
-                if (Platform.isIOS)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -190,7 +187,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                               ExternalUserAgent.customBrowserFirefox),
                     ),
                   ),
-                if (Platform.isIOS)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -203,6 +199,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                               ExternalUserAgent.customBrowserOpera),
                     ),
                   ),
+                ],
                 ElevatedButton(
                   onPressed: _refreshToken != null ? _refresh : null,
                   child: const Text('Refresh token'),
