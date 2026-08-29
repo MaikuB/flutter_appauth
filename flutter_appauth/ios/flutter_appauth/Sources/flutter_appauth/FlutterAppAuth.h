@@ -61,7 +61,11 @@ static NSString *const END_SESSION_ERROR_MESSAGE_FORMAT =
 typedef NS_ENUM(NSInteger, ExternalUserAgent) {
   ASWebAuthenticationSession,
   EphemeralASWebAuthenticationSession,
-  SafariViewController
+  SafariViewController,
+  CustomBrowserSafari,
+  CustomBrowserChrome,
+  CustomBrowserFirefox,
+  CustomBrowserOpera
 };
 
 @interface AppAuthAuthorization : NSObject
