@@ -137,7 +137,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                               .ephemeralAsWebAuthenticationSession),
                     ),
                   ),
-                if (Platform.isIOS)
+                if (Platform.isIOS) ...[
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -151,7 +151,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                               ExternalUserAgent.sfSafariViewController),
                     ),
                   ),
-                if (Platform.isIOS)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -160,11 +159,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                         textAlign: TextAlign.center,
                       ),
                       onPressed: () => _signInWithAutoCodeExchange(
-                        externalUserAgent:
-                          ExternalUserAgent.customBrowserSafari),
+                          externalUserAgent:
+                              ExternalUserAgent.customBrowserSafari),
                     ),
                   ),
-                if (Platform.isIOS)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -173,11 +171,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                         textAlign: TextAlign.center,
                       ),
                       onPressed: () => _signInWithAutoCodeExchange(
-                        externalUserAgent:
-                          ExternalUserAgent.customBrowserChrome),
+                          externalUserAgent:
+                              ExternalUserAgent.customBrowserChrome),
                     ),
                   ),
-                if (Platform.isIOS)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -186,11 +183,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                         textAlign: TextAlign.center,
                       ),
                       onPressed: () => _signInWithAutoCodeExchange(
-                        externalUserAgent:
-                          ExternalUserAgent.customBrowserFirefox),
+                          externalUserAgent:
+                              ExternalUserAgent.customBrowserFirefox),
                     ),
                   ),
-                if (Platform.isIOS)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -199,10 +195,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                         textAlign: TextAlign.center,
                       ),
                       onPressed: () => _signInWithAutoCodeExchange(
-                        externalUserAgent:
-                          ExternalUserAgent.customBrowserOpera),
+                          externalUserAgent:
+                              ExternalUserAgent.customBrowserOpera),
                     ),
                   ),
+                ],
                 ElevatedButton(
                   onPressed: _refreshToken != null ? _refresh : null,
                   child: const Text('Refresh token'),
@@ -426,7 +423,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         getting from the details from the discovery document.
       */
       final Future<AuthorizationTokenResponse> authRequest =
-      _appAuth.authorizeAndExchangeCode(
+          _appAuth.authorizeAndExchangeCode(
         AuthorizationTokenRequest(_clientId, _redirectUrl,
             serviceConfiguration: _serviceConfiguration,
             scopes: _scopes,
@@ -434,10 +431,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       );
 
       // Apply timeout only when using an external browser user agent.
-      final AuthorizationTokenResponse result = _isCustomBrowser(externalUserAgent)
-          ? await authRequest.timeout(const Duration(minutes: 2))
-          : await authRequest;
-
+      final AuthorizationTokenResponse result =
+          _isCustomBrowser(externalUserAgent)
+              ? await authRequest.timeout(const Duration(minutes: 2))
+              : await authRequest;
 
       /*
         This code block demonstrates passing in values for the prompt

@@ -47,12 +47,11 @@ enum ExternalUserAgent {
   /// this at their own discretion.
   sfSafariViewController,
 
-
   /// Uses the `CustomBrowserSafari` factory method of [OIDExternalUserAgentIOSCustomBrowser](https://openid.github.io/AppAuth-iOS/docs/latest/interface_o_i_d_external_user_agent_i_o_s_custom_browser.html)
   /// to open Safari as an external browser.
   ///
-  /// This is suitable for e.g. the secure browser of a MDM solution, SSO
-  /// flows and using the cookies/context of the system main browser.
+  /// This is suitable when scenarios like using the secure browser of a MDM
+  /// solution, SSO flows and using the cookies/context of the system main browser.
   ///
   /// This is only applicable to iOS (fallback is [asWebAuthenticationSession]).
   ///
