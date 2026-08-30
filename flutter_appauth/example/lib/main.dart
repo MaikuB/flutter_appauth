@@ -16,8 +16,9 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   bool _isBusy = false;
+  bool _isAuthFlowInProgress = false;
   final FlutterAppAuth _appAuth = const FlutterAppAuth();
 
   String? _codeVerifier;
@@ -61,6 +62,30 @@ class _MyAppState extends State<MyApp> {
     tokenEndpoint: 'https://demo.duendesoftware.com/connect/token',
     endSessionEndpoint: 'https://demo.duendesoftware.com/connect/endsession',
   );
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (_isAuthFlowInProgress) {
+        setState(() {
+          _isAuthFlowInProgress = false;
+          _clearBusyState();
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +137,7 @@ class _MyAppState extends State<MyApp> {
                               .ephemeralAsWebAuthenticationSession),
                     ),
                   ),
-                if (Platform.isIOS)
+                if (Platform.isIOS) ...[
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -126,6 +151,55 @@ class _MyAppState extends State<MyApp> {
                               ExternalUserAgent.sfSafariViewController),
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: const Text(
+                        'Auto code exchange using system browser (iOS only)',
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () => _signInWithAutoCodeExchange(
+                          externalUserAgent:
+                              ExternalUserAgent.customBrowserSafari),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: const Text(
+                        'Auto code exchange using Chrome (iOS only)',
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () => _signInWithAutoCodeExchange(
+                          externalUserAgent:
+                              ExternalUserAgent.customBrowserChrome),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: const Text(
+                        'Auto code exchange using Firefox (iOS only)',
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () => _signInWithAutoCodeExchange(
+                          externalUserAgent:
+                              ExternalUserAgent.customBrowserFirefox),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: const Text(
+                        'Auto code exchange using Opera (iOS only)',
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () => _signInWithAutoCodeExchange(
+                          externalUserAgent:
+                              ExternalUserAgent.customBrowserOpera),
+                    ),
+                  ),
+                ],
                 ElevatedButton(
                   onPressed: _refreshToken != null ? _refresh : null,
                   child: const Text('Refresh token'),
@@ -331,25 +405,38 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  bool _isCustomBrowser(ExternalUserAgent externalUserAgent) {
+    return externalUserAgent == ExternalUserAgent.customBrowserSafari ||
+        externalUserAgent == ExternalUserAgent.customBrowserChrome ||
+        externalUserAgent == ExternalUserAgent.customBrowserFirefox ||
+        externalUserAgent == ExternalUserAgent.customBrowserOpera;
+  }
+
   Future<void> _signInWithAutoCodeExchange(
       {ExternalUserAgent externalUserAgent =
           ExternalUserAgent.asWebAuthenticationSession}) async {
     try {
-      _setBusyState();
+      _setBusyState(isAuthFlow: _isCustomBrowser(externalUserAgent));
 
       /*
         This shows that we can also explicitly specify the endpoints rather than
         getting from the details from the discovery document.
       */
-      final AuthorizationTokenResponse result =
-          await _appAuth.authorizeAndExchangeCode(
+      final Future<AuthorizationTokenResponse> authRequest =
+          _appAuth.authorizeAndExchangeCode(
         AuthorizationTokenRequest(_clientId, _redirectUrl,
             serviceConfiguration: _serviceConfiguration,
             scopes: _scopes,
             externalUserAgent: externalUserAgent),
       );
 
-      /* 
+      // Apply timeout only when using an external browser user agent.
+      final AuthorizationTokenResponse result =
+          _isCustomBrowser(externalUserAgent)
+              ? await authRequest.timeout(const Duration(minutes: 2))
+              : await authRequest;
+
+      /*
         This code block demonstrates passing in values for the prompt
         parameter. In this case it prompts the user login even if they have
         already signed in. the list of supported values depends on the
@@ -402,10 +489,13 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void _setBusyState() {
+  void _setBusyState({bool? isAuthFlow}) {
     setState(() {
       _error = '';
       _isBusy = true;
+      if (isAuthFlow != null) {
+        _isAuthFlowInProgress = isAuthFlow;
+      }
     });
   }
 

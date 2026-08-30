@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "flutter-appauth", targets: ["flutter_appauth"])
     ],
     dependencies: [
-        .package(url: "https://github.com/openid/AppAuth-iOS", exact: "2.0.0"),
+        .package(url: "https://github.com/openid/AppAuth-iOS", exact: "2.1.0"),
         .package(name: "FlutterFramework", path: "../FlutterFramework")
     ],
     targets: [

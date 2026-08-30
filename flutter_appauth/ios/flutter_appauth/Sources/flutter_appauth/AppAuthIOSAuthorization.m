@@ -173,6 +173,18 @@
     return [[OIDExternalUserAgentIOSSafariViewController alloc]
         initWithPresentingViewController:rootViewController];
   }
+  if ([externalUserAgent integerValue] == CustomBrowserSafari) {
+    return [OIDExternalUserAgentIOSCustomBrowser CustomBrowserSafari];
+  }
+  if ([externalUserAgent integerValue] == CustomBrowserChrome) {
+    return [OIDExternalUserAgentIOSCustomBrowser CustomBrowserChrome];
+  }
+  if ([externalUserAgent integerValue] == CustomBrowserFirefox) {
+    return [OIDExternalUserAgentIOSCustomBrowser CustomBrowserFirefox];
+  }
+  if ([externalUserAgent integerValue] == CustomBrowserOpera) {
+    return [OIDExternalUserAgentIOSCustomBrowser CustomBrowserOpera];
+  }
   // Both the default (SSO) and ephemeral ASWebAuthenticationSession modes are
   // served by OIDExternalUserAgentIOSNoSSO so that `https` redirect URIs are
   // supported on iOS 17.4+. AppAuth's own OIDExternalUserAgentIOS only supports

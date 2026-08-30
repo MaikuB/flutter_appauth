@@ -1,6 +1,11 @@
-## [12.1.0]
+## [12.2.0]
 
 * [iOS] Added support for `https` redirect URIs on iOS 17.4 and newer. When the redirect URL uses the `https` scheme, the plugin now starts the `ASWebAuthenticationSession` using the `callbackWithHTTPSHost:path:` API. This applies to both the default and ephemeral `ASWebAuthenticationSession` external user agents. No Dart API changes are required — pass an `https` redirect URL as usual. Note that the app must declare the matching Associated Domains entitlement (e.g. `webcredentials:<host>`) for the callback to be delivered.
+
+## [12.1.0]
+
+* [iOS] added custom browser support. Thanks to the PR from [Kuurse)](https://github.com/Kuurse)
+* [iOS][macOS] bumped AppAuth IOS SDK dependency to 2.1.0
 
 ## [12.0.2]
 
