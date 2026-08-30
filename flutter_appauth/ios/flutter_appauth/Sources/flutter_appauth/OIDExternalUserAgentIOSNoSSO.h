@@ -2,8 +2,12 @@
     @brief OIDExternalUserAgentIOSNoSSO is a custom user agent based on the
    default user agent in the AppAuth iOS SDK found here:
             https://github.com/openid/AppAuth-iOS/blob/master/Source/iOS/OIDExternalUserAgentIOS.h
-            Ths user agent allows setting `prefersEphemeralSession` flag on iOS
-   13 or newer to avoid cookies being shared across the device.
+            This user agent allows setting the `prefersEphemeralSession` flag on
+   iOS 13 or newer to avoid cookies being shared across the device. It also
+   supports `https` redirect URIs on iOS 17.4 or newer by
+   using `ASWebAuthenticationSession`'s `callbackWithHTTPSHost:path:` API when
+   the redirect URL passed to the designated initializer uses the `https`
+   scheme.
     @copydetails
         Licensed under the Apache License, Version 2.0 (the "License");
         you may not use this file except in compliance with the License.
@@ -36,13 +40,32 @@ API_UNAVAILABLE(macCatalyst)
     "This method will not work on iOS 13, use "
     "initWithPresentingViewController:presentingViewController");
 
-/*! @brief The designated initializer.
+/*! @brief Convenience initializer that prefers an ephemeral session and does
+   not enable `https` redirect URI handling.
     @param presentingViewController The view controller from which to present
-   the
-        \SFSafariViewController.
+   the \SFSafariViewController.
  */
 - (nullable instancetype)initWithPresentingViewController:
-    (UIViewController *)presentingViewController NS_DESIGNATED_INITIALIZER;
+    (UIViewController *)presentingViewController;
+
+/*! @brief The designated initializer.
+    @param presentingViewController The view controller from which to present
+   the \SFSafariViewController.
+    @param prefersEphemeralSession Whether the underlying
+   `ASWebAuthenticationSession` should use a private (ephemeral) browser session
+   so cookies are not shared across the device.
+    @param redirectURL The redirect URL of the request. When this uses the
+   `https` scheme, the `ASWebAuthenticationSession` is started with a
+   `callbackWithHTTPSHost:path:` callback on iOS 17.4 or newer so that HTTPS
+   URLs can be used as redirect URIs. May be nil, in which case the legacy
+   `callbackURLScheme:` behaviour is used.
+ */
+- (nullable instancetype)
+    initWithPresentingViewController:
+        (UIViewController *)presentingViewController
+             prefersEphemeralSession:(BOOL)prefersEphemeralSession
+                         redirectURL:(nullable NSURL *)redirectURL
+    NS_DESIGNATED_INITIALIZER;
 
 @end
 

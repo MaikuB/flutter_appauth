@@ -13,6 +13,7 @@
   - [Ephemeral Sessions (iOS and macOS only)](#ephemeral-sessions-ios-and-macos-only)
 - [Android setup](#android-setup)
 - [iOS/macOS setup](#iosmacos-setup)
+  - [Using https redirect URIs on iOS 17.4+](#using-https-redirect-uris-on-ios-174)
 - [API docs](#api-docs)
 - [FAQs](#faqs)
 
@@ -259,6 +260,52 @@ Go to the `Info.plist` for your iOS/macOS app to specify the custom scheme so th
 ```
 
 Note: iOS apps generate a file called `cache.db` which contains the table `cfurl_cache_receiver_data`. This table will contain the access token obtained after the login is completed. If the potential data leak represents a threat for your application then you can disable the information caching for the entire iOS app (ex. https://kunalgupta1508.medium.com/data-leakage-with-cache-db-2d311582cf23).
+
+### Using https redirect URIs on iOS 17.4+
+
+Starting with iOS 17.4, you can use an `https` redirect URI (a universal-link-style URL such as `https://app.example.com/callback`) instead of a custom scheme. When the redirect URL you pass uses the `https` scheme, the plugin automatically starts the `ASWebAuthenticationSession` using Apple's `callbackWithHTTPSHost:path:` API. No Dart API change is required — you just pass an `https` redirect URL.
+
+This only applies to iOS 17.4 and newer. The plugin's minimum deployment target is unchanged, and the feature is gated behind a runtime `@available(iOS 17.4, *)` check so older devices are unaffected. However, the API genuinely does not exist before 17.4, so on earlier versions an `https` redirect cannot work. If you need to support devices below 17.4, branch on the OS version and fall back to a custom scheme:
+
+```dart
+import 'dart:io' show Platform;
+import 'package:device_info_plus/device_info_plus.dart';
+
+Future<String> redirectUrl() async {
+  if (Platform.isIOS) {
+    final info = await DeviceInfoPlugin().iosInfo;
+    final parts = info.systemVersion.split('.');
+    final major = int.tryParse(parts.elementAt(0)) ?? 0;
+    final minor = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+    final supportsHttps = major > 17 || (major == 17 && minor >= 4);
+    if (supportsHttps) {
+      return 'https://app.example.com/oauth/callback';
+    }
+  }
+  return 'com.example.app://oauth/callback';
+}
+```
+
+If your app's minimum iOS version is already 17.4 or higher, you can drop the branching and always use the `https` redirect URL.
+
+Requirements when using an `https` redirect URI:
+
+1. **Associated Domains entitlement.** Add a `webcredentials` entry (not `applinks`) for the callback host. `ASWebAuthenticationSession`'s `https` callback uses the `webcredentials` association to verify your app owns the domain — it does not go through the universal-link (`applinks`) machinery, and iOS refuses to start the session without it (validation is lenient on the Simulator, so always test on a real device):
+
+   ```xml
+   <key>com.apple.developer.associated-domains</key>
+   <array>
+       <string>webcredentials:app.example.com</string>
+   </array>
+   ```
+
+2. **`apple-app-site-association` file** hosted at `https://app.example.com/.well-known/apple-app-site-association` listing your app under the `webcredentials` key:
+
+   ```json
+   { "webcredentials": { "apps": ["TEAMID.com.example.myapp"] } }
+   ```
+
+3. **Register both redirect URIs with your identity provider** if you support older devices, since OAuth servers match `redirect_uri` exactly. Keep the custom scheme registered in `Info.plist` (see above) for the fallback path.
 
 
 ## API docs
