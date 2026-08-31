@@ -163,6 +163,10 @@ AppAuthAuthorization *authorization;
     [self handleTokenMethodCall:[call arguments] result:result];
   } else if ([END_SESSION_METHOD isEqualToString:call.method]) {
     [self handleEndSessionMethodCall:[call arguments] result:result];
+  } else if ([RESUME_PENDING_AUTHORIZATION_METHOD isEqualToString:call.method]) {
+    // Only Android can lose a pending authorization result to Activity
+    // recreation; there is never anything to resume here.
+    result(nil);
   } else {
     result(FlutterMethodNotImplemented);
   }

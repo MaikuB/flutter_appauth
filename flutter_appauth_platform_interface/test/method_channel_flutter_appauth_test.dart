@@ -190,4 +190,92 @@ void main() {
       })
     ]);
   });
+
+  group('resumePendingAuthorization', () {
+    tearDown(() {
+      // Restore the default handler used by the rest of the tests.
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+        log.add(methodCall);
+        return <Object, Object>{};
+      });
+    });
+
+    test('returns null when nothing is pending', () async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+        log.add(methodCall);
+        return null;
+      });
+
+      final AuthorizationResumeResponse? result =
+          await flutterAppAuth.resumePendingAuthorization();
+
+      expect(result, isNull);
+      expect(log, <Matcher>[
+        isMethodCall('resumePendingAuthorization', arguments: null)
+      ]);
+    });
+
+    test('returns an AuthorizationResponse for a resumed authorize() flow',
+        () async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+        log.add(methodCall);
+        return <Object, Object?>{
+          'authorizationCode': 'someAuthorizationCode',
+          'codeVerifier': 'someCodeVerifier',
+          'nonce': 'someNonce',
+          'authorizationAdditionalParameters': <String, dynamic>{},
+        };
+      });
+
+      final AuthorizationResumeResponse? result =
+          await flutterAppAuth.resumePendingAuthorization();
+
+      expect(result, isA<AuthorizationResumeResponseAuthorize>());
+      final response = (result as AuthorizationResumeResponseAuthorize)
+        .response;
+      expect(response.authorizationCode,
+          'someAuthorizationCode');
+      expect(response.codeVerifier, 'someCodeVerifier');
+      expect(response.nonce, 'someNonce');
+      expect(response.authorizationAdditionalParameters, isNotNull);
+    });
+
+    test(
+        'returns an AuthorizationTokenResponse for a resumed '
+        'authorizeAndExchangeCode() flow', () async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+        log.add(methodCall);
+        return <Object, Object?>{
+          'accessToken': 'someAccessToken',
+          'refreshToken': 'someRefreshToken',
+          'accessTokenExpirationTime': 1784239200000,
+          'idToken': 'someIdToken',
+          'tokenType': 'bearer',
+          'scopes': <String>['someScope'],
+          'authorizationAdditionalParameters': <String, dynamic>{},
+          'tokenAdditionalParameters': <String, dynamic>{},
+        };
+      });
+
+      final AuthorizationResumeResponse? result =
+          await flutterAppAuth.resumePendingAuthorization();
+
+      expect(result, isA<AuthorizationResumeResponseToken>());
+      final response = (result as AuthorizationResumeResponseToken).response;
+      expect(
+          response.accessToken, 'someAccessToken');
+      expect(
+          response.refreshToken, 'someRefreshToken');
+      expect(response.accessTokenExpirationDateTime, DateTime(2026, 7, 17));
+      expect(response.idToken, 'someIdToken');
+      expect(response.tokenType, 'bearer');
+      expect(response.scopes, ["someScope"]);
+      expect(response.authorizationAdditionalParameters, isNotNull);
+      expect(response.tokenAdditionalParameters, isNotNull);
+    });
+  });
 }
