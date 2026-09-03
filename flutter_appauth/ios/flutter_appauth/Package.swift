@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "flutter_appauth",
     platforms: [
-        .iOS("12.0")
+        .iOS("13.0")
     ],
     products: [
         .library(name: "flutter-appauth", targets: ["flutter_appauth"])
