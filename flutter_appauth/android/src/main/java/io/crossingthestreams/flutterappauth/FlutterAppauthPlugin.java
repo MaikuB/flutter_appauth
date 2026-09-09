@@ -210,6 +210,7 @@ public class FlutterAppauthPlugin
     final String issuer = (String) arguments.get("issuer");
     final String discoveryUrl = (String) arguments.get("discoveryUrl");
     final String redirectUrl = (String) arguments.get("redirectUrl");
+    final String proxyRedirectUrl = (String) arguments.get("proxyRedirectUrl");
     final String loginHint = (String) arguments.get("loginHint");
     final String nonce = (String) arguments.get("nonce");
     clientSecret = (String) arguments.get("clientSecret");
@@ -228,6 +229,7 @@ public class FlutterAppauthPlugin
         discoveryUrl,
         scopes,
         redirectUrl,
+        proxyRedirectUrl,
         serviceConfigurationParameters,
         additionalParameters,
         loginHint,
@@ -266,12 +268,15 @@ public class FlutterAppauthPlugin
     final Map<String, String> additionalParameters =
         (Map<String, String>) arguments.get("additionalParameters");
     allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
+    final String proxyRedirectUrl = (String) arguments.get("proxyRedirectUrl");
+    final String effectiveRedirectUrl = proxyRedirectUrl != null ? proxyRedirectUrl : redirectUrl;
     return new TokenRequestParameters(
         clientId,
         issuer,
         discoveryUrl,
         scopes,
-        redirectUrl,
+        effectiveRedirectUrl,
+        null,
         refreshToken,
         authorizationCode,
         codeVerifier,
@@ -317,6 +322,7 @@ public class FlutterAppauthPlugin
           serviceConfiguration,
           tokenRequestParameters.clientId,
           tokenRequestParameters.redirectUrl,
+          tokenRequestParameters.proxyRedirectUrl,
           tokenRequestParameters.scopes,
           tokenRequestParameters.loginHint,
           tokenRequestParameters.nonce,
@@ -336,6 +342,7 @@ public class FlutterAppauthPlugin
                     serviceConfiguration,
                     tokenRequestParameters.clientId,
                     tokenRequestParameters.redirectUrl,
+                    tokenRequestParameters.proxyRedirectUrl,
                     tokenRequestParameters.scopes,
                     tokenRequestParameters.loginHint,
                     tokenRequestParameters.nonce,
@@ -409,6 +416,7 @@ public class FlutterAppauthPlugin
       AuthorizationServiceConfiguration serviceConfiguration,
       String clientId,
       String redirectUrl,
+      String proxyRedirectUrl,
       ArrayList<String> scopes,
       String loginHint,
       String nonce,
@@ -416,9 +424,10 @@ public class FlutterAppauthPlugin
       boolean exchangeCode,
       ArrayList<String> promptValues,
       String responseMode) {
+    String effectiveRedirectUrl = proxyRedirectUrl != null ? proxyRedirectUrl : redirectUrl;
     AuthorizationRequest.Builder authRequestBuilder =
         new AuthorizationRequest.Builder(
-            serviceConfiguration, clientId, ResponseTypeValues.CODE, Uri.parse(redirectUrl));
+            serviceConfiguration, clientId, ResponseTypeValues.CODE, Uri.parse(effectiveRedirectUrl));
 
     if (scopes != null && !scopes.isEmpty()) {
       authRequestBuilder.setScopes(scopes);
@@ -791,6 +800,7 @@ public class FlutterAppauthPlugin
     final String discoveryUrl;
     final ArrayList<String> scopes;
     final String redirectUrl;
+    final String proxyRedirectUrl;
     final String refreshToken;
     final String grantType;
     final String codeVerifier;
@@ -805,6 +815,7 @@ public class FlutterAppauthPlugin
         String discoveryUrl,
         ArrayList<String> scopes,
         String redirectUrl,
+        String proxyRedirectUrl,
         String refreshToken,
         String authorizationCode,
         String codeVerifier,
@@ -817,6 +828,7 @@ public class FlutterAppauthPlugin
       this.discoveryUrl = discoveryUrl;
       this.scopes = scopes;
       this.redirectUrl = redirectUrl;
+      this.proxyRedirectUrl = proxyRedirectUrl;
       this.refreshToken = refreshToken;
       this.authorizationCode = authorizationCode;
       this.codeVerifier = codeVerifier;
@@ -868,6 +880,7 @@ public class FlutterAppauthPlugin
         String discoveryUrl,
         ArrayList<String> scopes,
         String redirectUrl,
+        String proxyRedirectUrl,
         Map<String, String> serviceConfigurationParameters,
         Map<String, String> additionalParameters,
         String loginHint,
@@ -880,6 +893,7 @@ public class FlutterAppauthPlugin
           discoveryUrl,
           scopes,
           redirectUrl,
+          proxyRedirectUrl,
           null,
           null,
           null,

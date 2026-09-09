@@ -1,4 +1,5 @@
 #import "AppAuthIOSAuthorization.h"
+#import "FlutterAppAuthProxyUserAgent.h"
 
 @implementation AppAuthIOSAuthorization
 
@@ -8,6 +9,7 @@
             clientSecret:(NSString *)clientSecret
                   scopes:(NSArray *)scopes
              redirectUrl:(NSString *)redirectUrl
+        proxyRedirectUrl:(NSString *)proxyRedirectUrl
     additionalParameters:(NSDictionary *)additionalParameters
        externalUserAgent:(NSNumber *)externalUserAgent
                   result:(FlutterResult)result
@@ -16,13 +18,14 @@
   NSString *codeVerifier = [OIDAuthorizationRequest generateCodeVerifier];
   NSString *codeChallenge =
       [OIDAuthorizationRequest codeChallengeS256ForVerifier:codeVerifier];
+  NSString *effectiveRedirectUrl = proxyRedirectUrl ?: redirectUrl;
 
   OIDAuthorizationRequest *request = [[OIDAuthorizationRequest alloc]
       initWithConfiguration:serviceConfiguration
                    clientId:clientId
                clientSecret:clientSecret
                       scope:[OIDScopeUtilities scopesWithArray:scopes]
-                redirectURL:[NSURL URLWithString:redirectUrl]
+                redirectURL:[NSURL URLWithString:effectiveRedirectUrl]
                responseType:OIDResponseTypeCode
                       state:[OIDAuthorizationRequest generateState]
                       nonce:nonce != nil
@@ -36,7 +39,9 @@
   if (exchangeCode) {
     id<OIDExternalUserAgent> agent =
         [self userAgentWithViewController:rootViewController
-                        externalUserAgent:externalUserAgent];
+                        externalUserAgent:externalUserAgent
+                              redirectUrl:redirectUrl
+                         proxyRedirectUrl:proxyRedirectUrl];
     return [OIDAuthState
         authStateByPresentingAuthorizationRequest:request
                                 externalUserAgent:agent
@@ -68,7 +73,9 @@
   } else {
     id<OIDExternalUserAgent> agent =
         [self userAgentWithViewController:rootViewController
-                        externalUserAgent:externalUserAgent];
+                        externalUserAgent:externalUserAgent
+                              redirectUrl:redirectUrl
+                         proxyRedirectUrl:proxyRedirectUrl];
     return [OIDAuthorizationService
         presentAuthorizationRequest:request
                   externalUserAgent:agent
@@ -136,7 +143,9 @@
   UIViewController *rootViewController = [self rootViewController];
   id<OIDExternalUserAgent> externalUserAgent =
       [self userAgentWithViewController:rootViewController
-                      externalUserAgent:requestParameters.externalUserAgent];
+                      externalUserAgent:requestParameters.externalUserAgent
+                            redirectUrl:@""
+                       proxyRedirectUrl:nil];
 
   return [OIDAuthorizationService
       presentEndSessionRequest:endSessionRequest
@@ -164,12 +173,25 @@
 
 - (id<OIDExternalUserAgent>)
     userAgentWithViewController:(UIViewController *)rootViewController
-              externalUserAgent:(NSNumber *)externalUserAgent {
-  if ([externalUserAgent integerValue] == EphemeralASWebAuthenticationSession) {
+              externalUserAgent:(NSNumber *)externalUserAgent
+                    redirectUrl:(NSString *)redirectUrl
+               proxyRedirectUrl:(NSString *_Nullable)proxyRedirectUrl {
+  NSInteger agentValue = [externalUserAgent integerValue];
+  if (proxyRedirectUrl &&
+      (agentValue == ASWebAuthenticationSession ||
+       agentValue == EphemeralASWebAuthenticationSession)) {
+    NSString *callbackScheme = [NSURL URLWithString:redirectUrl].scheme;
+    return [[FlutterAppAuthProxyUserAgent alloc]
+        initWithPresentingViewController:rootViewController
+                          callbackScheme:callbackScheme
+                        proxyRedirectUrl:proxyRedirectUrl
+                               ephemeral:(agentValue == EphemeralASWebAuthenticationSession)];
+  }
+  if (agentValue == EphemeralASWebAuthenticationSession) {
     return [[OIDExternalUserAgentIOSNoSSO alloc]
         initWithPresentingViewController:rootViewController];
   }
-  if ([externalUserAgent integerValue] == SafariViewController) {
+  if (agentValue == SafariViewController) {
     return [[OIDExternalUserAgentIOSSafariViewController alloc]
         initWithPresentingViewController:rootViewController];
   }
