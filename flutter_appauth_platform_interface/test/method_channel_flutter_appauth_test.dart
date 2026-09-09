@@ -32,7 +32,6 @@ void main() {
           'clientId': 'someClientId',
           'issuer': null,
           'redirectUrl': 'someRedirectUrl',
-          'proxyRedirectUrl': null,
           'discoveryUrl': 'someDiscoveryUrl',
           'loginHint': 'someLoginHint',
           'scopes': null,
@@ -62,7 +61,6 @@ void main() {
           'clientId': 'someClientId',
           'issuer': null,
           'redirectUrl': 'someRedirectUrl',
-          'proxyRedirectUrl': null,
           'discoveryUrl': 'someDiscoveryUrl',
           'loginHint': 'someLoginHint',
           'scopes': null,
@@ -102,7 +100,6 @@ void main() {
             'clientId': 'someClientId',
             'issuer': null,
             'redirectUrl': 'someRedirectUrl',
-            'proxyRedirectUrl': null,
             'discoveryUrl': 'someDiscoveryUrl',
             'scopes': null,
             'serviceConfiguration': null,
@@ -130,7 +127,6 @@ void main() {
             'clientId': 'someClientId',
             'issuer': null,
             'redirectUrl': 'someRedirectUrl',
-            'proxyRedirectUrl': null,
             'discoveryUrl': 'someDiscoveryUrl',
             'scopes': null,
             'serviceConfiguration': null,
@@ -140,35 +136,6 @@ void main() {
             'refreshToken': null,
             'authorizationCode': 'someAuthorizationCode',
             'grantType': 'authorization_code',
-            'codeVerifier': null,
-            'nonce': null,
-          })
-        ],
-      );
-    });
-
-    test('passes proxyRedirectUrl', () async {
-      await flutterAppAuth.token(TokenRequest('someClientId', 'someRedirectUrl',
-          discoveryUrl: 'someDiscoveryUrl',
-          refreshToken: 'someRefreshToken',
-          proxyRedirectUrl: 'someProxyRedirectUrl'));
-      expect(
-        log,
-        <Matcher>[
-          isMethodCall('token', arguments: <String, Object?>{
-            'clientId': 'someClientId',
-            'issuer': null,
-            'redirectUrl': 'someRedirectUrl',
-            'proxyRedirectUrl': 'someProxyRedirectUrl',
-            'discoveryUrl': 'someDiscoveryUrl',
-            'scopes': null,
-            'serviceConfiguration': null,
-            'additionalParameters': null,
-            'allowInsecureConnections': false,
-            'clientSecret': null,
-            'refreshToken': 'someRefreshToken',
-            'authorizationCode': null,
-            'grantType': 'refresh_token',
             'codeVerifier': null,
             'nonce': null,
           })
@@ -186,7 +153,6 @@ void main() {
             'clientId': 'someClientId',
             'issuer': null,
             'redirectUrl': 'someRedirectUrl',
-            'proxyRedirectUrl': null,
             'discoveryUrl': 'someDiscoveryUrl',
             'scopes': null,
             'serviceConfiguration': null,

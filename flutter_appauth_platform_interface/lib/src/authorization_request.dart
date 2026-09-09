@@ -9,7 +9,6 @@ class AuthorizationRequest extends CommonRequestDetails
   AuthorizationRequest(
     String clientId,
     String redirectUrl, {
-    String? proxyRedirectUrl,
     String? issuer,
     String? discoveryUrl,
     AuthorizationServiceConfiguration? serviceConfiguration,
@@ -25,7 +24,6 @@ class AuthorizationRequest extends CommonRequestDetails
   }) {
     this.clientId = clientId;
     this.redirectUrl = redirectUrl;
-    this.proxyRedirectUrl = proxyRedirectUrl;
     this.scopes = scopes;
     this.serviceConfiguration = serviceConfiguration;
     this.additionalParameters = additionalParameters;

@@ -1,5 +1,4 @@
 #import "AppAuthMacOSAuthorization.h"
-#import "FlutterAppAuthMacProxyUserAgent.h"
 
 @implementation AppAuthMacOSAuthorization
 
@@ -9,7 +8,6 @@
             clientSecret:(NSString *)clientSecret
                   scopes:(NSArray *)scopes
              redirectUrl:(NSString *)redirectUrl
-        proxyRedirectUrl:(NSString *)proxyRedirectUrl
     additionalParameters:(NSDictionary *)additionalParameters
        externalUserAgent:(NSNumber *)externalUserAgent
                   result:(FlutterResult)result
@@ -18,14 +16,13 @@
   NSString *codeVerifier = [OIDAuthorizationRequest generateCodeVerifier];
   NSString *codeChallenge =
       [OIDAuthorizationRequest codeChallengeS256ForVerifier:codeVerifier];
-  NSString *effectiveRedirectUrl = proxyRedirectUrl ?: redirectUrl;
 
   OIDAuthorizationRequest *request = [[OIDAuthorizationRequest alloc]
       initWithConfiguration:serviceConfiguration
                    clientId:clientId
                clientSecret:clientSecret
                       scope:[OIDScopeUtilities scopesWithArray:scopes]
-                redirectURL:[NSURL URLWithString:effectiveRedirectUrl]
+                redirectURL:[NSURL URLWithString:redirectUrl]
                responseType:OIDResponseTypeCode
                       state:[OIDAuthorizationRequest generateState]
                       nonce:nonce != nil
@@ -39,9 +36,7 @@
   if (exchangeCode) {
     NSObject<OIDExternalUserAgent> *agent =
         [self userAgentWithPresentingWindow:keyWindow
-                          externalUserAgent:externalUserAgent
-                                redirectUrl:redirectUrl
-                           proxyRedirectUrl:proxyRedirectUrl];
+                          externalUserAgent:externalUserAgent];
     return [OIDAuthState
         authStateByPresentingAuthorizationRequest:request
                                 externalUserAgent:agent
@@ -73,9 +68,7 @@
   } else {
     NSObject<OIDExternalUserAgent> *agent =
         [self userAgentWithPresentingWindow:keyWindow
-                          externalUserAgent:externalUserAgent
-                                redirectUrl:redirectUrl
-                           proxyRedirectUrl:proxyRedirectUrl];
+                          externalUserAgent:externalUserAgent];
     return [OIDAuthorizationService
         presentAuthorizationRequest:request
                   externalUserAgent:agent
@@ -143,9 +136,7 @@
   NSWindow *keyWindow = [[NSApplication sharedApplication] keyWindow];
   id<OIDExternalUserAgent> externalUserAgent =
       [self userAgentWithPresentingWindow:keyWindow
-                        externalUserAgent:requestParameters.externalUserAgent
-                              redirectUrl:@""
-                         proxyRedirectUrl:nil];
+                        externalUserAgent:requestParameters.externalUserAgent];
   return [OIDAuthorizationService
       presentEndSessionRequest:endSessionRequest
              externalUserAgent:externalUserAgent
@@ -172,21 +163,8 @@
 
 - (id<OIDExternalUserAgent>)
     userAgentWithPresentingWindow:(NSWindow *)presentingWindow
-                externalUserAgent:(NSNumber *)externalUserAgent
-                      redirectUrl:(NSString *)redirectUrl
-                 proxyRedirectUrl:(NSString *_Nullable)proxyRedirectUrl {
-  NSInteger agentValue = [externalUserAgent integerValue];
-  if (proxyRedirectUrl &&
-      (agentValue == ASWebAuthenticationSession ||
-       agentValue == EphemeralASWebAuthenticationSession)) {
-    NSString *callbackScheme = [NSURL URLWithString:redirectUrl].scheme;
-    return [[FlutterAppAuthMacProxyUserAgent alloc]
-        initWithPresentingWindow:presentingWindow
-                  callbackScheme:callbackScheme
-                proxyRedirectUrl:proxyRedirectUrl
-                       ephemeral:(agentValue == EphemeralASWebAuthenticationSession)];
-  }
-  if (agentValue == EphemeralASWebAuthenticationSession) {
+                externalUserAgent:(NSNumber *)externalUserAgent {
+  if ([externalUserAgent integerValue] == EphemeralASWebAuthenticationSession) {
     return [[OIDExternalUserAgentMacNoSSO alloc]
         initWithPresentingWindow:presentingWindow];
   }

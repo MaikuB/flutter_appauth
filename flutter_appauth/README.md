@@ -11,9 +11,9 @@
   - [End session](#end-session)
   - [Handling errors](#handling-errors)
   - [Ephemeral Sessions (iOS and macOS only)](#ephemeral-sessions-ios-and-macos-only)
-  - [Using a proxy redirect URL](#using-a-proxy-redirect-url)
 - [Android setup](#android-setup)
 - [iOS/macOS setup](#iosmacos-setup)
+  - [Using https redirect URIs on iOS 17.4+](#using-https-redirect-uris-on-ios-174)
 - [API docs](#api-docs)
 - [FAQs](#faqs)
 
@@ -166,64 +166,6 @@ With an ephemeral session there will be no warning like `"app_name" Wants to Use
 The option `preferEphemeralSession = true` must only be used for the end session call if it is also used for the sign in call. 
 Otherwise, there will be still an active login session in the browser.
 
-### Using a proxy redirect URL
-
-Some identity providers only allow HTTPS redirect URIs and wil reject custom-scheme deep links (e.g. `com.example.myapp://oauth2redirect`) during the authorization request. A common solution is to host a small HTTPS endpoint that immediately redirects to your app's custom scheme. The `proxyRedirectUrl` parameter supports this pattern.
-
-**How it works:**
-
-1. Your app registers a custom-scheme redirect URL (e.g. `com.example.myapp://oauth2redirect`) with the OS so it can intercept the callback — this is `redirectUrl`.
-2. You host an HTTPS endpoint (e.g. `https://myapp.example.com/oauth2redirect`) that simply redirects to the custom-scheme URL — this becomes `proxyRedirectUrl`.
-3. When making the authorization request, `proxyRedirectUrl` is sent to the identity provider as the `redirect_uri` parameter so that it passes the provider's HTTPS validation.
-4. The provider redirects the browser to `proxyRedirectUrl`, which in turn redirects to `redirectUrl`, and the OS hands the callback back to your app.
-5. When exchanging the authorization code for tokens, `proxyRedirectUrl` must also be specified so that the `redirect_uri` in the token request matches what was used during authorization.
-
-**Example:**
-
-```dart
-// Authorization + code exchange in one step
-final AuthorizationTokenResponse result = await appAuth.authorizeAndExchangeCode(
-  AuthorizationTokenRequest(
-    '<client_id>',
-    'com.example.myapp://oauth2redirect',   // redirectUrl: custom scheme the OS intercepts
-    proxyRedirectUrl: 'https://myapp.example.com/oauth2redirect', // sent to the provider as redirect_uri
-    discoveryUrl: '<discovery_url>',
-    scopes: ['openid', 'profile', 'email', 'offline_access'],
-  ),
-);
-```
-
-If you perform authorization and token exchange as separate steps, pass `proxyRedirectUrl` to both calls:
-
-```dart
-// Step 1: authorize
-final AuthorizationResponse authResult = await appAuth.authorize(
-  AuthorizationRequest(
-    '<client_id>',
-    'com.example.myapp://oauth2redirect',
-    proxyRedirectUrl: 'https://myapp.example.com/oauth2redirect',
-    discoveryUrl: '<discovery_url>',
-    scopes: ['openid', 'profile', 'email', 'offline_access'],
-  ),
-);
-
-// Step 2: exchange the code — proxyRedirectUrl must match what was sent during authorization
-final TokenResponse tokenResult = await appAuth.token(
-  TokenRequest(
-    '<client_id>',
-    'com.example.myapp://oauth2redirect',
-    proxyRedirectUrl: 'https://myapp.example.com/oauth2redirect',
-    authorizationCode: authResult.authorizationCode,
-    discoveryUrl: '<discovery_url>',
-    codeVerifier: authResult.codeVerifier,
-    nonce: authResult.nonce,
-    scopes: ['openid', 'profile', 'email', 'offline_access'],
-  ),
-);
-```
-
-> **Note:** The `redirectUrl` still needs to be registered with the OS (via `Info.plist` on iOS/macOS and `build.gradle`/`AndroidManifest.xml` on Android) so the OS knows to route the deep link back to your app. Only `proxyRedirectUrl` is sent to the identity provider.
-
 ## Android setup
 
 Go to the `build.gradle.kts` file for your Android app to specify the custom scheme so that there should be a section in it that look similar to the following but replace `<your_custom_scheme>` with the desired value:
@@ -318,6 +260,52 @@ Go to the `Info.plist` for your iOS/macOS app to specify the custom scheme so th
 ```
 
 Note: iOS apps generate a file called `cache.db` which contains the table `cfurl_cache_receiver_data`. This table will contain the access token obtained after the login is completed. If the potential data leak represents a threat for your application then you can disable the information caching for the entire iOS app (ex. https://kunalgupta1508.medium.com/data-leakage-with-cache-db-2d311582cf23).
+
+### Using https redirect URIs on iOS 17.4+
+
+Starting with iOS 17.4, you can use an `https` redirect URI (e.g. `https://example.com/login-callback`) instead of a custom scheme. When the redirect URL you pass uses the `https` scheme, the plugin automatically starts the `ASWebAuthenticationSession` using Apple's `callbackWithHTTPSHost:path:` API ([AppAuth-iOS #938](https://github.com/openid/AppAuth-iOS/pull/938) applied in this fork). No Dart API change is required — you just pass an `https` redirect URL.
+
+This only applies to iOS 17.4 and newer. The plugin's minimum deployment target is unchanged, and the feature is gated behind a runtime `@available(iOS 17.4, *)` check so older devices are unaffected. However, the API genuinely does not exist before 17.4, so on earlier versions an `https` redirect cannot work. If you need to support devices below 17.4, branch on the OS version and fall back to a custom scheme:
+
+```dart
+import 'dart:io' show Platform;
+import 'package:device_info_plus/device_info_plus.dart';
+
+Future<String> redirectUrl() async {
+  if (Platform.isIOS) {
+    final info = await DeviceInfoPlugin().iosInfo;
+    final parts = info.systemVersion.split('.');
+    final major = int.tryParse(parts.elementAt(0)) ?? 0;
+    final minor = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+    final supportsHttps = major > 17 || (major == 17 && minor >= 4);
+    if (supportsHttps) {
+      return 'https://example.com/login-callback';
+    }
+  }
+  return 'com.example.myapp://login-callback';
+}
+```
+
+If your app's minimum iOS version is already 17.4 or higher, you can drop the branching and always use the `https` redirect URL.
+
+Requirements when using an `https` redirect URI:
+
+1. **Associated Domains entitlement.** Add a `webcredentials` entry (not `applinks`) for the callback host. `ASWebAuthenticationSession`'s `https` callback uses the `webcredentials` association to verify your app owns the domain — it does not go through the universal-link (`applinks`) machinery, and iOS refuses to start the session without it (validation is lenient on the Simulator, so always test on a real device):
+
+   ```xml
+   <key>com.apple.developer.associated-domains</key>
+   <array>
+       <string>webcredentials:example.com</string>
+   </array>
+   ```
+
+2. **`apple-app-site-association` file** hosted at `https://example.com/.well-known/apple-app-site-association` listing the app under the `webcredentials` key:
+
+   ```json
+   { "webcredentials": { "apps": ["<TEAMID>.com.example.myapp"] } }
+   ```
+
+3. **Register both redirect URIs with your identity provider** if you support older devices, since OAuth servers match `redirect_uri` exactly. Keep the custom scheme registered in `Info.plist` (see above) for the fallback path.
 
 
 ## API docs

@@ -9,7 +9,6 @@ class AuthorizationTokenRequest extends TokenRequest
   AuthorizationTokenRequest(
     super.clientId,
     super.redirectUrl, {
-    super.proxyRedirectUrl,
     String? loginHint,
     super.clientSecret,
     super.scopes,

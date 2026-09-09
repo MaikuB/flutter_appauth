@@ -44,8 +44,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   // For a list of client IDs, go to https://demo.duendesoftware.com
   final String _clientId = 'interactive.public';
   final String _redirectUrl = 'com.duendesoftware.demo:/oauthredirect';
-  final String? _proxyRedirectUrl =
-      null /*'https://my-server.com/auth/redirect?client=app'*/;
   final String _issuer = 'https://demo.duendesoftware.com';
   final String _discoveryUrl =
       'https://demo.duendesoftware.com/.well-known/openid-configuration';
@@ -316,11 +314,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       _setBusyState();
       final TokenResponse result = await _appAuth.token(TokenRequest(
           _clientId, _redirectUrl,
-          proxyRedirectUrl: _proxyRedirectUrl,
-          refreshToken: _refreshToken,
-          serviceConfiguration: _serviceConfiguration,
-          issuer: _issuer,
-          scopes: _scopes));
+          refreshToken: _refreshToken, issuer: _issuer, scopes: _scopes));
       _processTokenResponse(result);
       await _testApi(result);
     } catch (e) {
@@ -335,7 +329,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       _setBusyState();
       final TokenResponse result = await _appAuth.token(TokenRequest(
           _clientId, _redirectUrl,
-          proxyRedirectUrl: _proxyRedirectUrl,
           authorizationCode: _authorizationCode,
           discoveryUrl: _discoveryUrl,
           codeVerifier: _codeVerifier,
@@ -353,9 +346,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Future<void> _signInWithNoCodeExchange() async {
     try {
       _setBusyState();
-      /*
+      /* 
         The discovery endpoint (_discoveryUrl) is used to find the
-        configuration. The code challenge generation can be checked here
+        configuration. The code challenge generation can be checked here 
         > https://github.com/MaikuB/flutter_appauth/search?q=challenge.
         The code challenge is generated from the code verifier and only the
         code verifier is included in the result. This because to get the token
@@ -366,19 +359,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       */
       final AuthorizationResponse result = await _appAuth.authorize(
         AuthorizationRequest(_clientId, _redirectUrl,
-            proxyRedirectUrl: _proxyRedirectUrl,
-            discoveryUrl: _discoveryUrl,
-            scopes: _scopes,
-            loginHint: 'bob'),
+            discoveryUrl: _discoveryUrl, scopes: _scopes, loginHint: 'bob'),
       );
 
-      /*
+      /* 
         or just use the issuer
         var result = await _appAuth.authorize(
           AuthorizationRequest(
             _clientId,
             _redirectUrl,
-            proxyRedirectUrl: _proxyRedirectUrl,
             issuer: _issuer,
             scopes: _scopes,
           ),
@@ -402,7 +391,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       // use the discovery endpoint to find the configuration
       final AuthorizationResponse result = await _appAuth.authorize(
         AuthorizationRequest(_clientId, _redirectUrl,
-            proxyRedirectUrl: _proxyRedirectUrl,
             discoveryUrl: _discoveryUrl,
             scopes: _scopes,
             loginHint: 'bob',
@@ -437,7 +425,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       final Future<AuthorizationTokenResponse> authRequest =
           _appAuth.authorizeAndExchangeCode(
         AuthorizationTokenRequest(_clientId, _redirectUrl,
-            proxyRedirectUrl: _proxyRedirectUrl,
             serviceConfiguration: _serviceConfiguration,
             scopes: _scopes,
             externalUserAgent: externalUserAgent),
@@ -459,7 +446,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         final AuthorizationTokenResponse result = await _appAuth
         .authorizeAndExchangeCode(
           AuthorizationTokenRequest(_clientId, _redirectUrl,
-              proxyRedirectUrl: _proxyRedirectUrl,
               serviceConfiguration: _serviceConfiguration,
               scopes: _scopes,
               promptValues: ['login']),
@@ -515,13 +501,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   void _processAuthTokenResponse(AuthorizationTokenResponse response) {
     setState(() {
-      _accessToken =
-          _accessTokenTextController.text = response.accessToken ?? '';
-      _idToken = _idTokenTextController.text = response.idToken ?? '';
-      _refreshToken =
-          _refreshTokenTextController.text = response.refreshToken ?? '';
+      _accessToken = _accessTokenTextController.text = response.accessToken!;
+      _idToken = _idTokenTextController.text = response.idToken!;
+      _refreshToken = _refreshTokenTextController.text = response.refreshToken!;
       _accessTokenExpirationTextController.text =
-          response.accessTokenExpirationDateTime?.toIso8601String() ?? '';
+          response.accessTokenExpirationDateTime!.toIso8601String();
     });
   }
 

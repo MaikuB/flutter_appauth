@@ -1,5 +1,4 @@
 #import "AppAuthIOSAuthorization.h"
-#import "FlutterAppAuthProxyUserAgent.h"
 
 @implementation AppAuthIOSAuthorization
 
@@ -9,7 +8,6 @@
             clientSecret:(NSString *)clientSecret
                   scopes:(NSArray *)scopes
              redirectUrl:(NSString *)redirectUrl
-        proxyRedirectUrl:(NSString *)proxyRedirectUrl
     additionalParameters:(NSDictionary *)additionalParameters
        externalUserAgent:(NSNumber *)externalUserAgent
                   result:(FlutterResult)result
@@ -18,14 +16,13 @@
   NSString *codeVerifier = [OIDAuthorizationRequest generateCodeVerifier];
   NSString *codeChallenge =
       [OIDAuthorizationRequest codeChallengeS256ForVerifier:codeVerifier];
-  NSString *effectiveRedirectUrl = proxyRedirectUrl ?: redirectUrl;
 
   OIDAuthorizationRequest *request = [[OIDAuthorizationRequest alloc]
       initWithConfiguration:serviceConfiguration
                    clientId:clientId
                clientSecret:clientSecret
                       scope:[OIDScopeUtilities scopesWithArray:scopes]
-                redirectURL:[NSURL URLWithString:effectiveRedirectUrl]
+                redirectURL:[NSURL URLWithString:redirectUrl]
                responseType:OIDResponseTypeCode
                       state:[OIDAuthorizationRequest generateState]
                       nonce:nonce != nil
@@ -40,8 +37,7 @@
     id<OIDExternalUserAgent> agent =
         [self userAgentWithViewController:rootViewController
                         externalUserAgent:externalUserAgent
-                              redirectUrl:redirectUrl
-                         proxyRedirectUrl:proxyRedirectUrl];
+                              redirectURL:[NSURL URLWithString:redirectUrl]];
     return [OIDAuthState
         authStateByPresentingAuthorizationRequest:request
                                 externalUserAgent:agent
@@ -74,8 +70,7 @@
     id<OIDExternalUserAgent> agent =
         [self userAgentWithViewController:rootViewController
                         externalUserAgent:externalUserAgent
-                              redirectUrl:redirectUrl
-                         proxyRedirectUrl:proxyRedirectUrl];
+                              redirectURL:[NSURL URLWithString:redirectUrl]];
     return [OIDAuthorizationService
         presentAuthorizationRequest:request
                   externalUserAgent:agent
@@ -144,8 +139,7 @@
   id<OIDExternalUserAgent> externalUserAgent =
       [self userAgentWithViewController:rootViewController
                       externalUserAgent:requestParameters.externalUserAgent
-                            redirectUrl:@""
-                       proxyRedirectUrl:nil];
+                            redirectURL:postLogoutRedirectURL];
 
   return [OIDAuthorizationService
       presentEndSessionRequest:endSessionRequest
@@ -174,24 +168,8 @@
 - (id<OIDExternalUserAgent>)
     userAgentWithViewController:(UIViewController *)rootViewController
               externalUserAgent:(NSNumber *)externalUserAgent
-                    redirectUrl:(NSString *)redirectUrl
-               proxyRedirectUrl:(NSString *_Nullable)proxyRedirectUrl {
-  NSInteger agentValue = [externalUserAgent integerValue];
-  if (proxyRedirectUrl &&
-      (agentValue == ASWebAuthenticationSession ||
-       agentValue == EphemeralASWebAuthenticationSession)) {
-    NSString *callbackScheme = [NSURL URLWithString:redirectUrl].scheme;
-    return [[FlutterAppAuthProxyUserAgent alloc]
-        initWithPresentingViewController:rootViewController
-                          callbackScheme:callbackScheme
-                        proxyRedirectUrl:proxyRedirectUrl
-                               ephemeral:(agentValue == EphemeralASWebAuthenticationSession)];
-  }
-  if (agentValue == EphemeralASWebAuthenticationSession) {
-    return [[OIDExternalUserAgentIOSNoSSO alloc]
-        initWithPresentingViewController:rootViewController];
-  }
-  if (agentValue == SafariViewController) {
+                    redirectURL:(NSURL *)redirectURL {
+  if ([externalUserAgent integerValue] == SafariViewController) {
     return [[OIDExternalUserAgentIOSSafariViewController alloc]
         initWithPresentingViewController:rootViewController];
   }
@@ -207,8 +185,16 @@
   if ([externalUserAgent integerValue] == CustomBrowserOpera) {
     return [OIDExternalUserAgentIOSCustomBrowser CustomBrowserOpera];
   }
-  return [[OIDExternalUserAgentIOS alloc]
-      initWithPresentingViewController:rootViewController];
+  // Both the default (SSO) and ephemeral ASWebAuthenticationSession modes are
+  // served by OIDExternalUserAgentIOSNoSSO so that `https` redirect URIs are
+  // supported on iOS 17.4+. AppAuth's own OIDExternalUserAgentIOS only supports
+  // custom-scheme callbacks.
+  BOOL prefersEphemeralSession =
+      [externalUserAgent integerValue] == EphemeralASWebAuthenticationSession;
+  return [[OIDExternalUserAgentIOSNoSSO alloc]
+      initWithPresentingViewController:rootViewController
+               prefersEphemeralSession:prefersEphemeralSession
+                           redirectURL:redirectURL];
 }
 
 - (UIViewController *)rootViewController {

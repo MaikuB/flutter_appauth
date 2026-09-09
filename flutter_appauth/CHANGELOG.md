@@ -1,3 +1,8 @@
+## [12.2.0]
+
+* **Fork only** — not for upstream `MaikuB/flutter_appauth`.
+* [iOS] HTTPS redirect URIs on iOS 17.4+ via `ASWebAuthenticationSessionCallback callbackWithHTTPSHost:path:`, ported from [AppAuth-iOS #938](https://github.com/openid/AppAuth-iOS/pull/938) into this plugin's custom user agent (AppAuth's stock `OIDExternalUserAgentIOS` still lacks it). Same approach as [flutter_appauth #662](https://github.com/MaikuB/flutter_appauth/pull/662). Requires `webcredentials:` Associated Domains. No Dart API changes.
+
 ## [12.1.0]
 
 * [iOS] added custom browser support. Thanks to the PR from [Kuurse)](https://github.com/Kuurse)
