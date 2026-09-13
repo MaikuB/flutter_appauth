@@ -1,3 +1,7 @@
+## [13.0.0]
+
+* **Breaking change** updated minimum supported SDK version to Flutter 3.44.0/Dart 3.12.0
+
 ## [12.1.0]
 
 * [iOS] added custom browser support. Thanks to the PR from [Kuurse)](https://github.com/Kuurse)
