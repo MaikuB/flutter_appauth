@@ -1,6 +1,8 @@
 ## [13.0.0-dev.1]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.44.0/Dart 3.12.0
+* [Android] **Breaking change** updated AGP to 9.0.1
+* [Android] migrated Gradle build scripts to Kotlin DSL
 
 ## [12.1.0]
 
