@@ -51,7 +51,7 @@ jobs:
         run: ./.github/workflows/scripts/install-tools.sh
       - name: Build
         run: melos run build:example_android
-  build_example_android_3_19:
+  build_example_android_3_44:
       name: Build Android example app (3.44.0)
       runs-on: ubuntu-latest
       steps:
@@ -84,7 +84,7 @@ jobs:
         run: ./.github/workflows/scripts/install-tools.sh
       - name: Build
         run: melos run build:example_ios
-  build_example_ios_3_19:
+  build_example_ios_3_44:
     name: Build iOS example app (3.44.0)
     runs-on: macos-latest
     steps:
@@ -113,7 +113,7 @@ jobs:
   #       run: ./.github/workflows/scripts/install-tools.sh
   #     - name: Build
   #       run: melos run build:example_macos
-  build_example_macos_3_19:
+  build_example_macos_3_44:
     name: Build macOS example app (3.44.0)
     runs-on: macos-latest
     steps:
