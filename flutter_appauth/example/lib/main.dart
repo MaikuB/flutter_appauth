@@ -63,6 +63,24 @@ class _MyAppState extends State<MyApp> {
   );
 
   @override
+  void initState() {
+    super.initState();
+    /*
+      On Android, the OS can recreate the host Activity (and with it this
+      Flutter engine/widget tree) while the authorization browser is in the
+      foreground, e.g. to reclaim memory. When that happens the auth result
+      arrives natively with nothing on the Dart side awaiting it, so it's
+      stored and can be retrieved once the app has reinitialized by calling
+      resumePendingAuthorization().
+      To test this on Android, enable "Don't keep activities" in the
+      developer options, start a sign in flow and then complete it. The
+      Activity will have been destroyed and recreated in the background.
+      Always returns null on other platforms, so can be called unconditionally.
+    */
+    _resumePendingAuthorization();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
@@ -98,6 +116,19 @@ class _MyAppState extends State<MyApp> {
                   child: const Text('Sign in with auto code exchange'),
                   onPressed: () => _signInWithAutoCodeExchange(),
                 ),
+                // resumePendingAuthorization() only ever returns something on
+                // Android, so only show this button there.
+                if (Platform.isAndroid)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: const Text(
+                        'Resume pending authorization',
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () => _resumePendingAuthorization(),
+                    ),
+                  ),
                 if (Platform.isIOS || Platform.isMacOS)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -324,6 +355,34 @@ class _MyAppState extends State<MyApp> {
       );
 
       _processAuthResponse(result);
+    } catch (e) {
+      _handleError(e);
+    } finally {
+      _clearBusyState();
+    }
+  }
+
+  Future<void> _resumePendingAuthorization() async {
+    try {
+      final AuthorizationResumeResponse? result =
+          await _appAuth.resumePendingAuthorization();
+      // Returns null when there was nothing pending, e.g. on a normal app
+      // start rather than a resumption after the Activity was recreated.
+      if (result == null) {
+        return;
+      }
+      _setBusyState();
+      // The response depends on whether the pending flow was started with
+      // authorize() or authorizeAndExchangeCode(). The response can be handled
+      // just like any standard sign in response.
+      
+      switch (result) {
+        case AuthorizationResumeResponseAuthorize(:final response):
+          _processAuthResponse(response);
+        case AuthorizationResumeResponseToken(:final response):
+          _processAuthTokenResponse(response);
+          await _testApi(response);
+      }
     } catch (e) {
       _handleError(e);
     } finally {
