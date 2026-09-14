@@ -1,7 +1,9 @@
 import 'authorization_parameters.dart';
 import 'authorization_request.dart';
+import 'authorization_response.dart';
 import 'authorization_service_configuration.dart';
 import 'authorization_token_request.dart';
+import 'authorization_token_response.dart';
 import 'common_request_details.dart';
 import 'end_session_request.dart';
 import 'grant_type.dart';
@@ -102,4 +104,35 @@ Map<String, Object?> _convertAuthorizationParametersToMap(
     'externalUserAgent': authorizationParameters.externalUserAgent?.index,
     'responseMode': authorizationParameters.responseMode,
   };
+}
+
+/// Builds an [AuthorizationResponse] from the raw method channel result of an
+/// `authorize` call.
+AuthorizationResponse authorizationResponseFromResultMap(
+    Map<dynamic, dynamic> result) {
+  return AuthorizationResponse(
+    authorizationCode: result['authorizationCode'],
+    codeVerifier: result['codeVerifier'],
+    nonce: result['nonce'],
+    authorizationAdditionalParameters:
+        result['authorizationAdditionalParameters']?.cast<String, dynamic>(),
+  );
+}
+
+/// Builds an [AuthorizationTokenResponse] from the raw method channel result
+/// of an `authorizeAndExchangeCode` call.
+AuthorizationTokenResponse authorizationTokenResponseFromResultMap(
+    Map<dynamic, dynamic> result) {
+  return AuthorizationTokenResponse(
+      result['accessToken'],
+      result['refreshToken'],
+      result['accessTokenExpirationTime'] == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(
+              result['accessTokenExpirationTime'].toInt()),
+      result['idToken'],
+      result['tokenType'],
+      result['scopes']?.cast<String>(),
+      result['authorizationAdditionalParameters']?.cast<String, dynamic>(),
+      result['tokenAdditionalParameters']?.cast<String, dynamic>());
 }
