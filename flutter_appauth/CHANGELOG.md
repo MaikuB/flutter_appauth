@@ -1,3 +1,15 @@
+## [13.0.0-dev.1]
+
+* **Breaking change** updated minimum supported SDK version to Flutter 3.44.0/Dart 3.12.0
+* [Android] **Breaking change** updated AGP to 9.0.1
+* [Android] migrated Gradle build scripts to Kotlin DSL
+* Removed Cocoapods integration from example app on iOS and macOS
+
+## [12.1.0]
+
+* [iOS] added custom browser support. Thanks to the PR from [Kuurse)](https://github.com/Kuurse)
+* [iOS][macOS] bumped AppAuth IOS SDK dependency to 2.1.0
+
 ## [12.0.2]
 
 * [iOS][macOS] improved SPM (Swift Package Manager) compatibility. Thanks to PR from [JarvanMo](https://github.com/JarvanMo)

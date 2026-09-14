@@ -5,7 +5,8 @@ class FlutterAppAuth {
 
   /// Convenience method for authorizing and then exchanges code
   Future<AuthorizationTokenResponse> authorizeAndExchangeCode(
-      AuthorizationTokenRequest request) {
+    AuthorizationTokenRequest request,
+  ) {
     return FlutterAppAuthPlatform.instance.authorizeAndExchangeCode(request);
   }
 
