@@ -270,7 +270,8 @@ void main() {
           response.accessToken, 'someAccessToken');
       expect(
           response.refreshToken, 'someRefreshToken');
-      expect(response.accessTokenExpirationDateTime, DateTime(2026, 7, 17));
+      expect(response.accessTokenExpirationDateTime,
+          DateTime.fromMillisecondsSinceEpoch(1784239200000));
       expect(response.idToken, 'someIdToken');
       expect(response.tokenType, 'bearer');
       expect(response.scopes, ["someScope"]);
