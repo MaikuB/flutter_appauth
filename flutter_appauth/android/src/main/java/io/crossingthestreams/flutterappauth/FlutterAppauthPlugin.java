@@ -201,15 +201,7 @@ public class FlutterAppauthPlugin
         }
         break;
       case RESUME_PENDING_AUTHORIZATION_METHOD:
-        try {
           handleResumePendingAuthorizationMethodCall(result);
-        } catch (Exception ex) {
-          String errorCode = AUTHORIZE_ERROR_CODE;
-          if (pendingAuthorization != null && pendingAuthorization.exchangeCode ) {
-            errorCode = AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE;
-          }
-          finishWithError(errorCode, ex.getLocalizedMessage(), ex);
-        }
         break;
       default:
         result.notImplemented();
@@ -735,8 +727,15 @@ public class FlutterAppauthPlugin
     final PendingAuthorization pendingAuth = pendingAuthorization;
     pendingAuthorization = null;
 
-    checkAndSetPendingOperation(RESUME_PENDING_AUTHORIZATION_METHOD, result);
-    processAuthorizationData(pendingAuth.response, pendingAuth.exception, pendingAuth.exchangeCode);
+    try {
+      checkAndSetPendingOperation(RESUME_PENDING_AUTHORIZATION_METHOD, result);
+      processAuthorizationData(pendingAuth.response, pendingAuth.exception, pendingAuth.exchangeCode);
+    } catch(Exception ex) {
+        final String errorCode = pendingAuth.exchangeCode
+                ? AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE
+                : AUTHORIZE_ERROR_CODE;
+      finishWithError(errorCode, ex.getLocalizedMessage(), ex);
+    }
   }
 
   private void processAuthorizationData(
