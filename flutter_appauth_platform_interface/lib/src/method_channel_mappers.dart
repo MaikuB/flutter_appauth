@@ -1,3 +1,4 @@
+import 'android_browser.dart';
 import 'authorization_parameters.dart';
 import 'authorization_request.dart';
 import 'authorization_service_configuration.dart';
@@ -34,6 +35,9 @@ extension EndSessionRequestMapper on EndSessionRequest {
       'discoveryUrl': discoveryUrl,
       'serviceConfiguration': serviceConfiguration?.toMap(),
       'externalUserAgent': externalUserAgent?.index,
+      'androidAllowedBrowsers': androidAllowedBrowsers
+          ?.map((AndroidBrowser browser) => browser.toMap())
+          .toList(),
     };
   }
 }
@@ -101,5 +105,8 @@ Map<String, Object?> _convertAuthorizationParametersToMap(
     'promptValues': authorizationParameters.promptValues,
     'externalUserAgent': authorizationParameters.externalUserAgent?.index,
     'responseMode': authorizationParameters.responseMode,
+    'androidAllowedBrowsers': authorizationParameters.androidAllowedBrowsers
+        ?.map((AndroidBrowser browser) => browser.toMap())
+        .toList(),
   };
 }

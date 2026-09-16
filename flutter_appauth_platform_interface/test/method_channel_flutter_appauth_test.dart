@@ -43,6 +43,7 @@ void main() {
           'promptValues': null,
           'responseMode': null,
           'nonce': null,
+          'androidAllowedBrowsers': null,
         })
       ],
     );
@@ -77,6 +78,7 @@ void main() {
           'codeVerifier': null,
           'responseMode': 'fragment',
           'nonce': null,
+          'androidAllowedBrowsers': null,
         })
       ],
     );
@@ -187,6 +189,156 @@ void main() {
         'discoveryUrl': 'someDiscoveryUrl',
         'serviceConfiguration': null,
         'externalUserAgent': ExternalUserAgent.asWebAuthenticationSession.index,
+        'androidAllowedBrowsers': null,
+      })
+    ]);
+  });
+
+  test('authorize with androidAllowedBrowsers presets', () async {
+    await flutterAppAuth.authorize(AuthorizationRequest(
+        'someClientId', 'someRedirectUrl',
+        discoveryUrl: 'someDiscoveryUrl',
+        androidAllowedBrowsers: <AndroidBrowser>[
+          AndroidBrowser.chromeCustomTab,
+          AndroidBrowser.chromeBrowser,
+        ]));
+    expect(
+      log,
+      <Matcher>[
+        isMethodCall('authorize', arguments: <String, Object?>{
+          'clientId': 'someClientId',
+          'issuer': null,
+          'redirectUrl': 'someRedirectUrl',
+          'discoveryUrl': 'someDiscoveryUrl',
+          'loginHint': null,
+          'scopes': null,
+          'serviceConfiguration': null,
+          'additionalParameters': null,
+          'allowInsecureConnections': false,
+          'externalUserAgent':
+              ExternalUserAgent.asWebAuthenticationSession.index,
+          'promptValues': null,
+          'responseMode': null,
+          'nonce': null,
+          'androidAllowedBrowsers': <Map<String, Object?>>[
+            <String, Object?>{'preset': 'chromeCustomTab'},
+            <String, Object?>{'preset': 'chromeBrowser'},
+          ],
+        })
+      ],
+    );
+  });
+
+  test('authorize with a custom androidAllowedBrowsers entry', () async {
+    await flutterAppAuth.authorize(AuthorizationRequest(
+        'someClientId', 'someRedirectUrl',
+        discoveryUrl: 'someDiscoveryUrl',
+        androidAllowedBrowsers: <AndroidBrowser>[
+          const AndroidBrowser.custom(
+            packageName: 'com.acme.mdmbrowser',
+            signatureHashes: <String>{'AbC123...'},
+            useCustomTab: true,
+            minVersion: '12',
+          ),
+        ]));
+    expect(
+      log,
+      <Matcher>[
+        isMethodCall('authorize', arguments: <String, Object?>{
+          'clientId': 'someClientId',
+          'issuer': null,
+          'redirectUrl': 'someRedirectUrl',
+          'discoveryUrl': 'someDiscoveryUrl',
+          'loginHint': null,
+          'scopes': null,
+          'serviceConfiguration': null,
+          'additionalParameters': null,
+          'allowInsecureConnections': false,
+          'externalUserAgent':
+              ExternalUserAgent.asWebAuthenticationSession.index,
+          'promptValues': null,
+          'responseMode': null,
+          'nonce': null,
+          'androidAllowedBrowsers': <Map<String, Object?>>[
+            <String, Object?>{
+              'packageName': 'com.acme.mdmbrowser',
+              'signatureHashes': <String>['AbC123...'],
+              'useCustomTab': true,
+              'minVersion': '12',
+            },
+          ],
+        })
+      ],
+    );
+  });
+
+  test('authorize with a mixed androidAllowedBrowsers list', () async {
+    await flutterAppAuth.authorize(AuthorizationRequest(
+        'someClientId', 'someRedirectUrl',
+        discoveryUrl: 'someDiscoveryUrl',
+        androidAllowedBrowsers: <AndroidBrowser>[
+          AndroidBrowser.chromeCustomTab,
+          const AndroidBrowser.custom(
+            packageName: 'com.acme.mdmbrowser',
+            signatureHashes: <String>{'AbC123...'},
+            useCustomTab: false,
+          ),
+        ]));
+    expect(
+      log,
+      <Matcher>[
+        isMethodCall('authorize', arguments: <String, Object?>{
+          'clientId': 'someClientId',
+          'issuer': null,
+          'redirectUrl': 'someRedirectUrl',
+          'discoveryUrl': 'someDiscoveryUrl',
+          'loginHint': null,
+          'scopes': null,
+          'serviceConfiguration': null,
+          'additionalParameters': null,
+          'allowInsecureConnections': false,
+          'externalUserAgent':
+              ExternalUserAgent.asWebAuthenticationSession.index,
+          'promptValues': null,
+          'responseMode': null,
+          'nonce': null,
+          'androidAllowedBrowsers': <Map<String, Object?>>[
+            <String, Object?>{'preset': 'chromeCustomTab'},
+            <String, Object?>{
+              'packageName': 'com.acme.mdmbrowser',
+              'signatureHashes': <String>['AbC123...'],
+              'useCustomTab': false,
+              'minVersion': null,
+            },
+          ],
+        })
+      ],
+    );
+  });
+
+  test('endSession with androidAllowedBrowsers', () async {
+    await flutterAppAuth.endSession(EndSessionRequest(
+        idTokenHint: 'someIdToken',
+        postLogoutRedirectUrl: 'somePostLogoutRedirectUrl',
+        state: 'someState',
+        discoveryUrl: 'someDiscoveryUrl',
+        androidAllowedBrowsers: <AndroidBrowser>[
+          AndroidBrowser.chromeCustomTab,
+        ]));
+    expect(log, <Matcher>[
+      isMethodCall('endSession', arguments: <String, Object?>{
+        'idTokenHint': 'someIdToken',
+        'postLogoutRedirectUrl': 'somePostLogoutRedirectUrl',
+        'state': 'someState',
+        'allowInsecureConnections': false,
+        'additionalParameters': null,
+        'issuer': null,
+        'discoveryUrl': 'someDiscoveryUrl',
+        'serviceConfiguration': null,
+        'externalUserAgent': ExternalUserAgent.asWebAuthenticationSession.index,
+        'androidAllowedBrowsers': <Map<String, Object?>>[
+          <String, Object?>{'preset': 'chromeCustomTab'},
+        ],
       })
     ]);
   });

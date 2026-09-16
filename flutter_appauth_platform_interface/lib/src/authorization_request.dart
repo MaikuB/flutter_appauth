@@ -1,3 +1,4 @@
+import 'android_browser.dart';
 import 'authorization_parameters.dart';
 import 'authorization_service_configuration.dart';
 import 'common_request_details.dart';
@@ -21,6 +22,7 @@ class AuthorizationRequest extends CommonRequestDetails
         ExternalUserAgent.asWebAuthenticationSession,
     String? nonce,
     String? responseMode,
+    List<AndroidBrowser>? androidAllowedBrowsers,
   }) {
     this.clientId = clientId;
     this.redirectUrl = redirectUrl;
@@ -35,6 +37,7 @@ class AuthorizationRequest extends CommonRequestDetails
     this.externalUserAgent = externalUserAgent;
     this.nonce = nonce;
     this.responseMode = responseMode;
+    this.androidAllowedBrowsers = androidAllowedBrowsers;
     assertConfigurationInfo();
   }
 }

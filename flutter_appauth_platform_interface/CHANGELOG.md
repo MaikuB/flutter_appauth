@@ -1,3 +1,7 @@
+## [Unreleased]
+
+* Added `androidAllowedBrowsers` property to the `AuthorizationRequest`, `AuthorizationTokenRequest` and `EndSessionRequest` classes to restrict which Android browser (or Custom Tab implementation) is allowed to handle the request. Accepts a list of `AndroidBrowser` entries, either one of the built-in presets (e.g. `AndroidBrowser.chromeCustomTab`) or a custom browser described via `AndroidBrowser.custom`. This is only applicable to Android
+
 ## [13.0.0-dev.1]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.44.0/Dart 3.12.0

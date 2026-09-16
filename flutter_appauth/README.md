@@ -233,6 +233,41 @@ Attribute application@name at AndroidManifest.xml:5:9-42 requires a placeholder 
 
 If you see this error then update your `build.gradle` to use `+=` instead.
 
+### Restricting the Android browser
+
+By default, AppAuth for Android will use whichever installed browser it considers best, falling back through Chrome Custom Tabs, standalone browsers, Custom Tabs from other browsers etc. The `androidAllowedBrowsers` property on `AuthorizationRequest`, `AuthorizationTokenRequest` and `EndSessionRequest` restricts this to a specific list of browsers, for example to force Chrome
+
+```dart
+final AuthorizationTokenResponse result = await appAuth.authorizeAndExchangeCode(
+                    AuthorizationTokenRequest(
+                      '<client_id>',
+                      '<redirect_url>',
+                      discoveryUrl: '<discovery_url>',
+                      androidAllowedBrowsers: [
+                        AndroidBrowser.chromeCustomTab,
+                        AndroidBrowser.chromeBrowser,
+                      ],
+                    ),
+                  );
+```
+
+The `AndroidBrowser` class offers six presets covering Chrome, Firefox and the Samsung Internet browser, each as either a Custom Tab or a standalone browser: `chromeCustomTab`, `chromeBrowser`, `firefoxCustomTab`, `firefoxBrowser`, `samsungCustomTab` and `samsungBrowser`. For a browser that isn't covered by a preset (e.g. one pushed to devices via MDM), use `AndroidBrowser.custom` and provide its package name, signing certificate hash(es) and whether it should be used as a Custom Tab
+
+```dart
+androidAllowedBrowsers: [
+  AndroidBrowser.custom(
+    packageName: 'com.acme.mdmbrowser',
+    signatureHashes: {'<signature_hash>'},
+    useCustomTab: true,
+    minVersion: '12',
+  ),
+],
+```
+
+A custom browser's signature hash can be obtained from AppAuth for Android's `BrowserDescriptor.generateSignatureHash`, given the `PackageInfo` of the installed browser APK.
+
+If none of the installed browsers on the device match the allow-list, the request fails the same way it would if no browser were installed at all (a `no_browser_available` error). This property is Android-only; a `null` or empty list means any installed browser may be used, which is the existing behaviour.
+
 ### Troubleshooting
 
 #### No Redirect to app after login

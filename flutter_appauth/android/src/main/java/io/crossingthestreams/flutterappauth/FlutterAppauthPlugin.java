@@ -15,6 +15,11 @@ import net.openid.appauth.AuthorizationRequest;
 import net.openid.appauth.AuthorizationResponse;
 import net.openid.appauth.AuthorizationService;
 import net.openid.appauth.AuthorizationServiceConfiguration;
+import net.openid.appauth.browser.AnyBrowserMatcher;
+import net.openid.appauth.browser.BrowserAllowList;
+import net.openid.appauth.browser.BrowserMatcher;
+import net.openid.appauth.browser.VersionRange;
+import net.openid.appauth.browser.VersionedBrowserMatcher;
 import net.openid.appauth.ClientSecretBasic;
 import net.openid.appauth.EndSessionRequest;
 import net.openid.appauth.EndSessionResponse;
@@ -30,7 +35,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -63,6 +71,8 @@ public class FlutterAppauthPlugin
   private static final String NULL_ACTIVITY_ERROR_CODE = "null_activity";
   private static final String INVALID_CLAIMS_ERROR_CODE = "invalid_claims";
   private static final String NO_BROWSER_AVAILABLE_ERROR_CODE = "no_browser_available";
+  private static final String INVALID_ANDROID_ALLOWED_BROWSER_ERROR_CODE =
+      "invalid_android_allowed_browser";
 
   private static final String DISCOVERY_ERROR_MESSAGE_FORMAT =
       "Error retrieving discovery document: [error: %s, description: %s]";
@@ -80,6 +90,8 @@ public class FlutterAppauthPlugin
       "Failed to authorize: Null activity received";
   private static final String NO_BROWSER_AVAILABLE_ERROR_FORMAT =
       "Failed to authorize: No suitable browser is available";
+  private static final String INVALID_ANDROID_ALLOWED_BROWSER_ERROR_FORMAT =
+      "Unrecognised androidAllowedBrowsers preset: %s";
 
   private final int RC_AUTH_EXCHANGE_CODE = 65030;
   private final int RC_AUTH = 65031;
@@ -90,12 +102,11 @@ public class FlutterAppauthPlugin
   private PendingOperation pendingOperation;
   private String clientSecret;
   private boolean allowInsecureConnections;
-  private AuthorizationService defaultAuthorizationService;
-  private AuthorizationService insecureAuthorizationService;
+  private List<Map<String, Object>> androidAllowedBrowsers;
+  private final Map<String, AuthorizationService> authorizationServices = new HashMap<>();
 
   private void onAttachedToEngine(Context context, BinaryMessenger binaryMessenger) {
     this.applicationContext = context;
-    createAuthorizationServices();
     final MethodChannel channel =
         new MethodChannel(binaryMessenger, "crossingthestreams.io/flutter_appauth");
     channel.setMethodCallHandler(this);
@@ -133,25 +144,13 @@ public class FlutterAppauthPlugin
     this.mainActivity = null;
   }
 
-  private void createAuthorizationServices() {
-    if (defaultAuthorizationService == null) {
-      defaultAuthorizationService = new AuthorizationService(this.applicationContext);
-    }
-
-    if (insecureAuthorizationService == null) {
-      AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
-      authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
-      authConfigBuilder.setSkipIssuerHttpsCheck(true);
-      insecureAuthorizationService =
-          new AuthorizationService(applicationContext, authConfigBuilder.build());
-    }
-  }
-
   private void disposeAuthorizationServices() {
-    defaultAuthorizationService.dispose();
-    insecureAuthorizationService.dispose();
-    defaultAuthorizationService = null;
-    insecureAuthorizationService = null;
+    for (AuthorizationService authorizationService : authorizationServices.values()) {
+      if (authorizationService != null) {
+        authorizationService.dispose();
+      }
+    }
+    authorizationServices.clear();
   }
 
   private void checkAndSetPendingOperation(String method, Result result) {
@@ -221,6 +220,8 @@ public class FlutterAppauthPlugin
         (Map<String, String>) arguments.get("additionalParameters");
     allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
     final String responseMode = (String) arguments.get("responseMode");
+    androidAllowedBrowsers =
+        (List<Map<String, Object>>) arguments.get("androidAllowedBrowsers");
 
     return new AuthorizationTokenRequestParameters(
         clientId,
@@ -266,6 +267,9 @@ public class FlutterAppauthPlugin
     final Map<String, String> additionalParameters =
         (Map<String, String>) arguments.get("additionalParameters");
     allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
+    // A bare token/refresh call never opens a browser, so it must not inherit a stale
+    // browser list left over from an earlier authorize call.
+    androidAllowedBrowsers = null;
     return new TokenRequestParameters(
         clientId,
         issuer,
@@ -294,6 +298,8 @@ public class FlutterAppauthPlugin
         (Map<String, String>) arguments.get("serviceConfiguration");
     final Map<String, String> additionalParameters =
         (Map<String, String>) arguments.get("additionalParameters");
+    androidAllowedBrowsers =
+        (List<Map<String, Object>>) arguments.get("androidAllowedBrowsers");
     return new EndSessionRequestParameters(
         idTokenHint,
         postLogoutRedirectUrl,
@@ -581,22 +587,86 @@ public class FlutterAppauthPlugin
 
     final EndSessionRequest endSessionRequest = endSessionRequestBuilder.build();
     AuthorizationService authorizationService = getAuthorizationService();
-    Intent endSessionIntent = authorizationService.getEndSessionRequestIntent(endSessionRequest);
-
     try {
+      Intent endSessionIntent = authorizationService.getEndSessionRequestIntent(endSessionRequest);
       mainActivity.startActivityForResult(endSessionIntent, RC_END_SESSION);
+    } catch (ActivityNotFoundException ex) {
+      finishWithError(NO_BROWSER_AVAILABLE_ERROR_CODE, NO_BROWSER_AVAILABLE_ERROR_FORMAT, ex);
     } catch (NullPointerException ex) {
       finishWithError(NULL_ACTIVITY_ERROR_CODE, NULL_ACTIVITY_ERROR_FORMAT, ex);
     }
   }
 
   private AuthorizationService getAuthorizationService() {
-    // Call to createAuthorizationService() is done as there have been some reported instances where
+    final String key =
+        authorizationServiceCacheKey(allowInsecureConnections, androidAllowedBrowsers);
+    // Services are built on a cache miss as there have been some reported instances where
     // the services have been disposed but they're still needed e.g. to refresh tokens
-    createAuthorizationServices();
-    AuthorizationService authorizationService =
-        allowInsecureConnections ? insecureAuthorizationService : defaultAuthorizationService;
+    AuthorizationService authorizationService = authorizationServices.get(key);
+    if (authorizationService == null) {
+      AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
+      if (allowInsecureConnections) {
+        authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
+        authConfigBuilder.setSkipIssuerHttpsCheck(true);
+      }
+      authConfigBuilder.setBrowserMatcher(buildBrowserMatcher(androidAllowedBrowsers));
+      authorizationService =
+          new AuthorizationService(applicationContext, authConfigBuilder.build());
+      authorizationServices.put(key, authorizationService);
+    }
     return authorizationService;
+  }
+
+  private String authorizationServiceCacheKey(
+      boolean allowInsecureConnections, List<Map<String, Object>> androidAllowedBrowsers) {
+    return allowInsecureConnections + "|" + androidAllowedBrowsers;
+  }
+
+  private BrowserMatcher buildBrowserMatcher(List<Map<String, Object>> specs) {
+    if (specs == null || specs.isEmpty()) {
+      return AnyBrowserMatcher.INSTANCE;
+    }
+    List<BrowserMatcher> matchers = new ArrayList<>();
+    for (Map<String, Object> spec : specs) {
+      final String preset = (String) spec.get("preset");
+      if (preset != null) {
+        matchers.add(presetBrowserMatcher(preset));
+        continue;
+      }
+      final String packageName = (String) spec.get("packageName");
+      @SuppressWarnings("unchecked")
+      final Set<String> hashes = new HashSet<>((List<String>) spec.get("signatureHashes"));
+      final boolean useCustomTab = Boolean.TRUE.equals(spec.get("useCustomTab"));
+      final String minVersion = (String) spec.get("minVersion");
+      final VersionRange range =
+          minVersion == null ? VersionRange.ANY_VERSION : VersionRange.atLeast(minVersion);
+      matchers.add(new VersionedBrowserMatcher(packageName, hashes, useCustomTab, range));
+    }
+    return new BrowserAllowList(matchers.toArray(new BrowserMatcher[0]));
+  }
+
+  private BrowserMatcher presetBrowserMatcher(String preset) {
+    switch (preset) {
+      case "chromeCustomTab":
+        return VersionedBrowserMatcher.CHROME_CUSTOM_TAB;
+      case "chromeBrowser":
+        return VersionedBrowserMatcher.CHROME_BROWSER;
+      case "firefoxCustomTab":
+        return VersionedBrowserMatcher.FIREFOX_CUSTOM_TAB;
+      case "firefoxBrowser":
+        return VersionedBrowserMatcher.FIREFOX_BROWSER;
+      case "samsungCustomTab":
+        return VersionedBrowserMatcher.SAMSUNG_CUSTOM_TAB;
+      case "samsungBrowser":
+        return VersionedBrowserMatcher.SAMSUNG_BROWSER;
+      default:
+        finishWithError(
+            INVALID_ANDROID_ALLOWED_BROWSER_ERROR_CODE,
+            String.format(INVALID_ANDROID_ALLOWED_BROWSER_ERROR_FORMAT, preset),
+            null);
+        throw new IllegalArgumentException(
+            String.format(INVALID_ANDROID_ALLOWED_BROWSER_ERROR_FORMAT, preset));
+    }
   }
 
   private void finishWithTokenError(AuthorizationException ex) {
