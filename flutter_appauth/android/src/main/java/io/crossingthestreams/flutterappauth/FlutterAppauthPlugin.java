@@ -52,6 +52,7 @@ public class FlutterAppauthPlugin
   private static final String AUTHORIZE_METHOD = "authorize";
   private static final String TOKEN_METHOD = "token";
   private static final String END_SESSION_METHOD = "endSession";
+  private static final String CANCEL_PENDING_SESSION_METHOD = "cancelPendingSession";
 
   private static final String DISCOVERY_ERROR_CODE = "discovery_failed";
   private static final String AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE =
@@ -197,6 +198,10 @@ public class FlutterAppauthPlugin
         } catch (Exception ex) {
           finishWithError(END_SESSION_ERROR_CODE, ex.getLocalizedMessage(), ex);
         }
+        break;
+      case CANCEL_PENDING_SESSION_METHOD:
+        // No-op on Android; only iOS/macOS use ASWebAuthenticationSession.
+        result.success(new HashMap<>());
         break;
       default:
         result.notImplemented();

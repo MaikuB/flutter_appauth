@@ -62,4 +62,15 @@ abstract class FlutterAppAuthPlatform extends PlatformInterface {
   Future<EndSessionResponse> endSession(EndSessionRequest request) {
     throw UnimplementedError('endSession() has not been implemented');
   }
+
+  /// Cancels any pending [ASWebAuthenticationSession] (iOS/macOS) that may
+  /// be re-presented on app launch after the app was backgrounded or killed
+  /// during the auth flow.
+  ///
+  /// Call this early at app startup (e.g. after plugin init, before showing
+  /// the main UI) to clear any stale session so the system consent dialog
+  /// is not shown automatically. No-op on Android.
+  Future<void> cancelPendingSession() {
+    throw UnimplementedError('cancelPendingSession() has not been implemented');
+  }
 }

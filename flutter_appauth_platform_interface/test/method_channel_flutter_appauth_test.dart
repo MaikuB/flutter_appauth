@@ -190,4 +190,9 @@ void main() {
       })
     ]);
   });
+
+  test('cancelPendingSession', () async {
+    await flutterAppAuth.cancelPendingSession();
+    expect(log, <Matcher>[isMethodCall('cancelPendingSession', arguments: null)]);
+  });
 }
