@@ -12,10 +12,14 @@
        externalUserAgent:(NSNumber *)externalUserAgent
                   result:(FlutterResult)result
             exchangeCode:(BOOL)exchangeCode
-                   nonce:(NSString *)nonce {
+                   nonce:(NSString *)nonce
+               state:(id)state {
   NSString *codeVerifier = [OIDAuthorizationRequest generateCodeVerifier];
   NSString *codeChallenge =
       [OIDAuthorizationRequest codeChallengeS256ForVerifier:codeVerifier];
+  NSString *resolvedState = (state != nil)
+                                ? ([state isKindOfClass:[NSString class]] ? state : nil)
+                                : [OIDAuthorizationRequest generateState];
 
   OIDAuthorizationRequest *request = [[OIDAuthorizationRequest alloc]
       initWithConfiguration:serviceConfiguration
@@ -24,7 +28,7 @@
                       scope:[OIDScopeUtilities scopesWithArray:scopes]
                 redirectURL:[NSURL URLWithString:redirectUrl]
                responseType:OIDResponseTypeCode
-                      state:[OIDAuthorizationRequest generateState]
+                      state:resolvedState
                       nonce:nonce != nil
                                 ? nonce
                                 : [OIDAuthorizationRequest generateState]
@@ -119,19 +123,18 @@
           ? [NSURL URLWithString:requestParameters.postLogoutRedirectUrl]
           : nil;
 
+  NSString *resolvedState = (requestParameters.state != nil)
+      ? ([requestParameters.state isKindOfClass:[NSString class]]
+             ? requestParameters.state
+             : nil)
+      : [OIDAuthorizationRequest generateState];
   OIDEndSessionRequest *endSessionRequest =
-      requestParameters.state
-          ? [[OIDEndSessionRequest alloc]
-                initWithConfiguration:serviceConfiguration
-                          idTokenHint:requestParameters.idTokenHint
-                postLogoutRedirectURL:postLogoutRedirectURL
-                                state:requestParameters.state
-                 additionalParameters:requestParameters.additionalParameters]
-          : [[OIDEndSessionRequest alloc]
-                initWithConfiguration:serviceConfiguration
-                          idTokenHint:requestParameters.idTokenHint
-                postLogoutRedirectURL:postLogoutRedirectURL
-                 additionalParameters:requestParameters.additionalParameters];
+      [[OIDEndSessionRequest alloc]
+            initWithConfiguration:serviceConfiguration
+                      idTokenHint:requestParameters.idTokenHint
+            postLogoutRedirectURL:postLogoutRedirectURL
+                            state:resolvedState
+             additionalParameters:requestParameters.additionalParameters];
 
   UIViewController *rootViewController = [self rootViewController];
   id<OIDExternalUserAgent> externalUserAgent =
