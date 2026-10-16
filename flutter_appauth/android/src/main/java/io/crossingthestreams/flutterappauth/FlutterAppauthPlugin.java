@@ -724,6 +724,22 @@ public class FlutterAppauthPlugin
       return;
     }
 
+    if (pendingOperation != null) {
+      final IllegalStateException ex =
+          new IllegalStateException(
+              "Concurrent operations detected: "
+                  + pendingOperation.method
+                  + ", "
+                  + RESUME_PENDING_AUTHORIZATION_METHOD);
+      result.error(
+          pendingAuthorization.exchangeCode
+              ? AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE
+              : AUTHORIZE_ERROR_CODE,
+          ex.getLocalizedMessage(),
+          createErrorMap(ex));
+      return;
+    }
+
     final PendingAuthorization pendingAuth = pendingAuthorization;
     pendingAuthorization = null;
 
