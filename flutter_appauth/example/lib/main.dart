@@ -75,6 +75,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       arrives natively with nothing on the Dart side awaiting it, so it's
       stored and can be retrieved once the app has reinitialized by calling
       resumePendingAuthorization().
+      In these cases, the initState invocation
+      and the app's resumed state have no reliable order, so
+      resumePendingAuthorization is called from both events, see
+      didChangeAppLifecycleState.
       To test this on Android, enable "Don't keep activities" in the
       developer options, start a sign in flow and then complete it. The
       Activity will have been destroyed and recreated in the background.
@@ -92,6 +96,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      _resumePendingAuthorization();
       if (_isAuthFlowInProgress) {
         setState(() {
           _isAuthFlowInProgress = false;
