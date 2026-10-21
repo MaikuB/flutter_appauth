@@ -120,9 +120,9 @@
 }
 @end
 
-@implementation FlutterAppauthPlugin
+static AppAuthAuthorization *authorization;
 
-AppAuthAuthorization *authorization;
+@implementation FlutterAppauthPlugin
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
   FlutterMethodChannel *channel = [FlutterMethodChannel
