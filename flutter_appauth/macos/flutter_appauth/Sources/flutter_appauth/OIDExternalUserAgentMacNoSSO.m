@@ -85,7 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
                 if (callbackURL) {
                   [strongSelf->_session
                       resumeExternalUserAgentFlowWithURL:callbackURL
-                                     error:nil];
+                                                   error:nil];
                 } else {
                   NSError *safariError = [OIDErrorUtilities
                         errorWithCode:OIDErrorCodeUserCanceledAuthorizationFlow
