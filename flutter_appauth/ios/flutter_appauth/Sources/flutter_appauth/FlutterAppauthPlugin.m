@@ -521,7 +521,7 @@ AppAuthAuthorization *authorization;
   NSString *URLString =
       [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
   NSURL *URL = [NSURL URLWithString:URLString];
-  [_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:URL];
+  [_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:URL error:nil];
   _currentAuthorizationFlow = nil;
 }
 #endif
