@@ -122,11 +122,10 @@
 
 @implementation FlutterAppauthPlugin
 
-FlutterMethodChannel *channel;
 AppAuthAuthorization *authorization;
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
-  channel = [FlutterMethodChannel
+  FlutterMethodChannel *channel = [FlutterMethodChannel
       methodChannelWithName:@"crossingthestreams.io/flutter_appauth"
             binaryMessenger:[registrar messenger]];
   FlutterAppauthPlugin *instance = [[FlutterAppauthPlugin alloc] init];
