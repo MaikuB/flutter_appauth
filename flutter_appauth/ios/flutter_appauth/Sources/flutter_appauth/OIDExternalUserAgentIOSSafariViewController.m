@@ -35,8 +35,7 @@ static id<OIDSafariViewControllerFactory> __nullable
 @end
 
 @interface OIDExternalUserAgentIOSSafariViewController () <
-    SFSafariViewControllerDelegate,
-    UIAdaptivePresentationControllerDelegate>
+    SFSafariViewControllerDelegate, UIAdaptivePresentationControllerDelegate>
 @end
 
 @implementation OIDExternalUserAgentIOSSafariViewController {
@@ -94,7 +93,8 @@ static id<OIDSafariViewControllerFactory> __nullable
         safariViewControllerFactory] safariViewControllerWithURL:requestURL];
 
     if (@available(iOS 11.0, *)) {
-        safariVC.dismissButtonStyle = SFSafariViewControllerDismissButtonStyleCancel;
+      safariVC.dismissButtonStyle =
+          SFSafariViewControllerDismissButtonStyleCancel;
     }
 
     safariVC.delegate = self;
@@ -170,10 +170,10 @@ static id<OIDSafariViewControllerFactory> __nullable
   }
   id<OIDExternalUserAgentSession> session = _session;
   [self cleanUp];
-  NSError *error = [OIDErrorUtilities
-        errorWithCode:OIDErrorCodeUserCanceledAuthorizationFlow
-      underlyingError:nil
-          description:nil];
+  NSError *error =
+      [OIDErrorUtilities errorWithCode:OIDErrorCodeUserCanceledAuthorizationFlow
+                       underlyingError:nil
+                           description:nil];
   [session failExternalUserAgentFlowWithError:error];
 }
 
@@ -181,21 +181,21 @@ static id<OIDSafariViewControllerFactory> __nullable
 
 - (void)presentationControllerDidDismiss:
     (UIPresentationController *)presentationController {
-    if (presentationController.presentedViewController != _safariVC) {
-      // Ignore this call if the safari view controller do not match.
-      return;
-    }
-    if (!_externalUserAgentFlowInProgress) {
-      // Ignore this call if there is no authorization flow in progress.
-      return;
-    }
-    id<OIDExternalUserAgentSession> session = _session;
-    [self cleanUp];
-    NSError *error = [OIDErrorUtilities
-          errorWithCode:OIDErrorCodeUserCanceledAuthorizationFlow
-        underlyingError:nil
-            description:nil];
-    [session failExternalUserAgentFlowWithError:error];
+  if (presentationController.presentedViewController != _safariVC) {
+    // Ignore this call if the safari view controller do not match.
+    return;
+  }
+  if (!_externalUserAgentFlowInProgress) {
+    // Ignore this call if there is no authorization flow in progress.
+    return;
+  }
+  id<OIDExternalUserAgentSession> session = _session;
+  [self cleanUp];
+  NSError *error =
+      [OIDErrorUtilities errorWithCode:OIDErrorCodeUserCanceledAuthorizationFlow
+                       underlyingError:nil
+                           description:nil];
+  [session failExternalUserAgentFlowWithError:error];
 }
 
 @end
