@@ -33,4 +33,16 @@ class FlutterAppAuth {
   Future<EndSessionResponse> endSession(EndSessionRequest request) {
     return FlutterAppAuthPlatform.instance.endSession(request);
   }
+
+  /// On Android, attempts to resume an authorization result that the native
+  /// platform received while no Dart call is awaiting it. This can happen
+  /// when the host Activity is recreated (e.g. by the OS reclaiming memory)
+  /// while the authorization browser is in the foreground.
+  /// Call this after the app has reinitialized to
+  /// retrieve that result. Returns null if there is nothing pending.
+  ///
+  /// Always returns null on other platforms. 
+  Future<AuthorizationResumeResponse?> resumePendingAuthorization() {
+    return FlutterAppAuthPlatform.instance.resumePendingAuthorization();
+  }
 }
