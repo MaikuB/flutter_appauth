@@ -4,6 +4,7 @@
 * [iOS] **Breaking change** minimum iOS version is now 15.0 to align with requirements of AppAuth iOS SDK 3.0.0
 * [macOS] **Breaking change** minimum macOS version is now 12.0 to align with requirements of AppAuth iOS SDK 3.0.0
 * [iOS] fixed issue [#649](https://github.com/MaikuB/flutter_appauth/issues/649). Users cancelling an auth flow by swiping to dismiss a `SFSafariViewController` now throws an `FlutterAppAuthUserCancelledException`. Thanks to the PR from [bshvets-ama](https://github.com/bshvets-ama)
+* [iOS][macOS] fixed issue [#648](https://github.com/MaikuB/flutter_appauth/issues/648) where global declaration of variables resulted in duplicate symbol compilation errors when other plugins declared global variables with the same name
 
 ## [13.0.0-dev.1]
 
