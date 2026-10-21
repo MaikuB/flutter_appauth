@@ -1,3 +1,10 @@
+## [13.0.0-dev.2]
+
+* [iOS][macOS] bumped AppAuth iOS SDK dependency to 3.0.0
+* [iOS] **Breaking change** minimum iOS version is now 15.0 to align with requirements of AppAuth iOS SDK 3.0.0
+* [macOS] **Breaking change** minimum macOS version is now 12.0 to align with requirements of AppAuth iOS SDK 3.0.0
+* [iOS] fixed issue [#649](https://github.com/MaikuB/flutter_appauth/issues/649). Users cancelling an auth flow by swiping to dismiss a `SFSafariViewController` now throws an `FlutterAppAuthUserCancelledException`. Thanks to the PR from [bshvets-ama](https://github.com/bshvets-ama)
+
 ## [13.0.0-dev.1]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.44.0/Dart 3.12.0

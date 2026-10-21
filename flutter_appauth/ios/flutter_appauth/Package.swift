@@ -6,13 +6,13 @@ import PackageDescription
 let package = Package(
     name: "flutter_appauth",
     platforms: [
-        .iOS("12.0")
+        .iOS(.v15)
     ],
     products: [
         .library(name: "flutter-appauth", targets: ["flutter_appauth"])
     ],
     dependencies: [
-        .package(url: "https://github.com/openid/AppAuth-iOS", exact: "2.1.0"),
+        .package(url: "https://github.com/openid/AppAuth-iOS", exact: "3.0.0"),
         .package(name: "FlutterFramework", path: "../FlutterFramework")
     ],
     targets: [
