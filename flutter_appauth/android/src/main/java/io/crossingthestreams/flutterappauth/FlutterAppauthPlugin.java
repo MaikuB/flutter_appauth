@@ -17,7 +17,9 @@ import net.openid.appauth.AuthorizationService;
 import net.openid.appauth.AuthorizationServiceConfiguration;
 import net.openid.appauth.browser.AnyBrowserMatcher;
 import net.openid.appauth.browser.BrowserAllowList;
+import net.openid.appauth.browser.BrowserDescriptor;
 import net.openid.appauth.browser.BrowserMatcher;
+import net.openid.appauth.browser.BrowserSelector;
 import net.openid.appauth.browser.VersionRange;
 import net.openid.appauth.browser.VersionedBrowserMatcher;
 import net.openid.appauth.ClientSecretBasic;
@@ -60,6 +62,7 @@ public class FlutterAppauthPlugin
   private static final String AUTHORIZE_METHOD = "authorize";
   private static final String TOKEN_METHOD = "token";
   private static final String END_SESSION_METHOD = "endSession";
+  private static final String GET_INSTALLED_ANDROID_BROWSERS_METHOD = "getInstalledAndroidBrowsers";
 
   private static final String DISCOVERY_ERROR_CODE = "discovery_failed";
   private static final String AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE =
@@ -199,6 +202,9 @@ public class FlutterAppauthPlugin
         } catch (Exception ex) {
           finishWithError(END_SESSION_ERROR_CODE, ex.getLocalizedMessage(), ex);
         }
+        break;
+      case GET_INSTALLED_ANDROID_BROWSERS_METHOD:
+        result.success(getInstalledAndroidBrowsers());
         break;
       default:
         result.notImplemented();
@@ -630,6 +636,19 @@ public class FlutterAppauthPlugin
   private String authorizationServiceCacheKey(
       boolean allowInsecureConnections, List<Map<String, Object>> androidAllowedBrowsers) {
     return allowInsecureConnections + "|" + androidAllowedBrowsers;
+  }
+
+  private List<Map<String, Object>> getInstalledAndroidBrowsers() {
+    List<Map<String, Object>> browsers = new ArrayList<>();
+    for (BrowserDescriptor descriptor : BrowserSelector.getAllBrowsers(applicationContext)) {
+      Map<String, Object> browser = new HashMap<>();
+      browser.put("packageName", descriptor.packageName);
+      browser.put("version", descriptor.version);
+      browser.put("signatureHashes", new ArrayList<>(descriptor.signatureHashes));
+      browser.put("useCustomTab", descriptor.useCustomTab);
+      browsers.add(browser);
+    }
+    return browsers;
   }
 
   private BrowserMatcher buildBrowserMatcher(List<Map<String, Object>> specs) {

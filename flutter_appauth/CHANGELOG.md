@@ -1,6 +1,7 @@
 ## [Unreleased]
 
 * [Android] Added `androidAllowedBrowsers` property to the `AuthorizationRequest`, `AuthorizationTokenRequest` and `EndSessionRequest` classes to restrict which browser (or Custom Tab implementation) is allowed to handle the request. See the "Restricting the Android browser" section of the README for details
+* [Android] Added `getInstalledAndroidBrowsers()` method to `FlutterAppAuth` to look up the package name and signature hashes of installed browsers during development, for use with `AndroidBrowser.custom`
 * [Android] Fixed `endSession` throwing an uncaught `ActivityNotFoundException` instead of returning a `no_browser_available` error when no suitable browser is installed
 
 ## [13.0.0-dev.1]

@@ -33,4 +33,13 @@ class FlutterAppAuth {
   Future<EndSessionResponse> endSession(EndSessionRequest request) {
     return FlutterAppAuthPlatform.instance.endSession(request);
   }
+
+  /// Lists the browsers installed on an Android device that AppAuth could use.
+  ///
+  /// This is a development aid for finding the signature hashes of a browser
+  /// to pin with [AndroidBrowser.custom]. See [InstalledAndroidBrowser]. Only
+  /// implemented on Android.
+  Future<List<InstalledAndroidBrowser>> getInstalledAndroidBrowsers() {
+    return FlutterAppAuthPlatform.instance.getInstalledAndroidBrowsers();
+  }
 }

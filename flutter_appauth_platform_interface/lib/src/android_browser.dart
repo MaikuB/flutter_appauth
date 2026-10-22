@@ -92,3 +92,50 @@ class AndroidBrowser {
     };
   }
 }
+
+/// A browser (or custom tab implementation) installed on an Android device, as
+/// returned by `getInstalledAndroidBrowsers`.
+///
+/// This is meant for development: use it on a test device to look up the
+/// [signatureHashes] of a browser you want to pin, then hard-code them in an
+/// [AndroidBrowser.custom] entry. Passing hashes read at runtime straight back
+/// into `androidAllowedBrowsers` pins nothing, as a look-alike app installed
+/// under the same package name would be read and allowed too.
+class InstalledAndroidBrowser {
+  const InstalledAndroidBrowser({
+    required this.packageName,
+    required this.version,
+    required this.signatureHashes,
+    required this.useCustomTab,
+  });
+
+  /// Creates an instance from a map received over the method channel.
+  factory InstalledAndroidBrowser.fromMap(Map<dynamic, dynamic> map) {
+    return InstalledAndroidBrowser(
+      packageName: map['packageName'],
+      version: map['version'],
+      signatureHashes:
+          (map['signatureHashes'] as List<dynamic>).cast<String>().toSet(),
+      useCustomTab: map['useCustomTab'],
+    );
+  }
+
+  /// The browser's package name, e.g. `com.android.chrome`.
+  final String packageName;
+
+  /// The browser's version name, or `null` if it doesn't declare one.
+  final String? version;
+
+  /// The browser's Base64-encoded, SHA-512 signing certificate hashes, in the
+  /// form [AndroidBrowser.custom] expects.
+  final Set<String> signatureHashes;
+
+  /// Whether this entry describes the browser used as a Custom Tab. A browser
+  /// that supports Custom Tabs is listed twice, once for each mode.
+  final bool useCustomTab;
+
+  @override
+  String toString() => 'InstalledAndroidBrowser(packageName: $packageName, '
+      'version: $version, signatureHashes: $signatureHashes, '
+      'useCustomTab: $useCustomTab)';
+}

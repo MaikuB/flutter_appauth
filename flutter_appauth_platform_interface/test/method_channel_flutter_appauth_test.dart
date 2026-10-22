@@ -11,6 +11,16 @@ void main() {
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
     log.add(methodCall);
+    if (methodCall.method == 'getInstalledAndroidBrowsers') {
+      return <Object>[
+        <String, Object?>{
+          'packageName': 'com.acme.mdmbrowser',
+          'version': '12.3',
+          'signatureHashes': <String>['AbC123...'],
+          'useCustomTab': true,
+        },
+      ];
+    }
     return <Object, Object>{};
   });
 
@@ -341,5 +351,18 @@ void main() {
         ],
       })
     ]);
+  });
+
+  test('getInstalledAndroidBrowsers', () async {
+    final List<InstalledAndroidBrowser> browsers =
+        await flutterAppAuth.getInstalledAndroidBrowsers();
+    expect(log, <Matcher>[
+      isMethodCall('getInstalledAndroidBrowsers', arguments: null),
+    ]);
+    expect(browsers, hasLength(1));
+    expect(browsers.single.packageName, 'com.acme.mdmbrowser');
+    expect(browsers.single.version, '12.3');
+    expect(browsers.single.signatureHashes, <String>{'AbC123...'});
+    expect(browsers.single.useCustomTab, isTrue);
   });
 }
