@@ -92,6 +92,8 @@ public class FlutterAppauthPlugin
       "Failed to authorize: No suitable browser is available";
   private static final String INVALID_ANDROID_ALLOWED_BROWSER_ERROR_FORMAT =
       "Unrecognised androidAllowedBrowsers preset: %s";
+  private static final String INVALID_ANDROID_ALLOWED_CUSTOM_BROWSER_ERROR_MESSAGE =
+      "androidAllowedBrowsers custom entries need a packageName and at least one signature hash";
 
   private final int RC_AUTH_EXCHANGE_CODE = 65030;
   private final int RC_AUTH = 65031;
@@ -103,6 +105,7 @@ public class FlutterAppauthPlugin
   private String clientSecret;
   private boolean allowInsecureConnections;
   private List<Map<String, Object>> androidAllowedBrowsers;
+  private BrowserMatcher browserMatcher = AnyBrowserMatcher.INSTANCE;
   private final Map<String, AuthorizationService> authorizationServices = new HashMap<>();
 
   private void onAttachedToEngine(Context context, BinaryMessenger binaryMessenger) {
@@ -222,6 +225,9 @@ public class FlutterAppauthPlugin
     final String responseMode = (String) arguments.get("responseMode");
     androidAllowedBrowsers =
         (List<Map<String, Object>>) arguments.get("androidAllowedBrowsers");
+    // Built here rather than when the service is created, as that can happen in a discovery
+    // callback where an invalid entry would throw outside the method call's error handling.
+    browserMatcher = buildBrowserMatcher(androidAllowedBrowsers);
 
     return new AuthorizationTokenRequestParameters(
         clientId,
@@ -270,6 +276,7 @@ public class FlutterAppauthPlugin
     // A bare token/refresh call never opens a browser, so it must not inherit a stale
     // browser list left over from an earlier authorize call.
     androidAllowedBrowsers = null;
+    browserMatcher = AnyBrowserMatcher.INSTANCE;
     return new TokenRequestParameters(
         clientId,
         issuer,
@@ -300,6 +307,9 @@ public class FlutterAppauthPlugin
         (Map<String, String>) arguments.get("additionalParameters");
     androidAllowedBrowsers =
         (List<Map<String, Object>>) arguments.get("androidAllowedBrowsers");
+    // Built here rather than when the service is created, as that can happen in a discovery
+    // callback where an invalid entry would throw outside the method call's error handling.
+    browserMatcher = buildBrowserMatcher(androidAllowedBrowsers);
     return new EndSessionRequestParameters(
         idTokenHint,
         postLogoutRedirectUrl,
@@ -609,7 +619,7 @@ public class FlutterAppauthPlugin
         authConfigBuilder.setConnectionBuilder(InsecureConnectionBuilder.INSTANCE);
         authConfigBuilder.setSkipIssuerHttpsCheck(true);
       }
-      authConfigBuilder.setBrowserMatcher(buildBrowserMatcher(androidAllowedBrowsers));
+      authConfigBuilder.setBrowserMatcher(browserMatcher);
       authorizationService =
           new AuthorizationService(applicationContext, authConfigBuilder.build());
       authorizationServices.put(key, authorizationService);
@@ -635,7 +645,11 @@ public class FlutterAppauthPlugin
       }
       final String packageName = (String) spec.get("packageName");
       @SuppressWarnings("unchecked")
-      final Set<String> hashes = new HashSet<>((List<String>) spec.get("signatureHashes"));
+      final List<String> signatureHashes = (List<String>) spec.get("signatureHashes");
+      if (packageName == null || signatureHashes == null || signatureHashes.isEmpty()) {
+        throw invalidAllowedBrowser(INVALID_ANDROID_ALLOWED_CUSTOM_BROWSER_ERROR_MESSAGE);
+      }
+      final Set<String> hashes = new HashSet<>(signatureHashes);
       final boolean useCustomTab = Boolean.TRUE.equals(spec.get("useCustomTab"));
       final String minVersion = (String) spec.get("minVersion");
       final VersionRange range =
@@ -660,13 +674,19 @@ public class FlutterAppauthPlugin
       case "samsungBrowser":
         return VersionedBrowserMatcher.SAMSUNG_BROWSER;
       default:
-        finishWithError(
-            INVALID_ANDROID_ALLOWED_BROWSER_ERROR_CODE,
-            String.format(INVALID_ANDROID_ALLOWED_BROWSER_ERROR_FORMAT, preset),
-            null);
-        throw new IllegalArgumentException(
+        throw invalidAllowedBrowser(
             String.format(INVALID_ANDROID_ALLOWED_BROWSER_ERROR_FORMAT, preset));
     }
+  }
+
+  /**
+   * Reports an invalid allowed browser entry with its own error code. The returned exception
+   * must be thrown to abort the request; the method call's catch block then has no pending
+   * operation left to report on.
+   */
+  private IllegalArgumentException invalidAllowedBrowser(String message) {
+    finishWithError(INVALID_ANDROID_ALLOWED_BROWSER_ERROR_CODE, message, null);
+    return new IllegalArgumentException(message);
   }
 
   private void finishWithTokenError(AuthorizationException ex) {

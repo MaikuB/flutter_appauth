@@ -20,8 +20,9 @@ class AndroidBrowser {
   ///
   /// [signatureHashes] are the browser's Base64-encoded, SHA-512 signing
   /// certificate hashes, as returned by AppAuth for Android's
-  /// `BrowserDescriptor.generateSignatureHash`. A browser matches if it was
-  /// signed with any of the supplied hashes.
+  /// `BrowserDescriptor.generateSignatureHashes`. A browser matches only if
+  /// its signing certificates hash to exactly this set. To allow several
+  /// signer sets, e.g. before and after a key rotation, add one entry per set.
   ///
   /// [useCustomTab] indicates whether the browser should be used as a Chrome
   /// Custom Tab (`true`) or as a standalone browser (`false`). Defaults to
@@ -30,9 +31,9 @@ class AndroidBrowser {
   /// [minVersion] is the minimum version of the browser that is allowed. When
   /// omitted, any version is allowed.
   const AndroidBrowser.custom({
-    required this.packageName,
-    required this.signatureHashes,
-    this.useCustomTab = true,
+    required String this.packageName,
+    required Set<String> this.signatureHashes,
+    bool this.useCustomTab = true,
     this.minVersion,
   }) : preset = null;
 

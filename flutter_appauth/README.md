@@ -264,7 +264,7 @@ androidAllowedBrowsers: [
 ],
 ```
 
-A custom browser's signature hash can be obtained from AppAuth for Android's `BrowserDescriptor.generateSignatureHash`, given the `PackageInfo` of the installed browser APK.
+A custom browser's signature hashes are the Base64-encoded SHA-512 hashes of its signing certificates, as computed by AppAuth for Android's `BrowserDescriptor.generateSignatureHashes(packageInfo.signatures)`. This plugin doesn't compute them for you, so you need to run that once in native Android code against the installed browser and copy the result into your Dart code. A browser only matches if its hashes equal the supplied set exactly, so if a browser can be signed in more than one way (e.g. across a key rotation), add a separate `AndroidBrowser.custom` entry for each set.
 
 If none of the installed browsers on the device match the allow-list, the request fails the same way it would if no browser were installed at all (a `no_browser_available` error). This property is Android-only; a `null` or empty list means any installed browser may be used, which is the existing behaviour.
 
