@@ -74,8 +74,6 @@ public class FlutterAppauthPlugin
   private static final String NULL_ACTIVITY_ERROR_CODE = "null_activity";
   private static final String INVALID_CLAIMS_ERROR_CODE = "invalid_claims";
   private static final String NO_BROWSER_AVAILABLE_ERROR_CODE = "no_browser_available";
-  private static final String INVALID_ANDROID_ALLOWED_BROWSER_ERROR_CODE =
-      "invalid_android_allowed_browser";
 
   private static final String DISCOVERY_ERROR_MESSAGE_FORMAT =
       "Error retrieving discovery document: [error: %s, description: %s]";
@@ -152,9 +150,7 @@ public class FlutterAppauthPlugin
 
   private void disposeAuthorizationServices() {
     for (AuthorizationService authorizationService : authorizationServices.values()) {
-      if (authorizationService != null) {
-        authorizationService.dispose();
-      }
+      authorizationService.dispose();
     }
     authorizationServices.clear();
   }
@@ -614,11 +610,10 @@ public class FlutterAppauthPlugin
   }
 
   private AuthorizationService getAuthorizationService() {
-    final String key =
-        authorizationServiceCacheKey(allowInsecureConnections, androidAllowedBrowsers);
+    final String cacheKey = allowInsecureConnections + "|" + androidAllowedBrowsers;
     // Services are built on a cache miss as there have been some reported instances where
     // the services have been disposed but they're still needed e.g. to refresh tokens
-    AuthorizationService authorizationService = authorizationServices.get(key);
+    AuthorizationService authorizationService = authorizationServices.get(cacheKey);
     if (authorizationService == null) {
       AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
       if (allowInsecureConnections) {
@@ -628,14 +623,9 @@ public class FlutterAppauthPlugin
       authConfigBuilder.setBrowserMatcher(browserMatcher);
       authorizationService =
           new AuthorizationService(applicationContext, authConfigBuilder.build());
-      authorizationServices.put(key, authorizationService);
+      authorizationServices.put(cacheKey, authorizationService);
     }
     return authorizationService;
-  }
-
-  private String authorizationServiceCacheKey(
-      boolean allowInsecureConnections, List<Map<String, Object>> androidAllowedBrowsers) {
-    return allowInsecureConnections + "|" + androidAllowedBrowsers;
   }
 
   private List<Map<String, Object>> getInstalledAndroidBrowsers() {
@@ -666,7 +656,7 @@ public class FlutterAppauthPlugin
       @SuppressWarnings("unchecked")
       final List<String> signatureHashes = (List<String>) spec.get("signatureHashes");
       if (packageName == null || signatureHashes == null || signatureHashes.isEmpty()) {
-        throw invalidAllowedBrowser(INVALID_ANDROID_ALLOWED_CUSTOM_BROWSER_ERROR_MESSAGE);
+        throw new IllegalArgumentException(INVALID_ANDROID_ALLOWED_CUSTOM_BROWSER_ERROR_MESSAGE);
       }
       final Set<String> hashes = new HashSet<>(signatureHashes);
       final boolean useCustomTab = Boolean.TRUE.equals(spec.get("useCustomTab"));
@@ -693,19 +683,9 @@ public class FlutterAppauthPlugin
       case "samsungBrowser":
         return VersionedBrowserMatcher.SAMSUNG_BROWSER;
       default:
-        throw invalidAllowedBrowser(
+        throw new IllegalArgumentException(
             String.format(INVALID_ANDROID_ALLOWED_BROWSER_ERROR_FORMAT, preset));
     }
-  }
-
-  /**
-   * Reports an invalid allowed browser entry with its own error code. The returned exception
-   * must be thrown to abort the request; the method call's catch block then has no pending
-   * operation left to report on.
-   */
-  private IllegalArgumentException invalidAllowedBrowser(String message) {
-    finishWithError(INVALID_ANDROID_ALLOWED_BROWSER_ERROR_CODE, message, null);
-    return new IllegalArgumentException(message);
   }
 
   private void finishWithTokenError(AuthorizationException ex) {
