@@ -120,13 +120,12 @@
 }
 @end
 
+static AppAuthAuthorization *authorization;
+
 @implementation FlutterAppauthPlugin
 
-FlutterMethodChannel *channel;
-AppAuthAuthorization *authorization;
-
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
-  channel = [FlutterMethodChannel
+  FlutterMethodChannel *channel = [FlutterMethodChannel
       methodChannelWithName:@"crossingthestreams.io/flutter_appauth"
             binaryMessenger:[registrar messenger]];
   FlutterAppauthPlugin *instance = [[FlutterAppauthPlugin alloc] init];
@@ -483,7 +482,8 @@ AppAuthAuthorization *authorization;
             openURL:(NSURL *)url
             options:
                 (NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-  if ([_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:url]) {
+  if ([_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:url
+                                                              error:nil]) {
     _currentAuthorizationFlow = nil;
     return YES;
   }
@@ -505,7 +505,7 @@ AppAuthAuthorization *authorization;
   NSString *URLString =
       [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
   NSURL *URL = [NSURL URLWithString:URLString];
-  [_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:URL];
+  [_currentAuthorizationFlow resumeExternalUserAgentFlowWithURL:URL error:nil];
   _currentAuthorizationFlow = nil;
 }
 #endif

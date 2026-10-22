@@ -35,7 +35,7 @@ static id<OIDSafariViewControllerFactory> __nullable
 @end
 
 @interface OIDExternalUserAgentIOSSafariViewController () <
-    SFSafariViewControllerDelegate>
+    SFSafariViewControllerDelegate, UIAdaptivePresentationControllerDelegate>
 @end
 
 @implementation OIDExternalUserAgentIOSSafariViewController {
@@ -91,8 +91,15 @@ static id<OIDSafariViewControllerFactory> __nullable
   if (@available(iOS 9.0, *)) {
     SFSafariViewController *safariVC = [[[self class]
         safariViewControllerFactory] safariViewControllerWithURL:requestURL];
+
+    if (@available(iOS 11.0, *)) {
+      safariVC.dismissButtonStyle =
+          SFSafariViewControllerDismissButtonStyleCancel;
+    }
+
     safariVC.delegate = self;
     safariVC.modalPresentationStyle = UIModalPresentationFormSheet;
+    safariVC.presentationController.delegate = self;
     _safariVC = safariVC;
     [_presentingViewController presentViewController:safariVC
                                             animated:YES
@@ -163,10 +170,31 @@ static id<OIDSafariViewControllerFactory> __nullable
   }
   id<OIDExternalUserAgentSession> session = _session;
   [self cleanUp];
-  NSError *error = [OIDErrorUtilities
-        errorWithCode:OIDErrorCodeProgramCanceledAuthorizationFlow
-      underlyingError:nil
-          description:nil];
+  NSError *error =
+      [OIDErrorUtilities errorWithCode:OIDErrorCodeUserCanceledAuthorizationFlow
+                       underlyingError:nil
+                           description:nil];
+  [session failExternalUserAgentFlowWithError:error];
+}
+
+#pragma mark - UIAdaptivePresentationControllerDelegate
+
+- (void)presentationControllerDidDismiss:
+    (UIPresentationController *)presentationController {
+  if (presentationController.presentedViewController != _safariVC) {
+    // Ignore this call if the safari view controller do not match.
+    return;
+  }
+  if (!_externalUserAgentFlowInProgress) {
+    // Ignore this call if there is no authorization flow in progress.
+    return;
+  }
+  id<OIDExternalUserAgentSession> session = _session;
+  [self cleanUp];
+  NSError *error =
+      [OIDErrorUtilities errorWithCode:OIDErrorCodeUserCanceledAuthorizationFlow
+                       underlyingError:nil
+                           description:nil];
   [session failExternalUserAgentFlowWithError:error];
 }
 
