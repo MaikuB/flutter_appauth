@@ -105,9 +105,8 @@ public class FlutterAppauthPlugin
   private PendingOperation pendingOperation;
   private String clientSecret;
   private boolean allowInsecureConnections;
-  private List<Map<String, Object>> androidAllowedBrowsers;
   private BrowserMatcher browserMatcher = AnyBrowserMatcher.INSTANCE;
-  private final Map<String, AuthorizationService> authorizationServices = new HashMap<>();
+  private AuthorizationService authorizationService;
 
   private void onAttachedToEngine(Context context, BinaryMessenger binaryMessenger) {
     this.applicationContext = context;
@@ -123,7 +122,7 @@ public class FlutterAppauthPlugin
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-    disposeAuthorizationServices();
+    disposeAuthorizationService();
   }
 
   @Override
@@ -148,11 +147,11 @@ public class FlutterAppauthPlugin
     this.mainActivity = null;
   }
 
-  private void disposeAuthorizationServices() {
-    for (AuthorizationService authorizationService : authorizationServices.values()) {
+  private void disposeAuthorizationService() {
+    if (authorizationService != null) {
       authorizationService.dispose();
+      authorizationService = null;
     }
-    authorizationServices.clear();
   }
 
   private void checkAndSetPendingOperation(String method, Result result) {
@@ -161,6 +160,9 @@ public class FlutterAppauthPlugin
           "Concurrent operations detected: " + pendingOperation.method + ", " + method);
     }
     pendingOperation = new PendingOperation(method, result);
+    // Each operation gets a fresh service, so the browser is selected again with this call's
+    // settings. The previous operation has finished, so its service is no longer in use.
+    disposeAuthorizationService();
   }
 
   @Override
@@ -225,11 +227,10 @@ public class FlutterAppauthPlugin
         (Map<String, String>) arguments.get("additionalParameters");
     allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
     final String responseMode = (String) arguments.get("responseMode");
-    androidAllowedBrowsers =
-        (List<Map<String, Object>>) arguments.get("androidAllowedBrowsers");
     // Built here rather than when the service is created, as that can happen in a discovery
     // callback where an invalid entry would throw outside the method call's error handling.
-    browserMatcher = buildBrowserMatcher(androidAllowedBrowsers);
+    browserMatcher =
+        buildBrowserMatcher((List<Map<String, Object>>) arguments.get("androidAllowedBrowsers"));
 
     return new AuthorizationTokenRequestParameters(
         clientId,
@@ -275,9 +276,6 @@ public class FlutterAppauthPlugin
     final Map<String, String> additionalParameters =
         (Map<String, String>) arguments.get("additionalParameters");
     allowInsecureConnections = (boolean) arguments.get("allowInsecureConnections");
-    // A bare token/refresh call never opens a browser, so it must not inherit a stale
-    // browser list left over from an earlier authorize call.
-    androidAllowedBrowsers = null;
     browserMatcher = AnyBrowserMatcher.INSTANCE;
     return new TokenRequestParameters(
         clientId,
@@ -307,11 +305,10 @@ public class FlutterAppauthPlugin
         (Map<String, String>) arguments.get("serviceConfiguration");
     final Map<String, String> additionalParameters =
         (Map<String, String>) arguments.get("additionalParameters");
-    androidAllowedBrowsers =
-        (List<Map<String, Object>>) arguments.get("androidAllowedBrowsers");
     // Built here rather than when the service is created, as that can happen in a discovery
     // callback where an invalid entry would throw outside the method call's error handling.
-    browserMatcher = buildBrowserMatcher(androidAllowedBrowsers);
+    browserMatcher =
+        buildBrowserMatcher((List<Map<String, Object>>) arguments.get("androidAllowedBrowsers"));
     return new EndSessionRequestParameters(
         idTokenHint,
         postLogoutRedirectUrl,
@@ -610,10 +607,8 @@ public class FlutterAppauthPlugin
   }
 
   private AuthorizationService getAuthorizationService() {
-    final String cacheKey = allowInsecureConnections + "|" + androidAllowedBrowsers;
-    // Services are built on a cache miss as there have been some reported instances where
-    // the services have been disposed but they're still needed e.g. to refresh tokens
-    AuthorizationService authorizationService = authorizationServices.get(cacheKey);
+    // Built lazily, as there have been some reported instances where the service has been
+    // disposed but it's still needed e.g. to exchange the code after the browser returns.
     if (authorizationService == null) {
       AppAuthConfiguration.Builder authConfigBuilder = new AppAuthConfiguration.Builder();
       if (allowInsecureConnections) {
@@ -623,7 +618,6 @@ public class FlutterAppauthPlugin
       authConfigBuilder.setBrowserMatcher(browserMatcher);
       authorizationService =
           new AuthorizationService(applicationContext, authConfigBuilder.build());
-      authorizationServices.put(cacheKey, authorizationService);
     }
     return authorizationService;
   }
