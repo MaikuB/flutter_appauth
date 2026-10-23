@@ -10,6 +10,7 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
     this.allowInsecureConnections = false,
     this.externalUserAgent = ExternalUserAgent.asWebAuthenticationSession,
     this.additionalParameters,
+    this.androidAllowedBrowsers,
     String? issuer,
     String? discoveryUrl,
     AuthorizationServiceConfiguration? serviceConfiguration,
@@ -42,4 +43,13 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
 
   /// Additional parameters to include in the request.
   final Map<String, String>? additionalParameters;
+
+  /// Restricts which Android browsers (or Custom Tab implementations) are
+  /// allowed to handle the request.
+  ///
+  /// This is only applicable to Android. A `null` or empty list means any
+  /// installed browser may be used, which is the existing behaviour. If none
+  /// of the installed browsers match, the request fails the same way it
+  /// would if no browser were installed at all.
+  List<AndroidBrowser>? androidAllowedBrowsers;
 }

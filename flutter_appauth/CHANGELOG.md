@@ -1,3 +1,10 @@
+## [Unreleased]
+
+* [Android] Added `androidAllowedBrowsers` property to the `AuthorizationRequest`, `AuthorizationTokenRequest` and `EndSessionRequest` classes to restrict which browser (or Custom Tab implementation) is allowed to handle the request. See the "Restricting the Android browser" section of the README for details
+* [Android] Added `getInstalledAndroidBrowsers()` method to `FlutterAppAuth` to look up the package name and signature hashes of installed browsers during development, for use with `AndroidBrowser.custom`
+* [Android] Fixed `endSession` throwing an uncaught `ActivityNotFoundException` instead of returning a `no_browser_available` error when no suitable browser is installed
+* [Android] The browser is now selected for each request instead of once when the plugin is attached, so browsers installed, updated or uninstalled while the app is running are picked up. As a result, the Custom Tabs connection is no longer opened and warmed up when the app starts, so the first Custom Tab of each sign-in or sign-out may open slightly slower
+
 ## [13.0.0-dev.2]
 
 * [iOS][macOS] bumped AppAuth iOS SDK dependency to 3.0.0
