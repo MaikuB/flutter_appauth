@@ -2,6 +2,192 @@
 
 #import "FlutterAppauthPlugin_Private.h"
 
+#pragma mark - InsecureURLProtocol
+
+@interface InsecureURLProtocol : NSURLProtocol <NSURLSessionDataDelegate>
+@property (nonatomic, strong) NSURLSessionDataTask *dataTask;
+@property (nonatomic, strong) NSURLSession *session;
+@end
+
+static NSString *const kInsecureURLProtocolHandledKey = @"InsecureURLProtocolHandled";
+
+// Hosts of the OIDC providers with a live insecure registration. While the
+// protocol is registered it is consulted by every NSURLSession in the
+// process and may only intercept these host:port pairs; everything else
+// keeps its certificate verification. The set is guarded because
+// canInitWithRequest runs on URL-loading threads while arming happens on the
+// platform thread. Hosts stay armed after their exchange ends —
+// unregisterClass: cannot know which registration to drop, and overlapping
+// exchanges share it; a host only gets here because its deployment opted
+// into the insecure flag.
+static NSMutableSet<NSString *> *_insecureAllowedHosts = nil;
+
+// The interception key of a URL: host (case-folded) and port, with the
+// scheme default filled in (https 443, http 80) so a provider on :443 and
+// one on :8443 stay distinct.
+static NSString *InsecureHostKey(NSURL *url) {
+  NSNumber *port = url.port;
+  if (port == nil) {
+    port = [url.scheme.lowercaseString isEqualToString:@"http"] ? @80 : @443;
+  }
+  return [NSString stringWithFormat:@"%@:%@", url.host.lowercaseString, port];
+}
+
+// A usable string from a channel value: Dart null arrives over the method
+// channel as NSNull, which is non-nil and would poison a ?: chain or an
+// @[] literal (the same normalization processServiceConfigurationParameters:
+// applies).
+static NSString *AsNSString(id value) {
+  return [value isKindOfClass:[NSString class]] ? value : nil;
+}
+
+static NSString *EndpointString(NSDictionary *configuration, NSString *key) {
+  return AsNSString(configuration[key]);
+}
+
+@implementation InsecureURLProtocol
+
++ (NSMutableSet<NSString *> *)allowedHosts {
+  static dispatch_once_t once;
+  dispatch_once(&once, ^{
+    _insecureAllowedHosts = [NSMutableSet set];
+  });
+  return _insecureAllowedHosts;
+}
+
++ (void)armForIssuer:(NSString *)issuer
+         discoveryUrl:(NSString *)discoveryUrl
+serviceConfigurationParameters:(NSDictionary *)serviceConfigurationParameters {
+  // Arm every host the exchange can contact: the configuration's endpoints
+  // (what the app usually passes, and what the exchange will actually hit),
+  // plus the issuer or discovery URL for the discovery flow. A host the
+  // exchange needs but that is not armed fails its certificate check.
+  // AsNSString and EndpointString filter the NSNulls the channel sends for
+  // absent fields — the same normalization
+  // processServiceConfigurationParameters: needs on its end-session field;
+  // the candidates are collected into a mutable array because an @[]
+  // literal throws on a nil element.
+  NSMutableArray<NSString *> *endpoints = [NSMutableArray array];
+  for (NSString *key in @[
+    @"authorizationEndpoint",
+    @"tokenEndpoint",
+    @"endSessionEndpoint",
+  ]) {
+    NSString *endpoint = EndpointString(serviceConfigurationParameters, key);
+    if (endpoint) {
+      [endpoints addObject:endpoint];
+    }
+  }
+  issuer = AsNSString(issuer);
+  if (issuer) {
+    [endpoints addObject:issuer];
+  }
+  discoveryUrl = AsNSString(discoveryUrl);
+  if (discoveryUrl) {
+    [endpoints addObject:discoveryUrl];
+  }
+
+  // Keys are computed before the critical section: the same lock guards
+  // every URL load in the process while the protocol is registered.
+  NSMutableSet<NSString *> *allowedHosts = [InsecureURLProtocol allowedHosts];
+  NSMutableArray<NSString *> *keys = [NSMutableArray array];
+  for (NSString *endpoint in endpoints) {
+    NSURL *providerUrl = [NSURL URLWithString:endpoint];
+    if (!providerUrl.host) {
+      continue;
+    }
+    [keys addObject:InsecureHostKey(providerUrl)];
+  }
+  @synchronized(allowedHosts) {
+    [allowedHosts addObjectsFromArray:keys];
+  }
+}
+
++ (BOOL)canInitWithRequest:(NSURLRequest *)request {
+  if ([self propertyForKey:kInsecureURLProtocolHandledKey inRequest:request] != nil) {
+    return NO;
+  }
+  // Only the OIDC provider's host (and port) may be intercepted: everything
+  // else keeps its certificate verification even during an insecure
+  // exchange.
+  if (!request.URL.host) {
+    return NO;
+  }
+  NSMutableSet<NSString *> *allowedHosts = [InsecureURLProtocol allowedHosts];
+  @synchronized(allowedHosts) {
+    return [allowedHosts containsObject:InsecureHostKey(request.URL)];
+  }
+}
+
++ (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request {
+  return request;
+}
+
+- (void)startLoading {
+  NSMutableURLRequest *mutableRequest = [self.request mutableCopy];
+  [InsecureURLProtocol setProperty:@YES
+                            forKey:kInsecureURLProtocolHandledKey
+                         inRequest:mutableRequest];
+
+  NSURLSessionConfiguration *config =
+      [NSURLSessionConfiguration defaultSessionConfiguration];
+  config.protocolClasses = @[];
+
+  self.session = [NSURLSession sessionWithConfiguration:config
+                                               delegate:self
+                                          delegateQueue:[NSOperationQueue mainQueue]];
+  self.dataTask = [self.session dataTaskWithRequest:mutableRequest];
+  [self.dataTask resume];
+}
+
+- (void)stopLoading {
+  [self.dataTask cancel];
+}
+
+- (void)URLSession:(NSURLSession *)session
+    didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
+      completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition,
+                                  NSURLCredential *_Nullable credential))completionHandler {
+  if (challenge.protectionSpace.authenticationMethod ==
+      NSURLAuthenticationMethodServerTrust) {
+    SecTrustRef serverTrust = challenge.protectionSpace.serverTrust;
+    completionHandler(NSURLSessionAuthChallengeUseCredential,
+                      [NSURLCredential credentialForTrust:serverTrust]);
+  } else {
+    completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+  }
+}
+
+- (void)URLSession:(NSURLSession *)session
+          dataTask:(NSURLSessionDataTask *)dataTask
+didReceiveResponse:(NSURLResponse *)response
+ completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
+  [self.client URLProtocol:self
+        didReceiveResponse:response
+        cacheStoragePolicy:NSURLCacheStorageNotAllowed];
+  completionHandler(NSURLSessionResponseAllow);
+}
+
+- (void)URLSession:(NSURLSession *)session
+          dataTask:(NSURLSessionDataTask *)dataTask
+    didReceiveData:(NSData *)data {
+  [self.client URLProtocol:self didLoadData:data];
+}
+
+- (void)URLSession:(NSURLSession *)session
+              task:(NSURLSessionTask *)task
+didCompleteWithError:(NSError *)error {
+  if (error) {
+    [self.client URLProtocol:self didFailWithError:error];
+  } else {
+    [self.client URLProtocolDidFinishLoading:self];
+  }
+}
+
+@end
+
+#pragma mark - ArgumentProcessor
+
 @interface ArgumentProcessor : NSObject
 + (id _Nullable)processArgumentValue:(NSDictionary *)arguments
                              withKey:(NSString *)key;
@@ -31,6 +217,7 @@
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
 @property(nonatomic, strong) NSNumber *externalUserAgent;
+@property(nonatomic, assign) BOOL allowInsecureConnections;
 
 @end
 
@@ -67,6 +254,10 @@
   _externalUserAgent =
       [ArgumentProcessor processArgumentValue:arguments
                                       withKey:@"externalUserAgent"];
+  NSNumber *allowInsecure =
+      [ArgumentProcessor processArgumentValue:arguments
+                                      withKey:@"allowInsecureConnections"];
+  _allowInsecureConnections = allowInsecure ? [allowInsecure boolValue] : NO;
 }
 
 - (id)initWithArguments:(NSDictionary *)arguments {
@@ -116,6 +307,10 @@
   _externalUserAgent =
       [ArgumentProcessor processArgumentValue:arguments
                                       withKey:@"externalUserAgent"];
+  NSNumber *allowInsecure =
+      [ArgumentProcessor processArgumentValue:arguments
+                                      withKey:@"allowInsecureConnections"];
+  _allowInsecureConnections = allowInsecure ? [allowInsecure boolValue] : NO;
   return self;
 }
 @end
@@ -196,6 +391,20 @@ static AppAuthAuthorization *authorization;
           forKey:@"response_mode"];
   }
 
+  if (requestParameters.allowInsecureConnections) {
+    [InsecureURLProtocol armForIssuer:requestParameters.issuer
+                          discoveryUrl:requestParameters.discoveryUrl
+       serviceConfigurationParameters:requestParameters.serviceConfigurationParameters];
+    [NSURLProtocol registerClass:[InsecureURLProtocol class]];
+  }
+
+  FlutterResult insecureResult = ^(id _Nullable value) {
+    if (requestParameters.allowInsecureConnections) {
+      [NSURLProtocol unregisterClass:[InsecureURLProtocol class]];
+    }
+    result(value);
+  };
+
   if (requestParameters.serviceConfigurationParameters != nil) {
     OIDServiceConfiguration *serviceConfiguration =
         [self processServiceConfigurationParameters:
@@ -208,7 +417,7 @@ static AppAuthAuthorization *authorization;
                  redirectUrl:requestParameters.redirectUrl
         additionalParameters:requestParameters.additionalParameters
            externalUserAgent:requestParameters.externalUserAgent
-                      result:result
+                      result:insecureResult
                 exchangeCode:exchangeCode
                        nonce:requestParameters.nonce];
   } else if (requestParameters.discoveryUrl) {
@@ -223,7 +432,7 @@ static AppAuthAuthorization *authorization;
                                              [self
                                                  finishWithDiscoveryError:error
                                                                    result:
-                                                                       result];
+                                                                       insecureResult];
                                              return;
                                            }
 
@@ -248,7 +457,7 @@ static AppAuthAuthorization *authorization;
                                                   externalUserAgent:
                                                       requestParameters
                                                           .externalUserAgent
-                                                             result:result
+                                                             result:insecureResult
                                                        exchangeCode:exchangeCode
                                                               nonce:
                                                                   requestParameters
@@ -263,7 +472,7 @@ static AppAuthAuthorization *authorization;
                                                 NSError *_Nullable error) {
                                      if (!configuration) {
                                        [self finishWithDiscoveryError:error
-                                                               result:result];
+                                                               result:insecureResult];
                                        return;
                                      }
 
@@ -288,7 +497,7 @@ static AppAuthAuthorization *authorization;
                                                 externalUserAgent:
                                                     requestParameters
                                                         .externalUserAgent
-                                                           result:result
+                                                           result:insecureResult
                                                      exchangeCode:exchangeCode
                                                             nonce:
                                                                 requestParameters
@@ -309,20 +518,20 @@ static AppAuthAuthorization *authorization;
 
 - (OIDServiceConfiguration *)processServiceConfigurationParameters:
     (NSDictionary *)serviceConfigurationParameters {
-  NSURL *endSessionEndpoint =
-      serviceConfigurationParameters[@"endSessionEndpoint"] == [NSNull null]
-          ? nil
-          : [NSURL URLWithString:serviceConfigurationParameters
-                                     [@"endSessionEndpoint"]];
+  NSURL *endSessionEndpoint = [NSURL
+      URLWithString:EndpointString(serviceConfigurationParameters,
+                                   @"endSessionEndpoint")];
   OIDServiceConfiguration *serviceConfiguration =
       [[OIDServiceConfiguration alloc]
           initWithAuthorizationEndpoint:
-              [NSURL URLWithString:serviceConfigurationParameters
-                                       [@"authorizationEndpoint"]]
+              [NSURL URLWithString:EndpointString(
+                                       serviceConfigurationParameters,
+                                       @"authorizationEndpoint")]
                           tokenEndpoint:
                               [NSURL
-                                  URLWithString:serviceConfigurationParameters
-                                                    [@"tokenEndpoint"]]
+                                  URLWithString:EndpointString(
+                                                    serviceConfigurationParameters,
+                                                    @"tokenEndpoint")]
                                  issuer:nil
                    registrationEndpoint:nil
                      endSessionEndpoint:endSessionEndpoint];
@@ -333,13 +542,28 @@ static AppAuthAuthorization *authorization;
                        result:(FlutterResult)result {
   TokenRequestParameters *requestParameters =
       [[TokenRequestParameters alloc] initWithArguments:arguments];
+
+  if (requestParameters.allowInsecureConnections) {
+    [InsecureURLProtocol armForIssuer:requestParameters.issuer
+                          discoveryUrl:requestParameters.discoveryUrl
+       serviceConfigurationParameters:requestParameters.serviceConfigurationParameters];
+    [NSURLProtocol registerClass:[InsecureURLProtocol class]];
+  }
+
+  FlutterResult insecureResult = ^(id _Nullable value) {
+    if (requestParameters.allowInsecureConnections) {
+      [NSURLProtocol unregisterClass:[InsecureURLProtocol class]];
+    }
+    result(value);
+  };
+
   if (requestParameters.serviceConfigurationParameters != nil) {
     OIDServiceConfiguration *serviceConfiguration =
         [self processServiceConfigurationParameters:
                   requestParameters.serviceConfigurationParameters];
     [self performTokenRequest:serviceConfiguration
             requestParameters:requestParameters
-                       result:result];
+                       result:insecureResult];
   } else if (requestParameters.discoveryUrl) {
     NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
 
@@ -353,7 +577,7 @@ static AppAuthAuthorization *authorization;
                                              [self
                                                  finishWithDiscoveryError:error
                                                                    result:
-                                                                       result];
+                                                                       insecureResult];
                                              return;
                                            }
 
@@ -361,7 +585,7 @@ static AppAuthAuthorization *authorization;
                                                performTokenRequest:configuration
                                                  requestParameters:
                                                      requestParameters
-                                                            result:result];
+                                                            result:insecureResult];
                                          }];
   } else {
     NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -372,13 +596,13 @@ static AppAuthAuthorization *authorization;
                                                 NSError *_Nullable error) {
                                      if (!configuration) {
                                        [self finishWithDiscoveryError:error
-                                                               result:result];
+                                                               result:insecureResult];
                                        return;
                                      }
 
                                      [self performTokenRequest:configuration
                                              requestParameters:requestParameters
-                                                        result:result];
+                                                        result:insecureResult];
                                    }];
   }
 }
@@ -387,6 +611,21 @@ static AppAuthAuthorization *authorization;
                             result:(FlutterResult)result {
   EndSessionRequestParameters *requestParameters =
       [[EndSessionRequestParameters alloc] initWithArguments:arguments];
+
+  if (requestParameters.allowInsecureConnections) {
+    [InsecureURLProtocol armForIssuer:requestParameters.issuer
+                          discoveryUrl:requestParameters.discoveryUrl
+       serviceConfigurationParameters:requestParameters.serviceConfigurationParameters];
+    [NSURLProtocol registerClass:[InsecureURLProtocol class]];
+  }
+
+  FlutterResult insecureResult = ^(id _Nullable value) {
+    if (requestParameters.allowInsecureConnections) {
+      [NSURLProtocol unregisterClass:[InsecureURLProtocol class]];
+    }
+    result(value);
+  };
+
   if (requestParameters.serviceConfigurationParameters != nil) {
     OIDServiceConfiguration *serviceConfiguration =
         [self processServiceConfigurationParameters:
@@ -394,7 +633,7 @@ static AppAuthAuthorization *authorization;
     _currentAuthorizationFlow =
         [authorization performEndSessionRequest:serviceConfiguration
                               requestParameters:requestParameters
-                                         result:result];
+                                         result:insecureResult];
   } else if (requestParameters.discoveryUrl) {
     NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
 
@@ -408,7 +647,7 @@ static AppAuthAuthorization *authorization;
                                              [self
                                                  finishWithDiscoveryError:error
                                                                    result:
-                                                                       result];
+                                                                       insecureResult];
                                              return;
                                            }
 
@@ -419,7 +658,7 @@ static AppAuthAuthorization *authorization;
                                                           requestParameters:
                                                               requestParameters
                                                                      result:
-                                                                         result];
+                                                                         insecureResult];
                                          }];
   } else {
     NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -430,7 +669,7 @@ static AppAuthAuthorization *authorization;
                                                 NSError *_Nullable error) {
                                      if (!configuration) {
                                        [self finishWithDiscoveryError:error
-                                                               result:result];
+                                                               result:insecureResult];
                                        return;
                                      }
 
@@ -440,7 +679,7 @@ static AppAuthAuthorization *authorization;
                                                  configuration
                                                     requestParameters:
                                                         requestParameters
-                                                               result:result];
+                                                               result:insecureResult];
                                    }];
   }
 }
