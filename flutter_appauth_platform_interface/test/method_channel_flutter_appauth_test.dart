@@ -40,6 +40,8 @@ void main() {
           'allowInsecureConnections': false,
           'externalUserAgent':
               ExternalUserAgent.asWebAuthenticationSession.index,
+          'safariViewControllerPresentationStyle':
+              SafariViewControllerPresentationStyle.formSheet.index,
           'promptValues': null,
           'responseMode': null,
           'nonce': null,
@@ -53,7 +55,9 @@ void main() {
         'someClientId', 'someRedirectUrl',
         discoveryUrl: 'someDiscoveryUrl',
         loginHint: 'someLoginHint',
-        responseMode: 'fragment'));
+        responseMode: 'fragment',
+        safariViewControllerPresentationStyle:
+            SafariViewControllerPresentationStyle.fullScreen));
     expect(
       log,
       <Matcher>[
@@ -69,6 +73,8 @@ void main() {
           'allowInsecureConnections': false,
           'externalUserAgent':
               ExternalUserAgent.asWebAuthenticationSession.index,
+          'safariViewControllerPresentationStyle':
+              SafariViewControllerPresentationStyle.fullScreen.index,
           'promptValues': null,
           'clientSecret': null,
           'refreshToken': null,
@@ -187,7 +193,24 @@ void main() {
         'discoveryUrl': 'someDiscoveryUrl',
         'serviceConfiguration': null,
         'externalUserAgent': ExternalUserAgent.asWebAuthenticationSession.index,
+        'safariViewControllerPresentationStyle':
+            SafariViewControllerPresentationStyle.formSheet.index,
       })
     ]);
+  });
+
+  test('endSession uses the specified Safari View Controller presentation style',
+      () async {
+    await flutterAppAuth.endSession(EndSessionRequest(
+      safariViewControllerPresentationStyle:
+          SafariViewControllerPresentationStyle.fullScreen,
+    ));
+
+    final Map<Object?, Object?> arguments =
+        log.single.arguments as Map<Object?, Object?>;
+    expect(
+      arguments['safariViewControllerPresentationStyle'],
+      SafariViewControllerPresentationStyle.fullScreen.index,
+    );
   });
 }

@@ -2,6 +2,7 @@ import 'authorization_parameters.dart';
 import 'authorization_service_configuration.dart';
 import 'common_request_details.dart';
 import 'external_user_agent.dart';
+import 'safari_view_controller_presentation_style.dart';
 
 /// The details of an authorization request to get an authorization code.
 class AuthorizationRequest extends CommonRequestDetails
@@ -19,6 +20,9 @@ class AuthorizationRequest extends CommonRequestDetails
     bool allowInsecureConnections = false,
     ExternalUserAgent externalUserAgent =
         ExternalUserAgent.asWebAuthenticationSession,
+    SafariViewControllerPresentationStyle
+        safariViewControllerPresentationStyle =
+        SafariViewControllerPresentationStyle.formSheet,
     String? nonce,
     String? responseMode,
   }) {
@@ -33,6 +37,8 @@ class AuthorizationRequest extends CommonRequestDetails
     this.promptValues = promptValues;
     this.allowInsecureConnections = allowInsecureConnections;
     this.externalUserAgent = externalUserAgent;
+    this.safariViewControllerPresentationStyle =
+        safariViewControllerPresentationStyle;
     this.nonce = nonce;
     this.responseMode = responseMode;
     assertConfigurationInfo();
