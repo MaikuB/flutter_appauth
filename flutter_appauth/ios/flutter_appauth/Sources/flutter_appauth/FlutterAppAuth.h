@@ -56,6 +56,7 @@ static NSString *const END_SESSION_ERROR_MESSAGE_FORMAT =
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
 @property(nonatomic, strong) NSNumber *externalUserAgent;
+@property(nonatomic, assign) BOOL allowInsecureConnections;
 @end
 
 typedef NS_ENUM(NSInteger, ExternalUserAgent) {
