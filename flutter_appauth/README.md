@@ -134,6 +134,27 @@ await appAuth.endSession(EndSessionRequest(
 
 The above code passes an `AuthorizationServiceConfiguration` with all the endpoints defined but alternatives are to specify an `issuer` or `discoveryUrl` like you would with the other APIs in the plugin (e.g. `authorizeAndExchangeCode()`).
 
+### SFSafariViewController presentation style (iOS only)
+
+When using `ExternalUserAgent.sfSafariViewController`, the presentation can be
+configured as a form sheet (the default) or full screen:
+
+```dart
+final result = await appAuth.authorizeAndExchangeCode(
+  AuthorizationTokenRequest(
+    '<client_id>',
+    '<redirect_url>',
+    discoveryUrl: '<discovery_url>',
+    externalUserAgent: ExternalUserAgent.sfSafariViewController,
+    safariViewControllerPresentationStyle:
+        SafariViewControllerPresentationStyle.fullScreen,
+  ),
+);
+```
+
+The same option is available on `AuthorizationRequest` and `EndSessionRequest`.
+It is ignored when another external user-agent is used.
+
 ### Handling errors
 
 Each of these methods will throw exceptions if anything goes wrong. For example:

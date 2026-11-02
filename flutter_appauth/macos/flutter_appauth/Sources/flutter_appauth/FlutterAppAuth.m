@@ -133,7 +133,9 @@
              redirectUrl:(NSString *)redirectUrl
     additionalParameters:(NSDictionary *)additionalParameters
        externalUserAgent:(NSNumber *)externalUserAgent
-                  result:(FlutterResult)result
+    safariViewControllerPresentationStyle:
+        (NSNumber *)safariViewControllerPresentationStyle
+               result:(FlutterResult)result
             exchangeCode:(BOOL)exchangeCode
                    nonce:(NSString *)nonce {
   return nil;

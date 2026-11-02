@@ -1,5 +1,6 @@
 ## [13.0.0]
 
+* [iOS] added configurable presentation styles for `SFSafariViewController`
 * **Breaking change** updated minimum supported SDK version to Flutter 3.44.0/Dart 3.12.0
 * [Android] **Breaking change** updated AGP to 9.0.1
 * [iOS] **Breaking change** minimum iOS version is now 15.0 to align with requirements of AppAuth iOS SDK 3.0.0
