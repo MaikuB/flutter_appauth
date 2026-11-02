@@ -80,6 +80,7 @@
 @property(nonatomic, strong) NSString *loginHint;
 @property(nonatomic, strong) NSArray *promptValues;
 @property(nonatomic, strong) NSString *responseMode;
+@property(nonatomic, strong) NSNumber *safariViewControllerPresentationStyle;
 @end
 
 @implementation AuthorizationTokenRequestParameters
@@ -91,6 +92,9 @@
                                                   withKey:@"promptValues"];
   _responseMode = [ArgumentProcessor processArgumentValue:arguments
                                                   withKey:@"responseMode"];
+  _safariViewControllerPresentationStyle =
+      [ArgumentProcessor processArgumentValue:arguments
+                                      withKey:@"safariViewControllerPresentationStyle"];
   return self;
 }
 @end
@@ -116,6 +120,9 @@
   _externalUserAgent =
       [ArgumentProcessor processArgumentValue:arguments
                                       withKey:@"externalUserAgent"];
+  _safariViewControllerPresentationStyle =
+      [ArgumentProcessor processArgumentValue:arguments
+                                      withKey:@"safariViewControllerPresentationStyle"];
   return self;
 }
 @end
@@ -207,6 +214,8 @@ static AppAuthAuthorization *authorization;
                  redirectUrl:requestParameters.redirectUrl
         additionalParameters:requestParameters.additionalParameters
            externalUserAgent:requestParameters.externalUserAgent
+           safariViewControllerPresentationStyle:
+               requestParameters.safariViewControllerPresentationStyle
                       result:result
                 exchangeCode:exchangeCode
                        nonce:requestParameters.nonce];
@@ -247,6 +256,9 @@ static AppAuthAuthorization *authorization;
                                                   externalUserAgent:
                                                       requestParameters
                                                           .externalUserAgent
+                                                  safariViewControllerPresentationStyle:
+                                                      requestParameters
+                                                          .safariViewControllerPresentationStyle
                                                              result:result
                                                        exchangeCode:exchangeCode
                                                               nonce:
@@ -287,6 +299,9 @@ static AppAuthAuthorization *authorization;
                                                 externalUserAgent:
                                                     requestParameters
                                                         .externalUserAgent
+                                                safariViewControllerPresentationStyle:
+                                                    requestParameters
+                                                        .safariViewControllerPresentationStyle
                                                            result:result
                                                      exchangeCode:exchangeCode
                                                             nonce:

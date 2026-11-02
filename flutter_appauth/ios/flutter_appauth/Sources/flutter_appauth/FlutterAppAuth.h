@@ -56,6 +56,7 @@ static NSString *const END_SESSION_ERROR_MESSAGE_FORMAT =
 @property(nonatomic, strong) NSDictionary *serviceConfigurationParameters;
 @property(nonatomic, strong) NSDictionary *additionalParameters;
 @property(nonatomic, strong) NSNumber *externalUserAgent;
+@property(nonatomic, strong) NSNumber *safariViewControllerPresentationStyle;
 @end
 
 typedef NS_ENUM(NSInteger, ExternalUserAgent) {
@@ -68,6 +69,11 @@ typedef NS_ENUM(NSInteger, ExternalUserAgent) {
   CustomBrowserOpera
 };
 
+typedef NS_ENUM(NSInteger, SafariViewControllerPresentationStyle) {
+  SafariViewControllerFormSheet,
+  SafariViewControllerFullScreen
+};
+
 @interface AppAuthAuthorization : NSObject
 
 - (id<OIDExternalUserAgentSession>)
@@ -78,6 +84,8 @@ typedef NS_ENUM(NSInteger, ExternalUserAgent) {
              redirectUrl:(NSString *)redirectUrl
     additionalParameters:(NSDictionary *)additionalParameters
        externalUserAgent:(NSNumber *)externalUserAgent
+       safariViewControllerPresentationStyle:
+           (NSNumber *)safariViewControllerPresentationStyle
                   result:(FlutterResult)result
             exchangeCode:(BOOL)exchangeCode
                    nonce:(NSString *)nonce;

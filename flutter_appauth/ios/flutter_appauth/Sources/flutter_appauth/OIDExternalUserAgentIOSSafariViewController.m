@@ -40,6 +40,7 @@ static id<OIDSafariViewControllerFactory> __nullable
 
 @implementation OIDExternalUserAgentIOSSafariViewController {
   UIViewController *_presentingViewController;
+  UIModalPresentationStyle _modalPresentationStyle;
 
   BOOL _externalUserAgentFlowInProgress;
   __weak id<OIDExternalUserAgentSession> _session;
@@ -68,9 +69,17 @@ static id<OIDSafariViewControllerFactory> __nullable
 
 - (nullable instancetype)initWithPresentingViewController:
     (UIViewController *)presentingViewController {
+  return [self initWithPresentingViewController:presentingViewController
+                         modalPresentationStyle:UIModalPresentationFormSheet];
+}
+
+- (nullable instancetype)initWithPresentingViewController:
+                    (UIViewController *)presentingViewController
+    modalPresentationStyle:(UIModalPresentationStyle)modalPresentationStyle {
   self = [super init];
   if (self) {
     _presentingViewController = presentingViewController;
+    _modalPresentationStyle = modalPresentationStyle;
   }
   return self;
 }
@@ -98,7 +107,7 @@ static id<OIDSafariViewControllerFactory> __nullable
     }
 
     safariVC.delegate = self;
-    safariVC.modalPresentationStyle = UIModalPresentationFormSheet;
+    safariVC.modalPresentationStyle = _modalPresentationStyle;
     safariVC.presentationController.delegate = self;
     _safariVC = safariVC;
     [_presentingViewController presentViewController:safariVC
