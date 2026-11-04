@@ -15,8 +15,8 @@ A new flutter plugin project.
   s.source_files = 'flutter_appauth/Sources/flutter_appauth/**/*.{h,m}'
   s.public_header_files = 'flutter_appauth/Sources/flutter_appauth/include/**/*.h'
   s.dependency 'FlutterMacOS'
-  s.dependency 'AppAuth', '2.1.0'
-  s.platform = :osx, '10.15'
-  s.osx.deployment_target = "10.15"
+  s.dependency 'AppAuth', '3.0.0'
+  s.platform = :osx, '12.0'
+  s.osx.deployment_target = "12.0"
   s.resource_bundles = {'flutter_appauth_privacy' => ['flutter_appauth/Sources/flutter_appauth/PrivacyInfo.xcprivacy']}
 end
