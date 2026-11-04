@@ -5,6 +5,7 @@ export 'src/authorization_token_request.dart';
 export 'src/authorization_token_response.dart';
 export 'src/end_session_request.dart';
 export 'src/end_session_response.dart';
+export 'src/request_state.dart';
 export 'src/errors.dart';
 export 'src/external_user_agent.dart';
 export 'src/flutter_appauth_platform.dart';

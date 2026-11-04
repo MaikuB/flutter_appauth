@@ -80,6 +80,7 @@
 @property(nonatomic, strong) NSString *loginHint;
 @property(nonatomic, strong) NSArray *promptValues;
 @property(nonatomic, strong) NSString *responseMode;
+@property(nonatomic, strong) id state; // nil = absent (auto-generate), NSNull = suppress, NSString = custom
 @end
 
 @implementation AuthorizationTokenRequestParameters
@@ -91,6 +92,7 @@
                                                   withKey:@"promptValues"];
   _responseMode = [ArgumentProcessor processArgumentValue:arguments
                                                   withKey:@"responseMode"];
+  _state = [arguments objectForKey:@"state"];
   return self;
 }
 @end
@@ -102,7 +104,7 @@
   _postLogoutRedirectUrl =
       [ArgumentProcessor processArgumentValue:arguments
                                       withKey:@"postLogoutRedirectUrl"];
-  _state = [ArgumentProcessor processArgumentValue:arguments withKey:@"state"];
+  _state = [arguments objectForKey:@"state"];
   _issuer = [ArgumentProcessor processArgumentValue:arguments
                                             withKey:@"issuer"];
   _discoveryUrl = [ArgumentProcessor processArgumentValue:arguments
@@ -210,7 +212,8 @@ static AppAuthAuthorization *authorization;
            externalUserAgent:requestParameters.externalUserAgent
                       result:result
                 exchangeCode:exchangeCode
-                       nonce:requestParameters.nonce];
+                       nonce:requestParameters.nonce
+                   state:requestParameters.state];
   } else if (requestParameters.discoveryUrl) {
     NSURL *discoveryUrl = [NSURL URLWithString:requestParameters.discoveryUrl];
     [OIDAuthorizationService
@@ -252,7 +255,10 @@ static AppAuthAuthorization *authorization;
                                                        exchangeCode:exchangeCode
                                                               nonce:
                                                                   requestParameters
-                                                                      .nonce];
+                                                                      .nonce
+                                                          state:
+                                                              requestParameters
+                                                                  .state];
                                          }];
   } else {
     NSURL *issuerUrl = [NSURL URLWithString:requestParameters.issuer];
@@ -292,7 +298,10 @@ static AppAuthAuthorization *authorization;
                                                      exchangeCode:exchangeCode
                                                             nonce:
                                                                 requestParameters
-                                                                    .nonce];
+                                                                    .nonce
+                                                        state:
+                                                            requestParameters
+                                                                .state];
                                    }];
   }
 }
