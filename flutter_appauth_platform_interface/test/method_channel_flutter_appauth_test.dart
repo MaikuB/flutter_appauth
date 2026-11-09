@@ -213,7 +213,31 @@ void main() {
 
       expect(result, isNull);
       expect(log, <Matcher>[
-        isMethodCall('resumePendingAuthorization', arguments: null)
+        isMethodCall('resumePendingAuthorization', arguments: <String, Object?>{
+          'clientSecret': null,
+          'allowInsecureConnections': false,
+        })
+      ]);
+    });
+
+    test('passes clientSecret and allowInsecureConnections to the platform',
+        () async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+        log.add(methodCall);
+        return null;
+      });
+
+      await flutterAppAuth.resumePendingAuthorization(
+        clientSecret: 'someClientSecret',
+        allowInsecureConnections: true,
+      );
+
+      expect(log, <Matcher>[
+        isMethodCall('resumePendingAuthorization', arguments: <String, Object?>{
+          'clientSecret': 'someClientSecret',
+          'allowInsecureConnections': true,
+        })
       ]);
     });
 

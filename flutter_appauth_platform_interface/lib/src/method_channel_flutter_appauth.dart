@@ -69,11 +69,18 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
   }
 
   @override
-  Future<AuthorizationResumeResponse?> resumePendingAuthorization() async {
+  Future<AuthorizationResumeResponse?> resumePendingAuthorization({
+    String? clientSecret,
+    bool allowInsecureConnections = false,
+  }) async {
     Map<dynamic, dynamic>? result;
     try {
       result = await _channel.invokeMethod<Map<dynamic, dynamic>>(
         'resumePendingAuthorization',
+        <String, Object?>{
+          'clientSecret': clientSecret,
+          'allowInsecureConnections': allowInsecureConnections,
+        },
       );
     } on PlatformException catch (e) {
       _mapAndThrowPlatformException(e);

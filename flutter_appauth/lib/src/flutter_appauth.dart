@@ -41,8 +41,20 @@ class FlutterAppAuth {
   /// Call this after the app has reinitialized to
   /// retrieve that result. Returns null if there is nothing pending.
   ///
-  /// Always returns null on other platforms. 
-  Future<AuthorizationResumeResponse?> resumePendingAuthorization() {
-    return FlutterAppAuthPlatform.instance.resumePendingAuthorization();
+  /// If the pending flow was started with [authorizeAndExchangeCode], the
+  /// code exchange is performed as part of this call. In that case pass the
+  /// same [clientSecret] and [allowInsecureConnections] values that were used
+  /// for the original request, as the native side no longer has them after
+  /// the Activity was recreated.
+  ///
+  /// Always returns null on other platforms.
+  Future<AuthorizationResumeResponse?> resumePendingAuthorization({
+    String? clientSecret,
+    bool allowInsecureConnections = false,
+  }) {
+    return FlutterAppAuthPlatform.instance.resumePendingAuthorization(
+      clientSecret: clientSecret,
+      allowInsecureConnections: allowInsecureConnections,
+    );
   }
 }

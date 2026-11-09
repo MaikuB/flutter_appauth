@@ -437,6 +437,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   Future<void> _resumePendingAuthorization() async {
     try {
+      // If a pending authorizeAndExchangeCode() flow is resumed, the code
+      // exchange happens as part of this call. Pass the same clientSecret and
+      // allowInsecureConnections values as for the original request here, if
+      // your app uses them.
       final AuthorizationResumeResponse? result =
           await _appAuth.resumePendingAuthorization();
       // Returns null when there was nothing pending, e.g. on a normal app

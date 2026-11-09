@@ -201,7 +201,7 @@ public class FlutterAppauthPlugin
         }
         break;
       case RESUME_PENDING_AUTHORIZATION_METHOD:
-          handleResumePendingAuthorizationMethodCall(result);
+        handleResumePendingAuthorizationMethodCall(arguments, result);
         break;
       default:
         result.notImplemented();
@@ -596,6 +596,10 @@ public class FlutterAppauthPlugin
   }
 
   private AuthorizationService getAuthorizationService() {
+    return getAuthorizationService(allowInsecureConnections);
+  }
+
+  private AuthorizationService getAuthorizationService(boolean allowInsecureConnections) {
     // Call to createAuthorizationService() is done as there have been some reported instances where
     // the services have been disposed but they're still needed e.g. to refresh tokens
     createAuthorizationServices();
@@ -693,7 +697,8 @@ public class FlutterAppauthPlugin
         pendingAuthorization = new PendingAuthorization(authResponse, authException, exchangeCode);
         return true;
       }
-      processAuthorizationData(authResponse, authException, exchangeCode);
+      processAuthorizationData(
+          authResponse, authException, exchangeCode, clientSecret, allowInsecureConnections);
       return true;
     }
     if (requestCode == RC_END_SESSION) {
@@ -718,7 +723,8 @@ public class FlutterAppauthPlugin
     return false;
   }
 
-  private void handleResumePendingAuthorizationMethodCall(Result result) {
+  private void handleResumePendingAuthorizationMethodCall(
+      @Nullable Map<String, Object> arguments, Result result) {
     if (pendingAuthorization == null) {
       result.success(null);
       return;
@@ -743,13 +749,26 @@ public class FlutterAppauthPlugin
     final PendingAuthorization pendingAuth = pendingAuthorization;
     pendingAuthorization = null;
 
+    // The plugin instance that receives the stashed result is usually not the one that started
+    // the flow (a recreated Activity gets a new engine and with it a new plugin instance), so the
+    // clientSecret/allowInsecureConnections fields set by the original request aren't available.
+    // They are supplied by the resume call instead.
+    final String resumeClientSecret =
+        arguments != null ? (String) arguments.get("clientSecret") : null;
+    final boolean resumeAllowInsecureConnections =
+        arguments != null && Boolean.TRUE.equals(arguments.get("allowInsecureConnections"));
+
     try {
       checkAndSetPendingOperation(RESUME_PENDING_AUTHORIZATION_METHOD, result);
-      processAuthorizationData(pendingAuth.response, pendingAuth.exception, pendingAuth.exchangeCode);
-    } catch(Exception ex) {
-        final String errorCode = pendingAuth.exchangeCode
-                ? AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE
-                : AUTHORIZE_ERROR_CODE;
+      processAuthorizationData(
+          pendingAuth.response,
+          pendingAuth.exception,
+          pendingAuth.exchangeCode,
+          resumeClientSecret,
+          resumeAllowInsecureConnections);
+    } catch (Exception ex) {
+      final String errorCode =
+          pendingAuth.exchangeCode ? AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE : AUTHORIZE_ERROR_CODE;
       finishWithError(errorCode, ex.getLocalizedMessage(), ex);
     }
   }
@@ -757,10 +776,12 @@ public class FlutterAppauthPlugin
   private void processAuthorizationData(
       final AuthorizationResponse authResponse,
       AuthorizationException authException,
-      boolean exchangeCode) {
+      boolean exchangeCode,
+      @Nullable String clientSecret,
+      boolean allowInsecureConnections) {
     if (authException == null) {
       if (exchangeCode) {
-        AuthorizationService authService = getAuthorizationService();
+        AuthorizationService authService = getAuthorizationService(allowInsecureConnections);
         AuthorizationService.TokenResponseCallback tokenResponseCallback =
             new AuthorizationService.TokenResponseCallback() {
               @Override
