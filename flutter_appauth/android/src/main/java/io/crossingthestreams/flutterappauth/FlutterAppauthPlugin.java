@@ -52,6 +52,7 @@ public class FlutterAppauthPlugin
   private static final String AUTHORIZE_METHOD = "authorize";
   private static final String TOKEN_METHOD = "token";
   private static final String END_SESSION_METHOD = "endSession";
+  private static final String RESUME_PENDING_AUTHORIZATION_METHOD = "resumePendingAuthorization";
 
   private static final String DISCOVERY_ERROR_CODE = "discovery_failed";
   private static final String AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE =
@@ -88,6 +89,7 @@ public class FlutterAppauthPlugin
   private Context applicationContext;
   private Activity mainActivity;
   private PendingOperation pendingOperation;
+  private PendingAuthorization pendingAuthorization;
   private String clientSecret;
   private boolean allowInsecureConnections;
   private AuthorizationService defaultAuthorizationService;
@@ -197,6 +199,9 @@ public class FlutterAppauthPlugin
         } catch (Exception ex) {
           finishWithError(END_SESSION_ERROR_CODE, ex.getLocalizedMessage(), ex);
         }
+        break;
+      case RESUME_PENDING_AUTHORIZATION_METHOD:
+        handleResumePendingAuthorizationMethodCall(arguments, result);
         break;
       default:
         result.notImplemented();
@@ -591,6 +596,10 @@ public class FlutterAppauthPlugin
   }
 
   private AuthorizationService getAuthorizationService() {
+    return getAuthorizationService(allowInsecureConnections);
+  }
+
+  private AuthorizationService getAuthorizationService(boolean allowInsecureConnections) {
     // Call to createAuthorizationService() is done as there have been some reported instances where
     // the services have been disposed but they're still needed e.g. to refresh tokens
     createAuthorizationServices();
@@ -669,20 +678,33 @@ public class FlutterAppauthPlugin
 
   @Override
   public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
-    if (pendingOperation == null) {
-      return false;
-    }
     if (requestCode == RC_AUTH_EXCHANGE_CODE || requestCode == RC_AUTH) {
       if (intent == null) {
+        if (pendingOperation == null) {
+          return false;
+        }
         finishWithError(NULL_INTENT_ERROR_CODE, NULL_INTENT_ERROR_FORMAT, null);
-      } else {
-        final AuthorizationResponse authResponse = AuthorizationResponse.fromIntent(intent);
-        AuthorizationException ex = AuthorizationException.fromIntent(intent);
-        processAuthorizationData(authResponse, ex, requestCode == RC_AUTH_EXCHANGE_CODE);
+        return true;
       }
+      final AuthorizationResponse authResponse = AuthorizationResponse.fromIntent(intent);
+      final AuthorizationException authException = AuthorizationException.fromIntent(intent);
+      final boolean exchangeCode = requestCode == RC_AUTH_EXCHANGE_CODE;
+      if (pendingOperation == null) {
+        // The Flutter call that started this authorization flow no longer has a
+        // pending Result to complete. This happens when the host activity is killed and recreated
+        // while in the background of the browser. Stash the response so it can be retrieved
+        // later via resumePendingAuthorization() to process the authorization on the flutter side.
+        pendingAuthorization = new PendingAuthorization(authResponse, authException, exchangeCode);
+        return true;
+      }
+      processAuthorizationData(
+          authResponse, authException, exchangeCode, clientSecret, allowInsecureConnections);
       return true;
     }
     if (requestCode == RC_END_SESSION) {
+      if (pendingOperation == null) {
+        return false;
+      }
       if (intent == null) {
         finishWithError(NULL_INTENT_ERROR_CODE, NULL_INTENT_ERROR_FORMAT, null);
       } else {
@@ -701,13 +723,65 @@ public class FlutterAppauthPlugin
     return false;
   }
 
+  private void handleResumePendingAuthorizationMethodCall(
+      @Nullable Map<String, Object> arguments, Result result) {
+    if (pendingAuthorization == null) {
+      result.success(null);
+      return;
+    }
+
+    if (pendingOperation != null) {
+      final IllegalStateException ex =
+          new IllegalStateException(
+              "Concurrent operations detected: "
+                  + pendingOperation.method
+                  + ", "
+                  + RESUME_PENDING_AUTHORIZATION_METHOD);
+      result.error(
+          pendingAuthorization.exchangeCode
+              ? AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE
+              : AUTHORIZE_ERROR_CODE,
+          ex.getLocalizedMessage(),
+          createErrorMap(ex));
+      return;
+    }
+
+    final PendingAuthorization pendingAuth = pendingAuthorization;
+    pendingAuthorization = null;
+
+    // The plugin instance that receives the stashed result is usually not the one that started
+    // the flow (a recreated Activity gets a new engine and with it a new plugin instance), so the
+    // clientSecret/allowInsecureConnections fields set by the original request aren't available.
+    // They are supplied by the resume call instead.
+    final String resumeClientSecret =
+        arguments != null ? (String) arguments.get("clientSecret") : null;
+    final boolean resumeAllowInsecureConnections =
+        arguments != null && Boolean.TRUE.equals(arguments.get("allowInsecureConnections"));
+
+    try {
+      checkAndSetPendingOperation(RESUME_PENDING_AUTHORIZATION_METHOD, result);
+      processAuthorizationData(
+          pendingAuth.response,
+          pendingAuth.exception,
+          pendingAuth.exchangeCode,
+          resumeClientSecret,
+          resumeAllowInsecureConnections);
+    } catch (Exception ex) {
+      final String errorCode =
+          pendingAuth.exchangeCode ? AUTHORIZE_AND_EXCHANGE_CODE_ERROR_CODE : AUTHORIZE_ERROR_CODE;
+      finishWithError(errorCode, ex.getLocalizedMessage(), ex);
+    }
+  }
+
   private void processAuthorizationData(
       final AuthorizationResponse authResponse,
       AuthorizationException authException,
-      boolean exchangeCode) {
+      boolean exchangeCode,
+      @Nullable String clientSecret,
+      boolean allowInsecureConnections) {
     if (authException == null) {
       if (exchangeCode) {
-        AuthorizationService authService = getAuthorizationService();
+        AuthorizationService authService = getAuthorizationService(allowInsecureConnections);
         AuthorizationService.TokenResponseCallback tokenResponseCallback =
             new AuthorizationService.TokenResponseCallback() {
               @Override
@@ -782,6 +856,22 @@ public class FlutterAppauthPlugin
     PendingOperation(String method, Result result) {
       this.method = method;
       this.result = result;
+    }
+  }
+
+  private class PendingAuthorization {
+    final AuthorizationResponse response;
+    final AuthorizationException exception;
+    final boolean exchangeCode;
+
+    PendingAuthorization(
+        AuthorizationResponse response,
+        AuthorizationException exception,
+        boolean exchangeCode
+    ) {
+      this.response = response;
+      this.exception = exception;
+      this.exchangeCode = exchangeCode;
     }
   }
 
