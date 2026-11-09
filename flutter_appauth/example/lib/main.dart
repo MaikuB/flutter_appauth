@@ -436,6 +436,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   Future<void> _resumePendingAuthorization() async {
+    // Only clear the busy state if this invocation set it. This is called on
+    // every app resume, so a null result must not clear the busy state of a
+    // regular sign in flow (or another resume invocation) that is in progress.
+    bool didSetBusyState = false;
     try {
       // If a pending authorizeAndExchangeCode() flow is resumed, the code
       // exchange happens as part of this call. Pass the same clientSecret and
@@ -449,6 +453,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         return;
       }
       _setBusyState();
+      didSetBusyState = true;
 
       // The response depends on whether the pending flow was started with
       // authorize() or authorizeAndExchangeCode(). The response can be handled
@@ -463,7 +468,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     } catch (e) {
       _handleError(e);
     } finally {
-      _clearBusyState();
+      if (didSetBusyState) {
+        _clearBusyState();
+      }
     }
   }
 
