@@ -5,19 +5,16 @@
 * [Android] Fixed `endSession` throwing an uncaught `ActivityNotFoundException` instead of returning a `no_browser_available` error when no suitable browser is installed
 * [Android] The browser is now selected for each request instead of once when the plugin is attached, so browsers installed, updated or uninstalled while the app is running are picked up. As a result, the Custom Tabs connection is no longer opened and warmed up when the app starts, so the first Custom Tab of each sign-in or sign-out may open slightly slower
 
-## [13.0.0-dev.2]
-
-* [iOS][macOS] bumped AppAuth iOS SDK dependency to 3.0.0
-* [iOS] **Breaking change** minimum iOS version is now 15.0 to align with requirements of AppAuth iOS SDK 3.0.0
-* [macOS] **Breaking change** minimum macOS version is now 12.0 to align with requirements of AppAuth iOS SDK 3.0.0
-* [iOS] fixed issue [#649](https://github.com/MaikuB/flutter_appauth/issues/649). Users cancelling an auth flow by swiping to dismiss a `SFSafariViewController` now throws an `FlutterAppAuthUserCancelledException`. Thanks to the PR from [bshvets-ama](https://github.com/bshvets-ama)
-* [iOS][macOS] fixed issue [#648](https://github.com/MaikuB/flutter_appauth/issues/648) where global declaration of variables resulted in duplicate symbol compilation errors when other plugins declared global variables with the same name
-
-## [13.0.0-dev.1]
+## [13.0.0]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.44.0/Dart 3.12.0
 * [Android] **Breaking change** updated AGP to 9.0.1
+* [iOS] **Breaking change** minimum iOS version is now 15.0 to align with requirements of AppAuth iOS SDK 3.0.0
+* [macOS] **Breaking change** minimum macOS version is now 12.0 to align with requirements of AppAuth iOS SDK 3.0.0
 * [Android] migrated Gradle build scripts to Kotlin DSL
+* [iOS][macOS] bumped AppAuth iOS SDK dependency to 3.0.0
+* [iOS][macOS] fixed issue [#648](https://github.com/MaikuB/flutter_appauth/issues/648) where global declaration of variables resulted in duplicate symbol compilation errors when other plugins declared global variables with the same name
+* [iOS] fixed issue [#649](https://github.com/MaikuB/flutter_appauth/issues/649). Users cancelling an auth flow by swiping to dismiss a `SFSafariViewController` now throws an `FlutterAppAuthUserCancelledException`. Thanks to the PR from [bshvets-ama](https://github.com/bshvets-ama)
 * Removed Cocoapods integration from example app on iOS and macOS
 
 ## [12.1.0]
