@@ -1,5 +1,6 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'android_browser.dart';
 import 'authorization_request.dart';
 import 'authorization_response.dart';
 import 'authorization_token_request.dart';
@@ -61,5 +62,14 @@ abstract class FlutterAppAuthPlatform extends PlatformInterface {
   /// end session endpoint per the [RP-initiated logout spec](https://openid.net/specs/openid-connect-rpinitiated-1_0.html).
   Future<EndSessionResponse> endSession(EndSessionRequest request) {
     throw UnimplementedError('endSession() has not been implemented');
+  }
+
+  /// Lists the browsers installed on an Android device that AppAuth could use.
+  ///
+  /// This is a development aid for finding the signature hashes of a browser
+  /// to pin with [AndroidBrowser.custom]. See [InstalledAndroidBrowser].
+  Future<List<InstalledAndroidBrowser>> getInstalledAndroidBrowsers() {
+    throw UnimplementedError(
+        'getInstalledAndroidBrowsers() has not been implemented');
   }
 }

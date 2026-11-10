@@ -1,5 +1,6 @@
 export 'package:flutter_appauth_platform_interface/flutter_appauth_platform_interface.dart'
     show
+        AndroidBrowser,
         AuthorizationRequest,
         AuthorizationResponse,
         AuthorizationServiceConfiguration,
@@ -13,6 +14,7 @@ export 'package:flutter_appauth_platform_interface/flutter_appauth_platform_inte
         FlutterAppAuthUserCancelledException,
         FlutterAppAuthPlatformException,
         GrantType,
+        InstalledAndroidBrowser,
         Prompt,
         TokenRequest,
         TokenResponse;

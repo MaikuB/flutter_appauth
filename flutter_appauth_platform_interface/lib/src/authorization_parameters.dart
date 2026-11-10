@@ -1,3 +1,4 @@
+import 'android_browser.dart';
 import 'external_user_agent.dart';
 
 mixin AuthorizationParameters {
@@ -14,4 +15,13 @@ mixin AuthorizationParameters {
 
   /// Specifies the response mode to use.
   String? responseMode;
+
+  /// Restricts which Android browsers (or Custom Tab implementations) are
+  /// allowed to handle the request.
+  ///
+  /// This is only applicable to Android. A `null` or empty list means any
+  /// installed browser may be used, which is the existing behaviour. If none
+  /// of the installed browsers match, the request fails the same way it
+  /// would if no browser were installed at all.
+  List<AndroidBrowser>? androidAllowedBrowsers;
 }

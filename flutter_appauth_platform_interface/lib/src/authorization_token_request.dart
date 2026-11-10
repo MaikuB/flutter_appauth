@@ -1,3 +1,4 @@
+import 'android_browser.dart';
 import 'authorization_parameters.dart';
 import 'external_user_agent.dart';
 import 'grant_type.dart';
@@ -22,6 +23,7 @@ class AuthorizationTokenRequest extends TokenRequest
         ExternalUserAgent.asWebAuthenticationSession,
     super.nonce,
     String? responseMode,
+    List<AndroidBrowser>? androidAllowedBrowsers,
   }) : super(
           grantType: GrantType.authorizationCode,
         ) {
@@ -29,5 +31,6 @@ class AuthorizationTokenRequest extends TokenRequest
     this.promptValues = promptValues;
     this.externalUserAgent = externalUserAgent;
     this.responseMode = responseMode;
+    this.androidAllowedBrowsers = androidAllowedBrowsers;
   }
 }
