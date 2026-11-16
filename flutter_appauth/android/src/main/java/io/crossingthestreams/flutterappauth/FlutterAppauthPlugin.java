@@ -91,6 +91,8 @@ public class FlutterAppauthPlugin
       "Failed to authorize: Null activity received";
   private static final String NO_BROWSER_AVAILABLE_ERROR_FORMAT =
       "Failed to authorize: No suitable browser is available";
+  private static final String END_SESSION_NO_BROWSER_AVAILABLE_ERROR_FORMAT =
+      "Failed to end session: No suitable browser is available";
   private static final String INVALID_ANDROID_ALLOWED_BROWSER_ERROR_FORMAT =
       "Unrecognised androidAllowedBrowsers preset: %s";
   private static final String INVALID_ANDROID_ALLOWED_CUSTOM_BROWSER_ERROR_MESSAGE =
@@ -600,7 +602,8 @@ public class FlutterAppauthPlugin
       Intent endSessionIntent = authorizationService.getEndSessionRequestIntent(endSessionRequest);
       mainActivity.startActivityForResult(endSessionIntent, RC_END_SESSION);
     } catch (ActivityNotFoundException ex) {
-      finishWithError(NO_BROWSER_AVAILABLE_ERROR_CODE, NO_BROWSER_AVAILABLE_ERROR_FORMAT, ex);
+      finishWithError(
+          NO_BROWSER_AVAILABLE_ERROR_CODE, END_SESSION_NO_BROWSER_AVAILABLE_ERROR_FORMAT, ex);
     } catch (NullPointerException ex) {
       finishWithError(NULL_ACTIVITY_ERROR_CODE, NULL_ACTIVITY_ERROR_FORMAT, ex);
     }
