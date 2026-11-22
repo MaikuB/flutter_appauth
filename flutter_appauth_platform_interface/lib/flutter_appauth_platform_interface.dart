@@ -1,4 +1,5 @@
 export 'src/authorization_request.dart';
+export 'src/authorization_resume_response.dart';
 export 'src/authorization_response.dart';
 export 'src/authorization_service_configuration.dart';
 export 'src/authorization_token_request.dart';
