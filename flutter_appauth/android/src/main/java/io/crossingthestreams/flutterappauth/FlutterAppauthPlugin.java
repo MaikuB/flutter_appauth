@@ -865,10 +865,7 @@ public class FlutterAppauthPlugin
     final boolean exchangeCode;
 
     PendingAuthorization(
-        AuthorizationResponse response,
-        AuthorizationException exception,
-        boolean exchangeCode
-    ) {
+        AuthorizationResponse response, AuthorizationException exception, boolean exchangeCode) {
       this.response = response;
       this.exception = exception;
       this.exchangeCode = exchangeCode;
