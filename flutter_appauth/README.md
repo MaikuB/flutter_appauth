@@ -233,6 +233,53 @@ Attribute application@name at AndroidManifest.xml:5:9-42 requires a placeholder 
 
 If you see this error then update your `build.gradle` to use `+=` instead.
 
+### Restricting the Android browser
+
+By default, AppAuth for Android will use whichever installed browser it considers best, falling back through Chrome Custom Tabs, standalone browsers, Custom Tabs from other browsers etc. The `androidAllowedBrowsers` property on `AuthorizationRequest`, `AuthorizationTokenRequest` and `EndSessionRequest` restricts this to a specific list of browsers, for example to force Chrome
+
+```dart
+final AuthorizationTokenResponse result = await appAuth.authorizeAndExchangeCode(
+                    AuthorizationTokenRequest(
+                      '<client_id>',
+                      '<redirect_url>',
+                      discoveryUrl: '<discovery_url>',
+                      androidAllowedBrowsers: [
+                        AndroidBrowser.chromeCustomTab,
+                        AndroidBrowser.chromeBrowser,
+                      ],
+                    ),
+                  );
+```
+
+The `AndroidBrowser` class offers six presets covering Chrome, Firefox and the Samsung Internet browser, each as either a Custom Tab or a standalone browser: `chromeCustomTab`, `chromeBrowser`, `firefoxCustomTab`, `firefoxBrowser`, `samsungCustomTab` and `samsungBrowser`. For a browser that isn't covered by a preset (e.g. one pushed to devices via MDM), use `AndroidBrowser.custom` and provide its package name, signing certificate hash(es) and whether it should be used as a Custom Tab
+
+```dart
+androidAllowedBrowsers: [
+  AndroidBrowser.custom(
+    packageName: 'com.acme.mdmbrowser',
+    signatureHashes: {'<signature_hash>'},
+    useCustomTab: true,
+    minVersion: '12',
+  ),
+],
+```
+
+A custom browser's signature hashes are the Base64-encoded SHA-512 hashes of its signing certificates. To look them up, install the browser on a test device and list the installed browsers from a debug build of your app
+
+```dart
+final List<InstalledAndroidBrowser> browsers =
+    await appAuth.getInstalledAndroidBrowsers();
+for (final InstalledAndroidBrowser browser in browsers) {
+  debugPrint('$browser');
+}
+```
+
+Then copy the `signatureHashes` of the browser you want into your `AndroidBrowser.custom` entry. This is a one-off step during development. Don't pass hashes read at runtime into `androidAllowedBrowsers`: that pins nothing, as a look-alike app installed under the same package name would be allowed too.
+
+A browser only matches if its hashes equal the supplied set exactly, so if a browser can be signed in more than one way (e.g. across a key rotation), add a separate `AndroidBrowser.custom` entry for each set.
+
+If none of the installed browsers on the device match the allow-list, the request fails the same way it would if no browser were installed at all (a `no_browser_available` error). This property is Android-only; a `null` or empty list means any installed browser may be used, which is the existing behaviour.
+
 ### Troubleshooting
 
 #### No Redirect to app after login

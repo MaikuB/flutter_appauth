@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_appauth_platform_interface/src/end_session_request.dart';
 import 'package:flutter_appauth_platform_interface/src/end_session_response.dart';
 
+import 'android_browser.dart';
 import 'authorization_request.dart';
 import 'authorization_resume_response.dart';
 import 'authorization_response.dart';
@@ -99,6 +100,13 @@ class MethodChannelFlutterAppAuth extends FlutterAppAuthPlatform {
     return AuthorizationResumeResponse.authorize(
       authorizationResponseFromResultMap(result),
     );
+  }
+
+  @override
+  Future<List<InstalledAndroidBrowser>> getInstalledAndroidBrowsers() async {
+    final List<Map<dynamic, dynamic>>? result = await _channel
+        .invokeListMethod<Map<dynamic, dynamic>>('getInstalledAndroidBrowsers');
+    return result!.map(InstalledAndroidBrowser.fromMap).toList();
   }
 
   Future<Map<dynamic, dynamic>> invokeMethod(

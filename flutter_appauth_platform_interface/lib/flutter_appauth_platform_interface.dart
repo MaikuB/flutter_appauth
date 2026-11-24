@@ -1,3 +1,4 @@
+export 'src/android_browser.dart';
 export 'src/authorization_request.dart';
 export 'src/authorization_resume_response.dart';
 export 'src/authorization_response.dart';

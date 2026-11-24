@@ -185,7 +185,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       child: const Text(
-                        'Auto code exchange using system browser (iOS only)',
+                        'Auto code exchange using system browser',
                         textAlign: TextAlign.center,
                       ),
                       onPressed: () => _signInWithAutoCodeExchange(
@@ -197,7 +197,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       child: const Text(
-                        'Auto code exchange using Chrome (iOS only)',
+                        'Auto code exchange using Chrome',
                         textAlign: TextAlign.center,
                       ),
                       onPressed: () => _signInWithAutoCodeExchange(
@@ -209,7 +209,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       child: const Text(
-                        'Auto code exchange using Firefox (iOS only)',
+                        'Auto code exchange using Firefox',
                         textAlign: TextAlign.center,
                       ),
                       onPressed: () => _signInWithAutoCodeExchange(
@@ -221,12 +221,50 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       child: const Text(
-                        'Auto code exchange using Opera (iOS only)',
+                        'Auto code exchange using Opera',
                         textAlign: TextAlign.center,
                       ),
                       onPressed: () => _signInWithAutoCodeExchange(
                           externalUserAgent:
                               ExternalUserAgent.customBrowserOpera),
+                    ),
+                  ),
+                ],
+                if (Platform.isAndroid) ...[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: const Text(
+                        'Auto code exchange using Chrome Custom Tab',
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () => _signInWithAutoCodeExchange(
+                          androidAllowedBrowsers: const <AndroidBrowser>[
+                            AndroidBrowser.chromeCustomTab
+                          ]),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      child: const Text(
+                        'Auto code exchange using Firefox Custom Tab',
+                        textAlign: TextAlign.center,
+                      ),
+                      onPressed: () => _signInWithAutoCodeExchange(
+                          androidAllowedBrowsers: const <AndroidBrowser>[
+                            AndroidBrowser.firefoxCustomTab
+                          ]),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: _printInstalledAndroidBrowsers,
+                      child: const Text(
+                        'Print installed browsers',
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ],
@@ -483,7 +521,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   Future<void> _signInWithAutoCodeExchange(
       {ExternalUserAgent externalUserAgent =
-          ExternalUserAgent.asWebAuthenticationSession}) async {
+          ExternalUserAgent.asWebAuthenticationSession,
+      List<AndroidBrowser>? androidAllowedBrowsers}) async {
     try {
       _setBusyState(isAuthFlow: _isCustomBrowser(externalUserAgent));
 
@@ -496,7 +535,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         AuthorizationTokenRequest(_clientId, _redirectUrl,
             serviceConfiguration: _serviceConfiguration,
             scopes: _scopes,
-            externalUserAgent: externalUserAgent),
+            externalUserAgent: externalUserAgent,
+            androidAllowedBrowsers: androidAllowedBrowsers),
       );
 
       // Apply timeout only when using an external browser user agent.
@@ -531,6 +571,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
+  // Development aid: copy a browser's signature hashes from the console into
+  // an AndroidBrowser.custom entry to pin it.
+  Future<void> _printInstalledAndroidBrowsers() async {
+    for (final InstalledAndroidBrowser browser
+        in await _appAuth.getInstalledAndroidBrowsers()) {
+      debugPrint(browser.toString());
+    }
+  }
+
   void _handleError(Object e) {
     if (e is FlutterAppAuthUserCancelledException) {
       setState(() {
@@ -538,7 +587,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       });
     } else if (e is FlutterAppAuthPlatformException) {
       setState(() {
-        _error = e.platformErrorDetails.toString();
+        _error = 'Code: ${e.code}\nMessage: ${e.message}\n'
+            '${e.platformErrorDetails}';
       });
     } else if (e is PlatformException) {
       setState(() {

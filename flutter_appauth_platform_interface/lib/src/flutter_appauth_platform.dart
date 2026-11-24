@@ -1,5 +1,6 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'android_browser.dart';
 import 'authorization_request.dart';
 import 'authorization_resume_response.dart';
 import 'authorization_response.dart';
@@ -84,5 +85,14 @@ abstract class FlutterAppAuthPlatform extends PlatformInterface {
   }) {
     throw UnimplementedError(
         'resumePendingAuthorization() has not been implemented');
+  }
+
+  /// Lists the browsers installed on an Android device that AppAuth could use.
+  ///
+  /// This is a development aid for finding the signature hashes of a browser
+  /// to pin with [AndroidBrowser.custom]. See [InstalledAndroidBrowser].
+  Future<List<InstalledAndroidBrowser>> getInstalledAndroidBrowsers() {
+    throw UnimplementedError(
+        'getInstalledAndroidBrowsers() has not been implemented');
   }
 }
