@@ -1,3 +1,7 @@
+## [13.1.0]
+
+* [Android] added `resumePendingAuthorization()` and `AuthorizationResumeResponse` types to support resuming a pending authorization after host Activity recreation. Thanks to the PR from [moritz-j](https://github.com/moritz-j)
+
 ## [13.0.0]
 
 * **Breaking change** updated minimum supported SDK version to Flutter 3.44.0/Dart 3.12.0
