@@ -34,3 +34,5 @@ pubspec.lock
 pubspec_overrides.yaml
 
 Package.resolved
+
+build/
