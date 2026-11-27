@@ -9,6 +9,8 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
     this.state,
     this.allowInsecureConnections = false,
     this.externalUserAgent = ExternalUserAgent.asWebAuthenticationSession,
+    this.safariViewControllerPresentationStyle =
+        SafariViewControllerPresentationStyle.formSheet,
     this.additionalParameters,
     String? issuer,
     String? discoveryUrl,
@@ -39,6 +41,14 @@ class EndSessionRequest with AcceptedAuthorizationServiceConfigurationDetails {
 
   /// Specifies the external user-agent to use.
   ExternalUserAgent? externalUserAgent;
+
+  /// Specifies the presentation style when
+  /// [ExternalUserAgent.sfSafariViewController] is selected.
+  ///
+  /// This is only applicable to iOS. The default is
+  /// [SafariViewControllerPresentationStyle.formSheet].
+  final SafariViewControllerPresentationStyle
+  safariViewControllerPresentationStyle;
 
   /// Additional parameters to include in the request.
   final Map<String, String>? additionalParameters;

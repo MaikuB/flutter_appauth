@@ -10,7 +10,9 @@
              redirectUrl:(NSString *)redirectUrl
     additionalParameters:(NSDictionary *)additionalParameters
        externalUserAgent:(NSNumber *)externalUserAgent
-                  result:(FlutterResult)result
+    safariViewControllerPresentationStyle:
+        (NSNumber *)safariViewControllerPresentationStyle
+               result:(FlutterResult)result
             exchangeCode:(BOOL)exchangeCode
                    nonce:(NSString *)nonce {
   NSString *codeVerifier = [OIDAuthorizationRequest generateCodeVerifier];
@@ -36,7 +38,9 @@
   if (exchangeCode) {
     id<OIDExternalUserAgent> agent =
         [self userAgentWithViewController:rootViewController
-                        externalUserAgent:externalUserAgent];
+                        externalUserAgent:externalUserAgent
+        safariViewControllerPresentationStyle:
+            safariViewControllerPresentationStyle];
     return [OIDAuthState
         authStateByPresentingAuthorizationRequest:request
                                 externalUserAgent:agent
@@ -68,7 +72,9 @@
   } else {
     id<OIDExternalUserAgent> agent =
         [self userAgentWithViewController:rootViewController
-                        externalUserAgent:externalUserAgent];
+                        externalUserAgent:externalUserAgent
+        safariViewControllerPresentationStyle:
+            safariViewControllerPresentationStyle];
     return [OIDAuthorizationService
         presentAuthorizationRequest:request
                   externalUserAgent:agent
@@ -136,7 +142,9 @@
   UIViewController *rootViewController = [self rootViewController];
   id<OIDExternalUserAgent> externalUserAgent =
       [self userAgentWithViewController:rootViewController
-                      externalUserAgent:requestParameters.externalUserAgent];
+                      externalUserAgent:requestParameters.externalUserAgent
+      safariViewControllerPresentationStyle:
+          requestParameters.safariViewControllerPresentationStyle];
 
   return [OIDAuthorizationService
       presentEndSessionRequest:endSessionRequest
@@ -164,14 +172,22 @@
 
 - (id<OIDExternalUserAgent>)
     userAgentWithViewController:(UIViewController *)rootViewController
-              externalUserAgent:(NSNumber *)externalUserAgent {
+              externalUserAgent:(NSNumber *)externalUserAgent
+    safariViewControllerPresentationStyle:
+        (NSNumber *)safariViewControllerPresentationStyle {
   if ([externalUserAgent integerValue] == EphemeralASWebAuthenticationSession) {
     return [[OIDExternalUserAgentIOSNoSSO alloc]
         initWithPresentingViewController:rootViewController];
   }
   if ([externalUserAgent integerValue] == SafariViewController) {
+    UIModalPresentationStyle modalPresentationStyle =
+        [safariViewControllerPresentationStyle integerValue] ==
+                SafariViewControllerFullScreen
+            ? UIModalPresentationFullScreen
+            : UIModalPresentationFormSheet;
     return [[OIDExternalUserAgentIOSSafariViewController alloc]
-        initWithPresentingViewController:rootViewController];
+        initWithPresentingViewController:rootViewController
+                  modalPresentationStyle:modalPresentationStyle];
   }
   if ([externalUserAgent integerValue] == CustomBrowserSafari) {
     return [OIDExternalUserAgentIOSCustomBrowser CustomBrowserSafari];

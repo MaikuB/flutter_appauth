@@ -58,17 +58,29 @@ NS_ASSUME_NONNULL_BEGIN
     (id<OIDSafariViewControllerFactory>)factory;
 
 /*! @internal
-    @brief Unavailable. Please use @c initWithPresentingViewController:
+    @brief Unavailable. Please use
+   @c initWithPresentingViewController:modalPresentationStyle:.
  */
 - (nonnull instancetype)init NS_UNAVAILABLE;
 
-/*! @brief The designated initializer.
+/*! @brief Convenience initializer that uses a form sheet presentation style.
     @param presentingViewController The view controller from which to present
    the
         \SFSafariViewController.
  */
 - (nullable instancetype)initWithPresentingViewController:
-    (UIViewController *)presentingViewController NS_DESIGNATED_INITIALIZER;
+    (UIViewController *)presentingViewController;
+
+/*! @brief The designated initializer.
+    @param presentingViewController The view controller from which to present
+   the
+        \SFSafariViewController.
+    @param modalPresentationStyle The modal presentation style to use.
+ */
+- (nullable instancetype)initWithPresentingViewController:
+                    (UIViewController *)presentingViewController
+    modalPresentationStyle:(UIModalPresentationStyle)modalPresentationStyle
+    NS_DESIGNATED_INITIALIZER;
 
 @end
 
