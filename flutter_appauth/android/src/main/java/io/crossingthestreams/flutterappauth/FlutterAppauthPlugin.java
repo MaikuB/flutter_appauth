@@ -364,6 +364,10 @@ public class FlutterAppauthPlugin
   }
 
   private @NonNull ConnectionBuilder getConnectionBuilder() {
+    return getConnectionBuilder(allowInsecureConnections);
+  }
+
+  private @NonNull ConnectionBuilder getConnectionBuilder(boolean allowInsecureConnections) {
     return allowInsecureConnections
         ? InsecureConnectionBuilder.INSTANCE
         : DefaultConnectionBuilder.INSTANCE;
@@ -551,12 +555,14 @@ public class FlutterAppauthPlugin
             }
           };
 
+      final ConnectionBuilder connectionBuilder =
+          getConnectionBuilder(endSessionRequestParameters.allowInsecureConnections);
       if (endSessionRequestParameters.discoveryUrl != null) {
         AuthorizationServiceConfiguration.fetchFromUrl(
-            Uri.parse(endSessionRequestParameters.discoveryUrl), callback, getConnectionBuilder());
+            Uri.parse(endSessionRequestParameters.discoveryUrl), callback, connectionBuilder);
       } else {
         AuthorizationServiceConfiguration.fetchFromIssuer(
-            Uri.parse(endSessionRequestParameters.issuer), callback, getConnectionBuilder());
+            Uri.parse(endSessionRequestParameters.issuer), callback, connectionBuilder);
       }
     }
   }
@@ -585,7 +591,8 @@ public class FlutterAppauthPlugin
     }
 
     final EndSessionRequest endSessionRequest = endSessionRequestBuilder.build();
-    AuthorizationService authorizationService = getAuthorizationService();
+    AuthorizationService authorizationService =
+        getAuthorizationService(endSessionRequestParameters.allowInsecureConnections);
     Intent endSessionIntent = authorizationService.getEndSessionRequestIntent(endSessionRequest);
 
     try {
